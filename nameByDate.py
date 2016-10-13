@@ -6,7 +6,7 @@ import exifread
 import shutil
 # import argparse
 
-print 'Lets rename some photos!'
+# print 'Lets rename some photos!'
 
 knownFileTypes = ['JPG', 'CR2', 'PNG', 'JPEG', 'TIFF']
 
@@ -16,6 +16,7 @@ fTest = '/Users/samgutentag/Developer/python/mediaDelta/samplePhotos/Cedar Point
 
 def isImageFile(file, knownFileTypes):
 	# print 'Checking filetype of %s' % file
+	
 
 	# get file extension
 	extension = file.split('.')[-1].upper()
@@ -86,11 +87,11 @@ def renameFile(sourceFile):
 		print '%s is not a supported file type, ignoring' % sourceFile
 
 
-print
-print '=' * 80
-print 'File name is: %s' % fTest
+# print
+# print '=' * 80
+# print 'File name is: %s' % fTest
 # print 'Is known file type: %r' % isImageFile(fTest, knownFileTypes)
-renameFile(fTest)
+# renameFile(fTest)
 
 
 print

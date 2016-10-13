@@ -4,26 +4,33 @@ import exifread
 import argparse
 import os
 
+import nameByDate
+
+
 
 #------------------------------------------------------------------------------
 #		argparser setup
 #------------------------------------------------------------------------------
+knownImageFileTypes = ['JPG', 'CR2', 'PNG', 'JPEG', 'TIFF']
 
-
-def isValidImageFile(parser, arg):
+def isValidFile(parser, arg):
 	if not os.path.exists(arg):
 		parser.error('The file %s does not exists' % arg)
 	else:
-		return open(arg, 'rb')
+		if nameByDate.isImageFile(arg, knownImageFileTypes):
+			print '%s is an image file!' % arg
+			return open(arg, 'rb')
+		else:
+			parser.error('The file %s is not a known image type' % arg)
 
 
 parser = argparse.ArgumentParser(description='Read EXIF data of a given image file')
-parser.add_argument('-i', dest='imageFile', required=True, help='input image file to read EXIF data from', metavar='IMAGE', type=lambda x: isValidImageFile(parser, x))
-# parser.add_argument('-f', dest='imagesFolder', required=True, help='input image file to read EXIF data from', metavar='IMAGE', type=lambda x: isValidImageFile(parser, x))
+parser.add_argument('-f', dest='mediaFile', required=True, help='input image file to read EXIF data from', metavar='FILE', type=lambda x: isValidFile(parser, x))
+# parser.add_argument('-d', dest='imagesFolder', required=True, help='input image file to read EXIF data from', metavar='IMAGE', type=lambda x: isValidmediaFile(parser, x))
 
 args = parser.parse_args()
 
-testTagsDict = exifread.process_file(args.imageFile)
+testTagsDict = exifread.process_file(args.mediaFile)
 
 
 #------------------------------------------------------------------------------
@@ -78,20 +85,19 @@ def getDate(exifTagsDict):
 
 
 def getFileName(file):
-	imageFileName = str(file).split('/')[-1].split("'")[0]
-	return imageFileName
+	mediaFileName = str(file).split('/')[-1].split("'")[0]
+	return mediaFileName
 
 def getFileSourcePath(file):
-	imageFilePath = str(file).split(imageFileName)[0].split("'")[-1]
-	return imageFilePath
+	mediaFilePath = str(file).split(mediaFileName)[0].split("'")[-1]
+	return mediaFilePath
 
-
-def setFileDestinationPath(rootLocation, imageFile):
+def setFileDestinationPath(rootLocation, mediaFile):
 	print 'setting file destination path'
 
 	# set new path based on image date, also set case for image without date
 
-	imageTags = exifread.process_file(args.imageFile)
+	imageTags = exifread.process_file(args.mediaFile)
 
 	printTags(imageTags)
 
@@ -126,19 +132,19 @@ def setFileName(file):
 #------------------------------------------------------------------------------
 
 
-imageFileName = getFileName(args.imageFile)
-imageFilePath = getFileSourcePath(args.imageFile)
+mediaFileName = getFileName(args.mediaFile)
+mediaFilePath = getFileSourcePath(args.mediaFile)
 
 
 
-# printTags(testTagsDict)
-# spacer()
+printTags(testTagsDict)
+spacer()
 
-# imageDate = getDate(testTagsDict)
-# spacer()
+imageDate = getDate(testTagsDict)
+spacer()
 
-# print 'File \'%s\' dated %s' % (imageFileName, imageDate)
-# print 'File path:\t%s' % imageFilePath
+print 'File \'%s\' dated %s' % (mediaFileName, imageDate)
+print 'File path:\t%s' % mediaFilePath
 
 
 
@@ -146,7 +152,7 @@ spacer()
 
 
 
-setFileDestinationPath('/Users/samgutentag/Desktop/', args.imageFile)
+setFileDestinationPath('/Users/samgutentag/Desktop/', args.mediaFile)
 
 
 
