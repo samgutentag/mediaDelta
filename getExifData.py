@@ -12,13 +12,17 @@ import nameByDate
 #		argparser setup
 #------------------------------------------------------------------------------
 knownImageFileTypes = ['JPG', 'CR2', 'PNG', 'JPEG', 'TIFF']
+knownVideoFileTypes = ['MOV', 'MP4']
 
 def isValidFile(parser, arg):
 	if not os.path.exists(arg):
 		parser.error('The file %s does not exists' % arg)
 	else:
-		if nameByDate.isImageFile(arg, knownImageFileTypes):
+		if nameByDate.isFileOfType(arg, knownImageFileTypes):
 			print '%s is an image file!' % arg
+			return open(arg, 'rb')
+		elif nameByDate.isFileOfType(arg, knownVideoFileTypes):
+			print '%s is a video file!' % arg
 			return open(arg, 'rb')
 		else:
 			parser.error('The file %s is not a known image type' % arg)

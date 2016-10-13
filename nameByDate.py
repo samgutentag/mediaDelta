@@ -14,7 +14,7 @@ knownFileTypes = ['JPG', 'CR2', 'PNG', 'JPEG', 'TIFF']
 fTest = '/Users/samgutentag/Developer/python/imageTagging/SAMPLES/Cedar Point Amusement Park - Sandusky, OH, September 25, 2010/2010 Detroit - TF3 0064.JPG'
 fTest = '/Users/samgutentag/Developer/python/mediaDelta/samplePhotos/Cedar Point Amusement Park - Sandusky, OH, September 25, 2010/2010 Detroit - TF3 0064.JPG'
 
-def isImageFile(file, knownFileTypes):
+def isFileOfType(file, knownFileTypes):
 	# print 'Checking filetype of %s' % file
 	
 
@@ -32,7 +32,7 @@ def renameFile(sourceFile):
 	print 'renaming %s' % sourceFile
 
 	# check file type
-	if isImageFile(sourceFile, knownFileTypes):
+	if isFileOfType(sourceFile, knownFileTypes):
 
 		# open file
 		f = open(sourceFile, 'rb')
@@ -90,7 +90,7 @@ def renameFile(sourceFile):
 # print
 # print '=' * 80
 # print 'File name is: %s' % fTest
-# print 'Is known file type: %r' % isImageFile(fTest, knownFileTypes)
+# print 'Is known file type: %r' % isFileOfType(fTest, knownFileTypes)
 # renameFile(fTest)
 
 
