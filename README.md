@@ -1,5 +1,13 @@
 
 
+Assumptions
+
+	exifread package is installed on host machine, can be installed with pip
+
+	> pip install exifread
+
+	
+
 
 
 What I need To Do/Goal of Project

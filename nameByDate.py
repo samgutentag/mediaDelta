@@ -12,6 +12,7 @@ knownFileTypes = ['JPG', 'CR2', 'PNG', 'JPEG', 'TIFF']
 
 
 fTest = '/Users/samgutentag/Developer/python/imageTagging/SAMPLES/Cedar Point Amusement Park - Sandusky, OH, September 25, 2010/2010 Detroit - TF3 0064.JPG'
+fTest = '/Users/samgutentag/Developer/python/mediaDelta/samplePhotos/Cedar Point Amusement Park - Sandusky, OH, September 25, 2010/2010 Detroit - TF3 0064.JPG'
 
 def isImageFile(file, knownFileTypes):
 	# print 'Checking filetype of %s' % file
