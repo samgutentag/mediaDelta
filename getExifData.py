@@ -30,7 +30,7 @@ parser.add_argument('-f', dest='mediaFile', required=True, help='input image fil
 
 args = parser.parse_args()
 
-testTagsDict = exifread.process_file(args.mediaFile)
+exifTagsDict = exifread.process_file(args.mediaFile)
 
 
 #------------------------------------------------------------------------------
@@ -64,7 +64,7 @@ def printTags(exifTagsDict):
 			
 			counter += 1
 
-# reads in exif tags, returns imageDAte string
+# reads in exif tags, returns imageDate string
 def getDate(exifTagsDict):
 	imageDate = ''
 	for tag in ['EXIF DateTimeOriginal', 'EXIF DateTimeDigitized', 'Image DateTime']:
@@ -79,18 +79,24 @@ def getDate(exifTagsDict):
 		print 'No image Date Tags found'
 		imageDate = 'NO_DATE'
 
-	print '$$ ' + imageDate + ' $$'
+	print 'Image date is:\t\t%s' % imageDate
 
 	return imageDate
 
-
+# returns the file name from a full path file
 def getFileName(file):
 	mediaFileName = str(file).split('/')[-1].split("'")[0]
 	return mediaFileName
 
+# returns sourth path of a file only
 def getFileSourcePath(file):
 	mediaFilePath = str(file).split(mediaFileName)[0].split("'")[-1]
 	return mediaFilePath
+
+
+
+
+
 
 def setFileDestinationPath(rootLocation, mediaFile):
 	print 'setting file destination path'
@@ -117,11 +123,6 @@ def setFileDestinationPath(rootLocation, mediaFile):
 
 	destinationPath = rootLocation
 
-
-
-
-
-
 def setFileName(file):
 	print 'setting file name'
 
@@ -135,12 +136,10 @@ def setFileName(file):
 mediaFileName = getFileName(args.mediaFile)
 mediaFilePath = getFileSourcePath(args.mediaFile)
 
-
-
-printTags(testTagsDict)
+printTags(exifTagsDict)
 spacer()
 
-imageDate = getDate(testTagsDict)
+imageDate = getDate(exifTagsDict)
 spacer()
 
 print 'File \'%s\' dated %s' % (mediaFileName, imageDate)
@@ -148,9 +147,9 @@ print 'File path:\t%s' % mediaFilePath
 
 spacer()
 
-setFileDestinationPath('/Users/samgutentag/Desktop/', args.mediaFile)
+# setFileDestinationPath('/Users/samgutentag/Desktop/', args.mediaFile)
 
-spacer()
+# spacer()
 
 
 
