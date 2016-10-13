@@ -146,15 +146,9 @@ spacer()
 print 'File \'%s\' dated %s' % (mediaFileName, imageDate)
 print 'File path:\t%s' % mediaFilePath
 
-
-
 spacer()
 
-
-
 setFileDestinationPath('/Users/samgutentag/Desktop/', args.mediaFile)
-
-
 
 spacer()
 
