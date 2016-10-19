@@ -104,7 +104,7 @@ def getMediaDateTime(exifTagsDict):
 	# if it gets this far, no DateTime tags could be found or fomred correctly
 	# return default output
 	print 'No media Date Time Tags found'
-	mediaDateTime = 'NO_DATE_TIME'
+	mediaDateTime = 'NODATETIME'
 
 	return mediaDateTime
 
@@ -123,21 +123,21 @@ def getMediaSourceDevice(exifTagsDict):
 				# combines make and model into a single string
 				if tag == 'Image Make':
 					try:
-						mediaSourceDevice = mediaSourceDevice + '_' + str(exifTagsDict['Image Model'])
-						print "Using '%s' and 'Image Model' tags: %s" % (tag, mediaSourceDevice.replace(' ', '_'))
+						mediaSourceDevice = mediaSourceDevice + ' ' + str(exifTagsDict['Image Model'])
+						print "Using '%s' and 'Image Model' tags: %s" % (tag, mediaSourceDevice)
 					except:
 						print "Could not find 'Image Model' tag, skipping..."
 				else:
-					print "Using '%s' tag:\t%s" % (tag, mediaSourceDevice.replace(' ', '_'))
+					print "Using '%s' tag:\t%s" % (tag, mediaSourceDevice)
 			except:
 				print "Could not find '%s' tag" % tag
 
 	# default fall back
 	if len(mediaSourceDevice) < 1:
 		print 'Could not generate SourceDevice from known media capture or creation tags'
-		mediaSourceDevice = 'NO_SOURCEDEVICE'
+		mediaSourceDevice = 'NOSOURCEDEVICE'
 
-	mediaSourceDevice = mediaSourceDevice.replace(' ', '_')
+	mediaSourceDevice = mediaSourceDevice.replace(' ', '').lower()
 
 	return mediaSourceDevice
 
@@ -174,7 +174,7 @@ def getFileSourcePath(file):
 
 
 
-def isValidFile(parser, arg, knownImageFileTypes, knownVideoFileTypes):
+def isValidMediaFile(parser, arg, knownImageFileTypes, knownVideoFileTypes):
 	if not os.path.exists(arg):
 		parser.error('The file %s does not exists' % arg)
 	else:
@@ -203,7 +203,7 @@ def main():
 	parser.add_argument('-a', '--artistName', required=True, help='used as a fallback artist name for file naming', metavar='ARTIST_NAME')
 
 	# passing a single file
-	parser.add_argument('-f', dest='mediaFile', required=True, help='input media file to read EXIF data from', metavar='MEDIA_FILE', type=lambda x: isValidFile(parser, x, knownImageFileTypes, knownVideoFileTypes))
+	parser.add_argument('-f', dest='mediaFile', required=True, help='input media file to read EXIF data from', metavar='MEDIA_FILE', type=lambda x: isValidMediaFile(parser, x, knownImageFileTypes, knownVideoFileTypes))
 
 	# passing a directory with subdirectories and files
 	parser.add_argument('-d', dest='mediaDirectory', required=False, help='input directory', metavar='MEDIA_DIRECTORY', type=lambda x: spacer())

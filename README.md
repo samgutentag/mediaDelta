@@ -6,32 +6,17 @@ Assumptions
 
 	> pip install exifread
 
+Usage
 
+	An example command would be
 
+	> python getExifData.py -f /sampleDirectory/sampleImage.jpg -a $USER
 
+	to get help on required and optional arguments use
 
-What I need To Do/Goal of Project
+	> python getExifData.py -h
 
-	Correctly format folder name as YYYYMMDD_EventName
-
-	Correctly format image name as YYYYMMDD_HHMMSS_<imageTag>.<extension>
-
-		<imageTag> 	will be the name of the parent folder, before the '-' character in camel case
-			else will be 'IMG0000' numbered incrementing from 0001 within the folder
-
-
-
-
-
-
-
-
-
-Sample Folder Structure
-
-
-Current Sample
-
+Current Sample Folder Structure
 	HardDrive
 		DateCorrected
 			Anchorage Square - San Francisco, CA, March 22, 2015
@@ -45,16 +30,15 @@ Current Sample
 
 
 
-Goal Sample
-
+Goal Sample Folder Structure
 	HardDrive
 		Images
 			2015
 				03
-					20150322_120000_anchorageSquare.JPG
-					20150322_120100_anchorageSquare.JPG
-					20150322_120200_anchorageSquare.JPG
+					20150322120000_username_cameramodel.JPG
+					20150322120100_username_cameramodel.JPG
+					20150322120200_username_cameramodel.JPG
 			2013
 				04
-					20130413_120000_IMG0230.JPG
-					20130420_120000_IMG0254.JPG
+					20130413120000_username_cameramodel.JPG
+					20130420120000_username_cameramodel.JPG
