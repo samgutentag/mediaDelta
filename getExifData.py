@@ -4,40 +4,6 @@ import exifread
 import argparse
 import os
 
-
-import nameByDate
-
-
-
-#------------------------------------------------------------------------------
-#		argparser setup
-#------------------------------------------------------------------------------
-knownImageFileTypes = ['JPG', 'CR2', 'PNG', 'JPEG', 'TIFF', 'TIF']
-knownVideoFileTypes = ['MOV', 'MP4']
-
-def isValidFile(parser, arg):
-	if not os.path.exists(arg):
-		parser.error('The file %s does not exists' % arg)
-	else:
-		if nameByDate.isFileOfType(arg, knownImageFileTypes):
-			print '%s is an image file!' % arg
-			return open(arg, 'rb')
-		elif nameByDate.isFileOfType(arg, knownVideoFileTypes):
-			print '%s is a video file!' % arg
-			return open(arg, 'rb')
-		else:
-			parser.error('The file %s is not a known image type' % arg)
-
-
-parser = argparse.ArgumentParser(description='Read EXIF data of a given image file')
-parser.add_argument('-f', dest='mediaFile', required=True, help='input image file to read EXIF data from', metavar='FILE', type=lambda x: isValidFile(parser, x))
-# parser.add_argument('-d', dest='imagesFolder', required=True, help='input image file to read EXIF data from', metavar='IMAGE', type=lambda x: isValidmediaFile(parser, x))
-
-args = parser.parse_args()
-
-exifTagsDict = exifread.process_file(args.mediaFile)
-
-
 #------------------------------------------------------------------------------
 #		functions
 #------------------------------------------------------------------------------
@@ -48,6 +14,20 @@ def spacer():
 	print '\n'
 	print '#' + '-' * 79
 	print '\n'
+
+def isFileOfType(file, knownFileTypes):
+	# print 'Checking filetype of %s' % file
+
+
+	# get file extension
+	extension = file.split('.')[-1].upper()
+
+	# check if file is in knownFileType list
+	if extension in knownFileTypes:
+		return True
+	else:
+		return False
+
 
 # prints all EXIF tags that can be found on the file, with the exception of
 def printTags(exifTagsDict):
@@ -159,6 +139,38 @@ def setFileDestinationPath(rootLocation, mediaFile):
 
 def setFileName(file):
 	print 'setting file name'
+
+
+
+
+#------------------------------------------------------------------------------
+#		argparser setup
+#------------------------------------------------------------------------------
+knownImageFileTypes = ['JPG', 'CR2', 'PNG', 'JPEG', 'TIFF', 'TIF']
+knownVideoFileTypes = ['MOV', 'MP4']
+
+def isValidFile(parser, arg):
+	if not os.path.exists(arg):
+		parser.error('The file %s does not exists' % arg)
+	else:
+		if isFileOfType(arg, knownImageFileTypes):
+			print '%s is an image file!' % arg
+			return open(arg, 'rb')
+		elif isFileOfType(arg, knownVideoFileTypes):
+			print '%s is a video file!' % arg
+			return open(arg, 'rb')
+		else:
+			parser.error('The file %s is not a known image type' % arg)
+
+
+parser = argparse.ArgumentParser(description='Read EXIF data of a given image file')
+parser.add_argument('-f', dest='mediaFile', required=True, help='input image file to read EXIF data from', metavar='FILE', type=lambda x: isValidFile(parser, x))
+# parser.add_argument('-d', dest='imagesFolder', required=True, help='input image file to read EXIF data from', metavar='IMAGE', type=lambda x: isValidmediaFile(parser, x))
+
+args = parser.parse_args()
+
+exifTagsDict = exifread.process_file(args.mediaFile)
+
 
 
 
