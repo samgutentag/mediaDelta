@@ -28,10 +28,15 @@ def isFileOfType(file, knownFileTypes):
 	else:
 		return False
 
-
 # prints all EXIF tags that can be found on the file
 def printTags(exifTagsDict):
 	spacer()
+
+	# make sure there is exif data to read, else escape
+	if len(exifTagsDict) < 1:
+		print 'This file has no exif data to read'
+		return
+
 	counter = 0
 	longestTag = 0
 
@@ -88,10 +93,8 @@ def getDateTime(exifTagsDict):
 
 					imageDateTime = '%s%s%s%s%s%s' % (imageYear, imageMonth, imageDay, imageHour, imageMinute, imageSecond)
 
-					print imageDateTime
-
 					return imageDateTime
-					
+
 				except:
 					print 'Could not form imageDateTime from %s tag, skipping...' % tag
 
@@ -103,68 +106,7 @@ def getDateTime(exifTagsDict):
 	print 'No image Date Time Tags found'
 	imageDateTime = 'NO_DATE_TIME'
 
-	print imageDateTime
-
 	return imageDateTime
-
-
-
-	# for tag in knownDateTimeTags:
-	# 	# copy date time data form tag if imageDateTime is currently empty
-	# 	if len(imageDateTime) < 1:
-	# 		try:
-	# 			imageDateTime = str(exifTagsDict[tag])
-	# 			print "Using '%s' tag: %s" % (tag, imageDateTime)
-	# 		except:
-	# 			print "Could not find '%s' tag, skipping..." % tag
-
-	# # default fall back in the case that no DateTime tags can be found
-	# if len(imageDateTime) < 1:
-	# 	print 'No image Date Time Tags found'
-	# 	imageDateTime = 'NO_DATE_TIME'
-	#
-	# # form correct string for output
-	# else:
-	# 	imageYear = imageDateTime.split(' ')[0].split(':')[0]
-	# 	imageMonth = imageDateTime.split(' ')[0].split(':')[1]
-	# 	imageDay = imageDateTime.split(' ')[0].split(':')[2]
-	# 	imageHour = imageDateTime.split(' ')[1].split(':')[0]
-	# 	imageMinute = imageDateTime.split(' ')[1].split(':')[1]
-	# 	imageSecond = imageDateTime.split(' ')[1].split(':')[2]
-	#
-	# 	imageDateTime = '%s%s%s%s%s%s' % (imageYear, imageMonth, imageDay, imageHour, imageMinute, imageSecond)
-	#
-
-
-	# # form correct string for output
-	# try:
-	# 	imageYear = imageDateTime.split(' ')[0].split(':')[0]
-	# 	imageMonth = imageDateTime.split(' ')[0].split(':')[1]
-	# 	imageDay = imageDateTime.split(' ')[0].split(':')[2]
-	# 	imageHour = imageDateTime.split(' ')[1].split(':')[0]
-	# 	imageMinute = imageDateTime.split(' ')[1].split(':')[1]
-	# 	imageSecond = imageDateTime.split(' ')[1].split(':')[2]
-	#
-	# 	imageDateTime = '%s%s%s%s%s%s' % (imageYear, imageMonth, imageDay, imageHour, imageMinute, imageSecond)
-
-	# default fall back in the case that no DateTime tags can be found
-	# except:
-	# 	print 'No image Date Time Tags found'
-	# 	imageDateTime = 'NO_DATE_TIME'
-	#
-	# print imageDateTime
-	#
-	# return imageDateTime
-
-# returns the file name from a full path file
-def getFileName(file):
-	mediaFileName = str(file).split('/')[-1].split("'")[0]
-	return mediaFileName
-
-# returns sourth path of a file only
-def getFileSourcePath(file):
-	mediaFilePath = str(file).split(mediaFileName)[0].split("'")[-1]
-	return mediaFilePath
 
 # returns identifier for device that captured or created the image
 def getImageSourceDevice(exifTagsDict):
@@ -173,18 +115,20 @@ def getImageSourceDevice(exifTagsDict):
 	knownImageSourceTags= ['MakerNote ImageType', 'Image Make', 'Image Software']
 
 	for tag in knownImageSourceTags:
-		if len(imageSourceDevice) < 1:
+		if imageSourceDevice == '':
 			try:
 				imageSourceDevice = str(exifTagsDict[tag])
 
+				# handling for images captured with a camera
+				# combines make and model into a single string
 				if tag == 'Image Make':
 					try:
 						imageSourceDevice = imageSourceDevice + '_' + str(exifTagsDict['Image Model'])
 						print "Using '%s' and 'Image Model' tags: %s" % (tag, imageSourceDevice.replace(' ', '_'))
 					except:
 						print "Could not find 'Image Model' tag, skipping..."
-
-				print "Using '%s' tag: %s" % (tag, imageSourceDevice.replace(' ', '_'))
+				else:
+					print "Using '%s' tag: %s" % (tag, imageSourceDevice.replace(' ', '_'))
 			except:
 				print "Could not find '%s' tag" % tag
 
@@ -197,38 +141,25 @@ def getImageSourceDevice(exifTagsDict):
 
 	return imageSourceDevice
 
-
-
-
-
-def setFileDestinationPath(rootLocation, mediaFile):
-	print 'setting file destination path'
-
-	# set new path based on image date, also set case for image without date
-
-	imageTags = exifread.process_file(args.mediaFile)
-
-	printTags(imageTags)
-
-	imageDate = getDateTime(imageTags)
-	print imageDate
-
+# returns name associated with the image, often the person who took the photo
+# will fall back to required artistName argument required by script
+def getImageArtistName(exifTagsDict, artistName):
 	try:
-		imageDateYear = imageDate.split(':')[0]
-		imageDateMonth = imageDate.split(':')[1]
+		imageArtist = exifTagsDict['MakerNote OwnerName']
+		return imageArtist
 	except:
-		imageDateYear = 'XXXX'
-		imageDateMonth = 'XX'
-
-	print 'Year:\t%s' % imageDateYear
-	print 'Month:\t%s' % imageDateMonth
-
-	destinationPath = rootLocation
-
-def setFileName(file):
-	print 'setting file name'
+		return artistName
 
 
+# returns source path of a file only
+def getFileSourcePath(file):
+	mediaFilePath = str(file).split(mediaFileName)[0].split("'")[-1]
+	return mediaFilePath
+
+# returns the file name from a full path file
+def getFileName(file):
+	mediaFileName = str(file).split('/')[-1].split("'")[0]
+	return mediaFileName
 
 
 #------------------------------------------------------------------------------
@@ -250,15 +181,27 @@ def isValidFile(parser, arg):
 		else:
 			parser.error('The file %s is not a known image type' % arg)
 
+def sayHello(parser, arg):
+	print 'Hello %s!' % arg
 
 parser = argparse.ArgumentParser(description='Read EXIF data of a given image file')
-parser.add_argument('-f', dest='mediaFile', required=True, help='input image file to read EXIF data from', metavar='FILE', type=lambda x: isValidFile(parser, x))
-# parser.add_argument('-d', dest='imagesFolder', required=True, help='input image file to read EXIF data from', metavar='IMAGE', type=lambda x: isValidmediaFile(parser, x))
 
-args = parser.parse_args()
+# passing a single file
+parser.add_argument('-f', dest='mediaFile', required=True, help='input image file to read EXIF data from', metavar='IMAGE_FILE', type=lambda x: isValidFile(parser, x))
 
-exifTagsDict = exifread.process_file(args.mediaFile)
+# passing a directory with subdirectories and files
+parser.add_argument('-d', dest='mediaDirectory', required=False, help='input directory', metavar='IMAGE_DIRECTORY', type=lambda x: spacer())
 
+# pass name of person running the script, wil be used in file naming as a fallback if no artist information can be found in exif tags
+# parser.add_argument('-a', '--artistName', required=True, help='used as a fallback artist name for file naming', metavar='ARTIST_NAME', type=lambda x: sayHello(parser, x))
+parser.add_argument('-a', '--artistName', required=True, help='used as a fallback artist name for file naming', metavar='ARTIST_NAME')
+
+args = vars(parser.parse_args())
+
+
+exifTagsDict = exifread.process_file(args['mediaFile'])
+
+print args['artistName']
 
 
 
@@ -267,27 +210,29 @@ exifTagsDict = exifread.process_file(args.mediaFile)
 #------------------------------------------------------------------------------
 
 
-mediaFileName = getFileName(args.mediaFile)
-mediaFilePath = getFileSourcePath(args.mediaFile)
+mediaFileName = getFileName(args['mediaFile'])
+mediaFilePath = getFileSourcePath(args['mediaFile'])
+mediaFileExtension = mediaFileName.split('.')[-1]
 
-printTags(exifTagsDict)
-spacer()
+# spacer()
+# printTags(exifTagsDict)
+# spacer()
 
 imageDate = getDateTime(exifTagsDict)
-# spacer()
-
 imageSourceDevice = getImageSourceDevice(exifTagsDict)
-# print '*' * 80
-# print imageSourceDevice
-# print '*' * 80
+imageArtist = getImageArtistName(exifTagsDict, args['artistName'])
+
+oldFileName = mediaFileName
+newFileName = '%s_%s_%s.%s' % (imageDate, imageArtist, imageSourceDevice, mediaFileExtension)
+
 
 spacer()
-
-print "File path:\t'%s'" % mediaFilePath
-print "File:\t\t'%s'" % mediaFileName
-
+print 'imageDate:\t\t%s' % imageDate
+print 'imageSourceDevice:\t%s' % imageSourceDevice
+print 'imageArtist:\t\t%s' % imageArtist
 spacer()
 
-# setFileDestinationPath('/Users/samgutentag/Desktop/', args.mediaFile)
 
-# spacer()
+print 'oldFileName:\t\t%s' % oldFileName
+print 'newFileName:\t\t%s' % newFileName
+spacer()
