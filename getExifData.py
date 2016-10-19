@@ -145,7 +145,14 @@ def getImageSourceDevice(exifTagsDict):
 # will fall back to required artistName argument required by script
 def getImageArtistName(exifTagsDict, artistName):
 
-	mediaArtistName = str(exifTagsDict['MakerNote OwnerName'])
+	mediaArtistName = ''
+	try:
+		mediaArtistName = str(exifTagsDict['MakerNote OwnerName'])
+
+	except:
+		print 'No artist tag found, using default'
+		# mediaArtistName = artistName
+		return artistName.replace(' ', '').lower()
 
 	if len(mediaArtistName) > 0:
 		print "Using 'MakerNote OwnerName' tag:\t%s" % mediaArtistName
@@ -153,7 +160,6 @@ def getImageArtistName(exifTagsDict, artistName):
 	else:
 		print 'No artist tag found, using default'
 		return artistName.replace(' ', '').lower()
-
 
 # returns the file name from a full path file
 def getFileName(file):
