@@ -15,9 +15,9 @@ def spacer():
 	print '#' + '-' * 79
 	print '\n'
 
+# validation to check incoming file type
 def isFileOfType(file, knownFileTypes):
-	# print 'Checking filetype of %s' % file
-
+	print 'Checking filetype of %s' % file
 
 	# get file extension
 	extension = file.split('.')[-1].upper()
@@ -29,44 +29,132 @@ def isFileOfType(file, knownFileTypes):
 		return False
 
 
-# prints all EXIF tags that can be found on the file, with the exception of
+# prints all EXIF tags that can be found on the file
 def printTags(exifTagsDict):
 	spacer()
 	counter = 0
 	longestTag = 0
 
+	# get string length of longest key
+	# assit in pretty printing
 	for key in exifTagsDict.keys():
 		if len(key) > longestTag:
 			longestTag = len(key)
 
+	# pretty print exif tags
 	for tag, entry in sorted(exifTagsDict.iteritems()):
+		# excludes text encoded image tags
+		# these are just a ton of garbage data we dont need
 		if tag not in ('JPEGThumbnail', 'TIFFThumbnail'):
+
+			# calculate number of tab characters needed to pretty print
 			tabsNeeded = ((longestTag - len(tag))/4) + 1
 
+			# print all in line and numbered
 			print '%s:\t%s:' % (counter, tag),
 			print '\t' * tabsNeeded,
 			print entry
-
 			counter += 1
 
-# reads in exif tags, returns imageDate string
-def getDate(exifTagsDict):
-	imageDate = ''
+# reads in exif tags, returns imageDateTime string
+def getDateTime(exifTagsDict):
+	imageDateTime = ''
+
+	# search known, preset, image tags for date and time information of image.
+	#
+	#	TO DO
+	#	Refactor to look for earliest tag available, not just the first one
+	#	to be found from given list
+	#
+
+	# list of known DateTime tags, to be checked in order
 	knownDateTimeTags = ['EXIF DateTimeOriginal', 'EXIF DateTimeDigitized', 'Image DateTime'];
+
 	for tag in knownDateTimeTags:
-		if len(imageDate) < 1:
+		# copy date time data form tag if imageDateTime is currently empty
+		if imageDateTime == '':
 			try:
-				imageDate = str(exifTagsDict[tag])
-				print "Using '%s' tag: %s" % (tag, imageDate)
+				imageDateTime = str(exifTagsDict[tag])
+				print "Using '%s' tag: %s" % (tag, imageDateTime)
+
+				# form correct string for output
+				try:
+					imageYear = imageDateTime.split(' ')[0].split(':')[0]
+					imageMonth = imageDateTime.split(' ')[0].split(':')[1]
+					imageDay = imageDateTime.split(' ')[0].split(':')[2]
+					imageHour = imageDateTime.split(' ')[1].split(':')[0]
+					imageMinute = imageDateTime.split(' ')[1].split(':')[1]
+					imageSecond = imageDateTime.split(' ')[1].split(':')[2]
+
+					imageDateTime = '%s%s%s%s%s%s' % (imageYear, imageMonth, imageDay, imageHour, imageMinute, imageSecond)
+
+					print imageDateTime
+
+					return imageDateTime
+					
+				except:
+					print 'Could not form imageDateTime from %s tag, skipping...' % tag
+
 			except:
-				print "Could not find '%s' tag" % tag
+				print "Could not find '%s' tag, skipping..." % tag
 
-	# default fall back
-	if len(imageDate) < 1:
-		print 'No image Date Tags found'
-		imageDate = 'NO_DATE'
+	# if it gets this far, no DateTime tags could be found or fomred correctly
+	# return default output
+	print 'No image Date Time Tags found'
+	imageDateTime = 'NO_DATE_TIME'
 
-	return imageDate
+	print imageDateTime
+
+	return imageDateTime
+
+
+
+	# for tag in knownDateTimeTags:
+	# 	# copy date time data form tag if imageDateTime is currently empty
+	# 	if len(imageDateTime) < 1:
+	# 		try:
+	# 			imageDateTime = str(exifTagsDict[tag])
+	# 			print "Using '%s' tag: %s" % (tag, imageDateTime)
+	# 		except:
+	# 			print "Could not find '%s' tag, skipping..." % tag
+
+	# # default fall back in the case that no DateTime tags can be found
+	# if len(imageDateTime) < 1:
+	# 	print 'No image Date Time Tags found'
+	# 	imageDateTime = 'NO_DATE_TIME'
+	#
+	# # form correct string for output
+	# else:
+	# 	imageYear = imageDateTime.split(' ')[0].split(':')[0]
+	# 	imageMonth = imageDateTime.split(' ')[0].split(':')[1]
+	# 	imageDay = imageDateTime.split(' ')[0].split(':')[2]
+	# 	imageHour = imageDateTime.split(' ')[1].split(':')[0]
+	# 	imageMinute = imageDateTime.split(' ')[1].split(':')[1]
+	# 	imageSecond = imageDateTime.split(' ')[1].split(':')[2]
+	#
+	# 	imageDateTime = '%s%s%s%s%s%s' % (imageYear, imageMonth, imageDay, imageHour, imageMinute, imageSecond)
+	#
+
+
+	# # form correct string for output
+	# try:
+	# 	imageYear = imageDateTime.split(' ')[0].split(':')[0]
+	# 	imageMonth = imageDateTime.split(' ')[0].split(':')[1]
+	# 	imageDay = imageDateTime.split(' ')[0].split(':')[2]
+	# 	imageHour = imageDateTime.split(' ')[1].split(':')[0]
+	# 	imageMinute = imageDateTime.split(' ')[1].split(':')[1]
+	# 	imageSecond = imageDateTime.split(' ')[1].split(':')[2]
+	#
+	# 	imageDateTime = '%s%s%s%s%s%s' % (imageYear, imageMonth, imageDay, imageHour, imageMinute, imageSecond)
+
+	# default fall back in the case that no DateTime tags can be found
+	# except:
+	# 	print 'No image Date Time Tags found'
+	# 	imageDateTime = 'NO_DATE_TIME'
+	#
+	# print imageDateTime
+	#
+	# return imageDateTime
 
 # returns the file name from a full path file
 def getFileName(file):
@@ -122,7 +210,7 @@ def setFileDestinationPath(rootLocation, mediaFile):
 
 	printTags(imageTags)
 
-	imageDate = getDate(imageTags)
+	imageDate = getDateTime(imageTags)
 	print imageDate
 
 	try:
@@ -185,7 +273,7 @@ mediaFilePath = getFileSourcePath(args.mediaFile)
 printTags(exifTagsDict)
 spacer()
 
-imageDate = getDate(exifTagsDict)
+imageDate = getDateTime(exifTagsDict)
 # spacer()
 
 imageSourceDevice = getImageSourceDevice(exifTagsDict)
