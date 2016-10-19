@@ -224,7 +224,6 @@ def main():
 	oldFileName = mediaFileName
 	newFileName = '%s_%s_%s.%s' % (mediaDate, mediaArtist, mediaSourceDevice, mediaFileExtension)
 
-
 	spacer()
 	print 'mediaDate:\t\t%s' % mediaDate
 	print 'mediaSourceDevice:\t%s' % mediaSourceDevice
@@ -233,14 +232,6 @@ def main():
 	print 'oldFileName:\t\t%s' % oldFileName
 	print 'newFileName:\t\t%s' % newFileName
 	spacer()
-
-
-
-
-
-
-
-
 
 	return True
 
