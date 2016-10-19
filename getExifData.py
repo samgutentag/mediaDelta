@@ -48,7 +48,7 @@ def printTags(exifTagsDict):
 
 	# pretty print exif tags
 	for tag, entry in sorted(exifTagsDict.iteritems()):
-		# excludes text encoded image tags
+		# excludes text encoded tags
 		# these are just a ton of garbage data we dont need
 		if tag not in ('JPEGThumbnail', 'TIFFThumbnail'):
 
@@ -61,11 +61,11 @@ def printTags(exifTagsDict):
 			print entry
 			counter += 1
 
-# reads in exif tags, returns imageDateTime string
-def getDateTime(exifTagsDict):
-	imageDateTime = ''
+# reads in exif tags, returns mediaDateTime string
+def getMediaDateTime(exifTagsDict):
+	mediaDateTime = ''
 
-	# search known, preset, image tags for date and time information of image.
+	# search known, preset, media tags for date and time information of media.
 	#
 	#	TO DO
 	#	Refactor to look for earliest tag available, not just the first one
@@ -76,74 +76,74 @@ def getDateTime(exifTagsDict):
 	knownDateTimeTags = ['EXIF DateTimeOriginal', 'EXIF DateTimeDigitized', 'Image DateTime'];
 
 	for tag in knownDateTimeTags:
-		# copy date time data form tag if imageDateTime is currently empty
-		if imageDateTime == '':
+		# copy date time data form tag if mediaDateTime is currently empty
+		if mediaDateTime == '':
 			try:
-				imageDateTime = str(exifTagsDict[tag])
-				print "Using '%s' tag:\t%s" % (tag, imageDateTime)
+				mediaDateTime = str(exifTagsDict[tag])
+				print "Using '%s' tag:\t%s" % (tag, mediaDateTime)
 
 				# form correct string for output
 				try:
-					imageYear = imageDateTime.split(' ')[0].split(':')[0]
-					imageMonth = imageDateTime.split(' ')[0].split(':')[1]
-					imageDay = imageDateTime.split(' ')[0].split(':')[2]
-					imageHour = imageDateTime.split(' ')[1].split(':')[0]
-					imageMinute = imageDateTime.split(' ')[1].split(':')[1]
-					imageSecond = imageDateTime.split(' ')[1].split(':')[2]
+					mediaYear = mediaDateTime.split(' ')[0].split(':')[0]
+					mediaMonth = mediaDateTime.split(' ')[0].split(':')[1]
+					mediaDay = mediaDateTime.split(' ')[0].split(':')[2]
+					mediaHour = mediaDateTime.split(' ')[1].split(':')[0]
+					mediaMinute = mediaDateTime.split(' ')[1].split(':')[1]
+					mediaSecond = mediaDateTime.split(' ')[1].split(':')[2]
 
-					imageDateTime = '%s%s%s%s%s%s' % (imageYear, imageMonth, imageDay, imageHour, imageMinute, imageSecond)
+					mediaDateTime = '%s%s%s%s%s%s' % (mediaYear, mediaMonth, mediaDay, mediaHour, mediaMinute, mediaSecond)
 
-					return imageDateTime
+					return mediaDateTime
 
 				except:
-					print 'Could not form imageDateTime from %s tag, skipping...' % tag
+					print 'Could not form mediaDateTime from %s tag, skipping...' % tag
 
 			except:
 				print "Could not find '%s' tag, skipping..." % tag
 
 	# if it gets this far, no DateTime tags could be found or fomred correctly
 	# return default output
-	print 'No image Date Time Tags found'
-	imageDateTime = 'NO_DATE_TIME'
+	print 'No media Date Time Tags found'
+	mediaDateTime = 'NO_DATE_TIME'
 
-	return imageDateTime
+	return mediaDateTime
 
-# returns identifier for device that captured or created the image
-def getImageSourceDevice(exifTagsDict):
-	imageSourceDevice = ''
+# returns identifier for device that captured or created the media
+def getMediaSourceDevice(exifTagsDict):
+	mediaSourceDevice = ''
 
-	knownImageSourceTags= ['MakerNote ImageType', 'Image Make', 'Image Software']
+	knownmediaSourceTags= ['MakerNote ImageType', 'Image Make', 'Image Software']
 
-	for tag in knownImageSourceTags:
-		if imageSourceDevice == '':
+	for tag in knownmediaSourceTags:
+		if mediaSourceDevice == '':
 			try:
-				imageSourceDevice = str(exifTagsDict[tag])
+				mediaSourceDevice = str(exifTagsDict[tag])
 
-				# handling for images captured with a camera
+				# handling for media captured with a camera
 				# combines make and model into a single string
 				if tag == 'Image Make':
 					try:
-						imageSourceDevice = imageSourceDevice + '_' + str(exifTagsDict['Image Model'])
-						print "Using '%s' and 'Image Model' tags: %s" % (tag, imageSourceDevice.replace(' ', '_'))
+						mediaSourceDevice = mediaSourceDevice + '_' + str(exifTagsDict['Image Model'])
+						print "Using '%s' and 'Image Model' tags: %s" % (tag, mediaSourceDevice.replace(' ', '_'))
 					except:
 						print "Could not find 'Image Model' tag, skipping..."
 				else:
-					print "Using '%s' tag:\t%s" % (tag, imageSourceDevice.replace(' ', '_'))
+					print "Using '%s' tag:\t%s" % (tag, mediaSourceDevice.replace(' ', '_'))
 			except:
 				print "Could not find '%s' tag" % tag
 
 	# default fall back
-	if len(imageSourceDevice) < 1:
-		print 'Could not generate SourceDevice from known image capture or creation tags'
-		imageSourceDevice = 'NO_SOURCEDEVICE'
+	if len(mediaSourceDevice) < 1:
+		print 'Could not generate SourceDevice from known media capture or creation tags'
+		mediaSourceDevice = 'NO_SOURCEDEVICE'
 
-	imageSourceDevice = imageSourceDevice.replace(' ', '_')
+	mediaSourceDevice = mediaSourceDevice.replace(' ', '_')
 
-	return imageSourceDevice
+	return mediaSourceDevice
 
-# returns name associated with the image, often the person who took the photo
+# returns name associated with the media, often the person who took the photo
 # will fall back to required artistName argument required by script
-def getImageArtistName(exifTagsDict, artistName):
+def getMediaArtistName(exifTagsDict, artistName):
 
 	mediaArtistName = ''
 	try:
@@ -185,7 +185,7 @@ def isValidFile(parser, arg, knownImageFileTypes, knownVideoFileTypes):
 			# print '%s is a video file!' % arg
 			return open(arg, 'rb')
 		else:
-			parser.error('The file %s is not a known image type' % arg)
+			parser.error('The file %s is not a known media type' % arg)
 
 
 #------------------------------------------------------------------------------
@@ -197,16 +197,16 @@ def main():
 	knownImageFileTypes = ['JPG', 'CR2', 'PNG', 'JPEG', 'TIFF', 'TIF']
 	knownVideoFileTypes = ['MOV', 'MP4']
 
-	parser = argparse.ArgumentParser(description='Read EXIF data of a given image file')
-
-	# passing a single file
-	parser.add_argument('-f', dest='mediaFile', required=True, help='input image file to read EXIF data from', metavar='IMAGE_FILE', type=lambda x: isValidFile(parser, x, knownImageFileTypes, knownVideoFileTypes))
-
-	# passing a directory with subdirectories and files
-	parser.add_argument('-d', dest='mediaDirectory', required=False, help='input directory', metavar='IMAGE_DIRECTORY', type=lambda x: spacer())
+	parser = argparse.ArgumentParser(description='Read EXIF data of a given media file')
 
 	# pass name of person running the script, wil be used in file naming as a fallback if no artist information can be found in exif tags
 	parser.add_argument('-a', '--artistName', required=True, help='used as a fallback artist name for file naming', metavar='ARTIST_NAME')
+
+	# passing a single file
+	parser.add_argument('-f', dest='mediaFile', required=True, help='input media file to read EXIF data from', metavar='MEDIA_FILE', type=lambda x: isValidFile(parser, x, knownImageFileTypes, knownVideoFileTypes))
+
+	# passing a directory with subdirectories and files
+	parser.add_argument('-d', dest='mediaDirectory', required=False, help='input directory', metavar='MEDIA_DIRECTORY', type=lambda x: spacer())
 
 	args = vars(parser.parse_args())
 
@@ -216,23 +216,19 @@ def main():
 	mediaFilePath = getFileSourcePath(args['mediaFile'])
 	mediaFileExtension = mediaFileName.split('.')[-1]
 
-	# spacer()
-	# printTags(exifTagsDict)
-	# spacer()
-
 	spacer()
-	imageDate = getDateTime(exifTagsDict)
-	imageSourceDevice = getImageSourceDevice(exifTagsDict)
-	imageArtist = getImageArtistName(exifTagsDict, args['artistName'])
+	mediaDate = getMediaDateTime(exifTagsDict)
+	mediaSourceDevice = getMediaSourceDevice(exifTagsDict)
+	mediaArtist = getMediaArtistName(exifTagsDict, args['artistName'])
 
 	oldFileName = mediaFileName
-	newFileName = '%s_%s_%s.%s' % (imageDate, imageArtist, imageSourceDevice, mediaFileExtension)
+	newFileName = '%s_%s_%s.%s' % (mediaDate, mediaArtist, mediaSourceDevice, mediaFileExtension)
 
 
 	spacer()
-	print 'imageDate:\t\t%s' % imageDate
-	print 'imageSourceDevice:\t%s' % imageSourceDevice
-	print 'imageArtist:\t\t%s' % imageArtist
+	print 'mediaDate:\t\t%s' % mediaDate
+	print 'mediaSourceDevice:\t%s' % mediaSourceDevice
+	print 'mediaArtist:\t\t%s' % mediaArtist
 	print
 	print 'oldFileName:\t\t%s' % oldFileName
 	print 'newFileName:\t\t%s' % newFileName
