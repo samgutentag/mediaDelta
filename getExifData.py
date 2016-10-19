@@ -155,24 +155,20 @@ def getImageArtistName(exifTagsDict, artistName):
 		return artistName.replace(' ', '').lower()
 
 
-# returns source path of a file only
-def getFileSourcePath(file):
-	mediaFilePath = str(file).split(mediaFileName)[0].split("'")[-1]
-	return mediaFilePath
-
 # returns the file name from a full path file
 def getFileName(file):
 	mediaFileName = str(file).split('/')[-1].split("'")[0]
 	return mediaFileName
 
+# returns source path of a file only
+def getFileSourcePath(file):
+	mediaFileName = getFileName(file)
+	mediaFilePath = str(file).split(mediaFileName)[0].split("'")[-1]
+	return mediaFilePath
 
-#------------------------------------------------------------------------------
-#		argparser setup
-#------------------------------------------------------------------------------
-knownImageFileTypes = ['JPG', 'CR2', 'PNG', 'JPEG', 'TIFF', 'TIF']
-knownVideoFileTypes = ['MOV', 'MP4']
 
-def isValidFile(parser, arg):
+
+def isValidFile(parser, arg, knownImageFileTypes, knownVideoFileTypes):
 	if not os.path.exists(arg):
 		parser.error('The file %s does not exists' % arg)
 	else:
@@ -185,59 +181,66 @@ def isValidFile(parser, arg):
 		else:
 			parser.error('The file %s is not a known image type' % arg)
 
-parser = argparse.ArgumentParser(description='Read EXIF data of a given image file')
-
-# passing a single file
-parser.add_argument('-f', dest='mediaFile', required=True, help='input image file to read EXIF data from', metavar='IMAGE_FILE', type=lambda x: isValidFile(parser, x))
-
-# passing a directory with subdirectories and files
-parser.add_argument('-d', dest='mediaDirectory', required=False, help='input directory', metavar='IMAGE_DIRECTORY', type=lambda x: spacer())
-
-# pass name of person running the script, wil be used in file naming as a fallback if no artist information can be found in exif tags
-parser.add_argument('-a', '--artistName', required=True, help='used as a fallback artist name for file naming', metavar='ARTIST_NAME')
-
-args = vars(parser.parse_args())
-
-
-exifTagsDict = exifread.process_file(args['mediaFile'])
-
-# print args['artistName']
-
-
 
 #------------------------------------------------------------------------------
 #		main function
 #------------------------------------------------------------------------------
 
 def main():
-	# print 'Hello World!'
+
+	knownImageFileTypes = ['JPG', 'CR2', 'PNG', 'JPEG', 'TIFF', 'TIF']
+	knownVideoFileTypes = ['MOV', 'MP4']
+
+	parser = argparse.ArgumentParser(description='Read EXIF data of a given image file')
+
+	# passing a single file
+	parser.add_argument('-f', dest='mediaFile', required=True, help='input image file to read EXIF data from', metavar='IMAGE_FILE', type=lambda x: isValidFile(parser, x, knownImageFileTypes, knownVideoFileTypes))
+
+	# passing a directory with subdirectories and files
+	parser.add_argument('-d', dest='mediaDirectory', required=False, help='input directory', metavar='IMAGE_DIRECTORY', type=lambda x: spacer())
+
+	# pass name of person running the script, wil be used in file naming as a fallback if no artist information can be found in exif tags
+	parser.add_argument('-a', '--artistName', required=True, help='used as a fallback artist name for file naming', metavar='ARTIST_NAME')
+
+	args = vars(parser.parse_args())
+
+	exifTagsDict = exifread.process_file(args['mediaFile'])
+
+	mediaFileName = getFileName(args['mediaFile'])
+	mediaFilePath = getFileSourcePath(args['mediaFile'])
+	mediaFileExtension = mediaFileName.split('.')[-1]
+
+	# spacer()
+	# printTags(exifTagsDict)
+	# spacer()
+
+	spacer()
+	imageDate = getDateTime(exifTagsDict)
+	imageSourceDevice = getImageSourceDevice(exifTagsDict)
+	imageArtist = getImageArtistName(exifTagsDict, args['artistName'])
+
+	oldFileName = mediaFileName
+	newFileName = '%s_%s_%s.%s' % (imageDate, imageArtist, imageSourceDevice, mediaFileExtension)
+
+
+	spacer()
+	print 'imageDate:\t\t%s' % imageDate
+	print 'imageSourceDevice:\t%s' % imageSourceDevice
+	print 'imageArtist:\t\t%s' % imageArtist
+	print
+	print 'oldFileName:\t\t%s' % oldFileName
+	print 'newFileName:\t\t%s' % newFileName
+	spacer()
+
+
+
+
+
+
+
+
+
 	return True
 
 if __name__ == "__main__":
 	main()
-
-mediaFileName = getFileName(args['mediaFile'])
-mediaFilePath = getFileSourcePath(args['mediaFile'])
-mediaFileExtension = mediaFileName.split('.')[-1]
-
-# spacer()
-# printTags(exifTagsDict)
-# spacer()
-
-spacer()
-imageDate = getDateTime(exifTagsDict)
-imageSourceDevice = getImageSourceDevice(exifTagsDict)
-imageArtist = getImageArtistName(exifTagsDict, args['artistName'])
-
-oldFileName = mediaFileName
-newFileName = '%s_%s_%s.%s' % (imageDate, imageArtist, imageSourceDevice, mediaFileExtension)
-
-
-spacer()
-print 'imageDate:\t\t%s' % imageDate
-print 'imageSourceDevice:\t%s' % imageSourceDevice
-print 'imageArtist:\t\t%s' % imageArtist
-print
-print 'oldFileName:\t\t%s' % oldFileName
-print 'newFileName:\t\t%s' % newFileName
-spacer()
