@@ -17,6 +17,7 @@ Usage
 	> python getExifData.py -h
 
 Current Sample Folder Structure
+
 	HardDrive
 		DateCorrected
 			Anchorage Square - San Francisco, CA, March 22, 2015
@@ -31,6 +32,7 @@ Current Sample Folder Structure
 
 
 Goal Sample Folder Structure
+
 	HardDrive
 		Images
 			2015
