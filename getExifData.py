@@ -17,7 +17,7 @@ def spacer():
 
 # validation to check incoming file type
 def isFileOfType(file, knownFileTypes):
-	print 'Checking filetype of %s' % file
+	# print 'Checking filetype of %s' % file
 
 	# get file extension
 	extension = file.split('.')[-1].upper()
@@ -80,7 +80,7 @@ def getDateTime(exifTagsDict):
 		if imageDateTime == '':
 			try:
 				imageDateTime = str(exifTagsDict[tag])
-				print "Using '%s' tag: %s" % (tag, imageDateTime)
+				print "Using '%s' tag:\t%s" % (tag, imageDateTime)
 
 				# form correct string for output
 				try:
@@ -128,7 +128,7 @@ def getImageSourceDevice(exifTagsDict):
 					except:
 						print "Could not find 'Image Model' tag, skipping..."
 				else:
-					print "Using '%s' tag: %s" % (tag, imageSourceDevice.replace(' ', '_'))
+					print "Using '%s' tag:\t%s" % (tag, imageSourceDevice.replace(' ', '_'))
 			except:
 				print "Could not find '%s' tag" % tag
 
@@ -144,11 +144,15 @@ def getImageSourceDevice(exifTagsDict):
 # returns name associated with the image, often the person who took the photo
 # will fall back to required artistName argument required by script
 def getImageArtistName(exifTagsDict, artistName):
-	try:
-		imageArtist = exifTagsDict['MakerNote OwnerName']
-		return imageArtist
-	except:
-		return artistName
+
+	mediaArtistName = str(exifTagsDict['MakerNote OwnerName'])
+
+	if len(mediaArtistName) > 0:
+		print "Using 'MakerNote OwnerName' tag:\t%s" % mediaArtistName
+		return mediaArtistName.replace(' ', '').lower()
+	else:
+		print 'No artist tag found, using default'
+		return artistName.replace(' ', '').lower()
 
 
 # returns source path of a file only
@@ -173,16 +177,13 @@ def isValidFile(parser, arg):
 		parser.error('The file %s does not exists' % arg)
 	else:
 		if isFileOfType(arg, knownImageFileTypes):
-			print '%s is an image file!' % arg
+			# print '%s is an image file!' % arg
 			return open(arg, 'rb')
 		elif isFileOfType(arg, knownVideoFileTypes):
-			print '%s is a video file!' % arg
+			# print '%s is a video file!' % arg
 			return open(arg, 'rb')
 		else:
 			parser.error('The file %s is not a known image type' % arg)
-
-def sayHello(parser, arg):
-	print 'Hello %s!' % arg
 
 parser = argparse.ArgumentParser(description='Read EXIF data of a given image file')
 
@@ -193,7 +194,6 @@ parser.add_argument('-f', dest='mediaFile', required=True, help='input image fil
 parser.add_argument('-d', dest='mediaDirectory', required=False, help='input directory', metavar='IMAGE_DIRECTORY', type=lambda x: spacer())
 
 # pass name of person running the script, wil be used in file naming as a fallback if no artist information can be found in exif tags
-# parser.add_argument('-a', '--artistName', required=True, help='used as a fallback artist name for file naming', metavar='ARTIST_NAME', type=lambda x: sayHello(parser, x))
 parser.add_argument('-a', '--artistName', required=True, help='used as a fallback artist name for file naming', metavar='ARTIST_NAME')
 
 args = vars(parser.parse_args())
@@ -201,7 +201,7 @@ args = vars(parser.parse_args())
 
 exifTagsDict = exifread.process_file(args['mediaFile'])
 
-print args['artistName']
+# print args['artistName']
 
 
 
@@ -209,6 +209,12 @@ print args['artistName']
 #		main function
 #------------------------------------------------------------------------------
 
+def main():
+	# print 'Hello World!'
+	return True
+
+if __name__ == "__main__":
+	main()
 
 mediaFileName = getFileName(args['mediaFile'])
 mediaFilePath = getFileSourcePath(args['mediaFile'])
@@ -218,6 +224,7 @@ mediaFileExtension = mediaFileName.split('.')[-1]
 # printTags(exifTagsDict)
 # spacer()
 
+spacer()
 imageDate = getDateTime(exifTagsDict)
 imageSourceDevice = getImageSourceDevice(exifTagsDict)
 imageArtist = getImageArtistName(exifTagsDict, args['artistName'])
@@ -230,9 +237,7 @@ spacer()
 print 'imageDate:\t\t%s' % imageDate
 print 'imageSourceDevice:\t%s' % imageSourceDevice
 print 'imageArtist:\t\t%s' % imageArtist
-spacer()
-
-
+print
 print 'oldFileName:\t\t%s' % oldFileName
 print 'newFileName:\t\t%s' % newFileName
 spacer()
