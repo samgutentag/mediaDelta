@@ -137,7 +137,7 @@ def getMediaSourceDevice(exifTagsDict):
 		print 'Could not generate SourceDevice from known media capture or creation tags'
 		mediaSourceDevice = 'NOSOURCEDEVICE'
 
-	mediaSourceDevice = mediaSourceDevice.replace(' ', '').lower()
+	mediaSourceDevice = mediaSourceDevice.replace(' ', '').replace('-', '').lower()
 
 	return mediaSourceDevice
 
@@ -152,14 +152,14 @@ def getMediaArtistName(exifTagsDict, artistName):
 	except:
 		print 'No artist tag found, using default'
 		# mediaArtistName = artistName
-		return artistName.replace(' ', '').lower()
+		return artistName.replace(' ', '').replace('-', '').lower()
 
 	if len(mediaArtistName) > 0:
 		print "Using 'MakerNote OwnerName' tag:\t%s" % mediaArtistName
-		return mediaArtistName.replace(' ', '').lower()
+		return mediaArtistName.replace(' ', '').replace('-', '').lower()
 	else:
 		print 'No artist tag found, using default'
-		return artistName.replace(' ', '').lower()
+		return artistName.replace(' ', '').replace('-', '').lower()
 
 # returns the file name from a full path file
 def getFileName(file):
@@ -202,6 +202,9 @@ def main():
 	# pass name of person running the script, wil be used in file naming as a fallback if no artist information can be found in exif tags
 	parser.add_argument('-a', '--artistName', required=True, help='used as a fallback artist name for file naming', metavar='ARTIST_NAME')
 
+	# verbose tag, will print out all exif data found in file
+	# parser.add_argument('-v', '--verbose', required=False, help='print all exif data to screen', metavar='VERBOSE_MODE')
+
 	# passing a single file
 	parser.add_argument('-f', dest='mediaFile', required=True, help='input media file to read EXIF data from', metavar='MEDIA_FILE', type=lambda x: isValidMediaFile(parser, x, knownImageFileTypes, knownVideoFileTypes))
 
@@ -231,6 +234,9 @@ def main():
 	print
 	print 'oldFileName:\t\t%s' % oldFileName
 	print 'newFileName:\t\t%s' % newFileName
+	spacer()
+
+	printTags(exifTagsDict)
 	spacer()
 
 	return True
