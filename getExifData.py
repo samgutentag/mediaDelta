@@ -239,6 +239,14 @@ def main():
 	printTags(exifTagsDict)
 	spacer()
 
+
+	# test a movie file hard path
+	print 'media test'
+	movieFile = open('/Users/samgutentag/Downloads/IMG_0160.mp4', 'rb')
+	movieTags = exifread.process_file(movieFile)
+
+	printTags(movieTags)
+
 	return True
 
 if __name__ == "__main__":
