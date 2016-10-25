@@ -2,19 +2,14 @@
 
 Assumptions
 
-	exifread package is installed on host machine, can be installed with pip
+	First ExifTool should be installed on the host machine, it can be downloaded here
+	http://www.sno.phy.queensu.ca/~phil/exiftool/
 
-	> pip install exifread
+	pyexifinfo should be installed as an awesome python wrapper for it!
 
-Usage
+	https://github.com/guinslym/pyexifinfo
 
-	An example command would be
-
-	> python getExifData.py -f /sampleDirectory/sampleImage.jpg -a $USER
-
-	to get help on required and optional arguments use
-
-	> python getExifData.py -h
+	> pip install -U pyexifinfo
 
 Current Sample Folder Structure
 
