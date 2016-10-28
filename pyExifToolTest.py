@@ -74,16 +74,12 @@ def getMediaDateTimeStamp(data):
     earliestTag = ''
 
     # formatted earliestDateTimeStamp YYYYMMDDHHmmSSsss
-    earliestDateTimeStamp = 999999999999999
+    earliestDateTimeStamp = 999999999999999999999999999
+    # earliestDateTimeStamp = 0
 
     for entry in dateTimeTags:
-        # default case
-        # if len(earliestTag) < 1:
-        #     earliestTag = entry[0]
-        #     earliestDateTimeStamp = entry[1]
-        #
-        # else:
         dateTimeStamp = entry[1]
+
         # remove timezone adjustment if it exists
         try:
             dateTimeStamp = dateTimeStamp.split('-')[0]
@@ -98,11 +94,9 @@ def getMediaDateTimeStamp(data):
 
         try:
             timeStamp = dateTimeStamp.split(' ')[1]
-
-            # sometimes time stamps have a letter appened to the end of the second, lets remove those
+            # sometimes time stamps have letters appened to the end of the second, lets remove those
             while timeStamp[len(timeStamp)-1].isalpha():
                 timeStamp = timeStamp[:-1]
-
         except:
             timeStamp = '23:59:99.999'
 
@@ -116,15 +110,24 @@ def getMediaDateTimeStamp(data):
         except:
             timeStamp = timeStamp + '.999'
 
-        # convert date and time stamps into a formatted string for comparison
-        dateTimeINT = '%s%s' % (dateStamp.replace(':', ''),timeStamp.replace(':', '').replace('.', ''))
+        dateStamp = dateStamp.replace(':', '')
+        timeStamp = timeStamp.replace(':', '').replace('.', '')
 
-        print entry
-        print dateTimeINT
+        # convert date and time stamps into a formatted string for comparison
+        dateTimeINT = '%s%s' % (dateStamp,timeStamp)
+
+        # check if dateTimeINT is earlier than previous earliestTag
+        if int(dateTimeINT) < int(earliestDateTimeStamp):
+            earliestTag = entry[0]
+            earliestDateTimeStamp = int(dateTimeINT)
+
+
+
+    return dateTimeINT
+
+
 
     print '>>> done!'
-
-
 
 
 
@@ -133,7 +136,6 @@ def getCameraOperator(data, name):
     print '>>> getting camera operator/photographer information...'
 
     print '>>> done!'
-
 
 
 
@@ -176,20 +178,14 @@ def main():
     print 'file: %s' % str(args['mediaFile']).split("'")[1]
     filename = str(args['mediaFile']).split("'")[1]
 
-
     spacer()
     exifTagsDict = JSONToDict(p.get_json(filename))
-
 
     spacer()
     prettyPrintTags(exifTagsDict)
 
-
     spacer()
-    getMediaDateTimeStamp(exifTagsDict)
-
-
-
+    dateTimeStamp = getMediaDateTimeStamp(exifTagsDict)
 
 
 
