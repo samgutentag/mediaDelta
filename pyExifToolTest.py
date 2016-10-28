@@ -25,23 +25,22 @@ def openMediaFile(parser, arg):
 # print tags
 def prettyPrintTags(dataDictionary):
     # print dataDictionary
+    print '>>> pretty printing EXIF tags'
     for key, value in dataDictionary.iteritems():
         print '%s\t:\t%s' % (key, value)
-
-
+    print '>>> done!'
 
 
 def JSONToDict(data):
-    print 'creating exifDict from json data...'
+    print '>>> creating exifDict from json data...'
 
     if len(data) < 1:
-        print 'this file has no exif data'
+        print '>>> this file has no exif data'
         return
     else:
         # dataDict = dict(sorted(data[0].iteritems()))
         dataDict = dict(sorted(data[0].iteritems()))
-        print type(dataDict)
-        print dataDict
+        print '>>> done!'
         return dataDict
 
 
@@ -50,14 +49,16 @@ def JSONToDict(data):
 #------------------------------------------------------------------------------
 
 def getCameraModel(data):
-    print 'getting camera info...'
+    print '>>> getting camera info...'
+
+    print '>>> done!'
 
     # get tags with the word 'date' in them
 
 
 
 def getMediaDateTimeStamp(data):
-    print 'getting earliest media time stamp...'
+    print '>>> getting earliest media time stamp...'
 
     # collect all date relted keys and values
     dateTimeTags = []
@@ -68,63 +69,70 @@ def getMediaDateTimeStamp(data):
             dateTimeTags.append([key, value])
             # print dateTimeTags
 
-    print 'All date and time related tags...'
-    for entry in dateTimeTags:
-        print '%s\t%s' % (entry[0], entry[1])
-
-
-    # find earliest dateTimeTag, that is most likely the date media was captured or created
+    # find earliest 'dateTimeTag'
 
     earliestTag = ''
-    earliestDateTimeStamp = ''
+
+    # formatted earliestDateTimeStamp YYYYMMDDHHmmSSsss
+    earliestDateTimeStamp = 999999999999999
 
     for entry in dateTimeTags:
         # default case
-        if len(earliestTag) < 1:
-            earliestTag = entry[0]
-            earliestDateTimeStamp = entry[1]
+        # if len(earliestTag) < 1:
+        #     earliestTag = entry[0]
+        #     earliestDateTimeStamp = entry[1]
+        #
+        # else:
+        dateTimeStamp = entry[1]
+        # remove timezone adjustment if it exists
+        try:
+            dateTimeStamp = dateTimeStamp.split('-')[0]
+        except:
+            pass
 
-        else:
+        # try to split into dateStamp and timeStamp
+        try:
+            dateStamp = dateTimeStamp.split(' ')[0]
+        except:
+            dateStamp = '9999:99:99'
+
+        try:
+            timeStamp = dateTimeStamp.split(' ')[1]
+
+            # sometimes time stamps have a letter appened to the end of the second, lets remove those
+            while timeStamp[len(timeStamp)-1].isalpha():
+                timeStamp = timeStamp[:-1]
+
+        except:
+            timeStamp = '23:59:99.999'
+
+        # append fake milliseconds if they dont exists
+        try:
+            timeStampMilliseconds = timeStamp.split('.')[1]
+            # strip milliseconds down to being 4 characters ie '.123'
+            if len(timeStampMilliseconds) > 3:
+                timeStampMilliseconds = timeStampMilliseconds[:4]
+        # if milliseconds are not in the tag, max it out
+        except:
+            timeStamp = timeStamp + '.999'
+
+        # convert date and time stamps into a formatted string for comparison
+        dateTimeINT = '%s%s' % (dateStamp.replace(':', ''),timeStamp.replace(':', '').replace('.', ''))
+
+        print entry
+        print dateTimeINT
+
+    print '>>> done!'
 
 
-            dateTimeStamp = entry[1]
-            # remove timezone adjsutment if it exists
-            try:
-                dateTimeStamp.split('-')[0]
-            except:
-                pass
 
-            # break into components
-            mediaYear = dateTimeStamp.split(' ')[0].split(':')[0]
-            mediaMonth = dateTimeStamp.split(' ')[0].split(':')[1]
-            mediaDay = dateTimeStamp.split(' ')[0].split(':')[2]
-            mediaHour = edateTimeStamp.split(' ')[1].split(':')[0]
-            mediaMinute = dateTimeStamp.split(' ')[1].split(':')[1]
-            mediaSecond = dateTimeStamp.split(' ')[1].split(':')[2]
-
-            # if tag is later than existing earliest tag, skip
-            if True:
-                # check mediaYear
-
-                # check mediaMonth
-
-                # check mediaDay
-
-                # check mediaHour
-
-                # check mediaMinute
-
-                # check mediaSecond
-
-            # else, set as new earliest tag
-            else:
-                earliestTag = entry[0]
-                earliestDateTimeStamp = entry[1]
 
 
 
 def getCameraOperator(data, name):
-    print 'getting camera operator/photographer information...'
+    print '>>> getting camera operator/photographer information...'
+
+    print '>>> done!'
 
 
 
@@ -164,17 +172,28 @@ def main():
 
     args = vars(parser.parse_args())
 
-    print 'filename: %s' % str(args['mediaFile']).split("'")[1]
+    spacer()
+    print 'file: %s' % str(args['mediaFile']).split("'")[1]
     filename = str(args['mediaFile']).split("'")[1]
 
+
+    spacer()
     exifTagsDict = JSONToDict(p.get_json(filename))
+
 
     spacer()
     prettyPrintTags(exifTagsDict)
-    spacer()
 
+
+    spacer()
     getMediaDateTimeStamp(exifTagsDict)
 
+
+
+
+
+
+    # all done!
     spacer()
 
 
