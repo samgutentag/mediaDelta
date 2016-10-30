@@ -26,8 +26,51 @@ def openMediaFile(parser, arg):
 def prettyPrintTags(dataDictionary):
     # print dataDictionary
     print '>>> pretty printing EXIF tags'
-    for key, value in dataDictionary.iteritems():
-        print '%s\t:\t%s' % (key, value)
+    # for key, value in dataDictionary.iteritems():
+    #     print '%s\t:\t%s' % (key, value)
+
+
+    counter = 0
+    longestTag = 0
+
+    # get string length of longest key
+    # assit in pretty printing
+    for key in dataDictionary.keys():
+        if len(key) > longestTag:
+            longestTag = len(key)
+
+    # pretty print exif tags
+    for tag, entry in sorted(dataDictionary.iteritems()):
+        # excludes text encoded tags
+        # these are just a ton of garbage data we dont need
+        if tag not in ('JPEGThumbnail', 'TIFFThumbnail'):
+
+            # calculate number of tab characters needed to pretty print
+            tabsNeeded = ((longestTag - len(tag))/4) + 1
+
+            # print all in line and numbered
+            if counter < 100:
+                print '%s:\t\t%s:' % (counter, tag),
+            else:
+                print '%s:\t%s:' % (counter, tag),
+            print '\t' * tabsNeeded,
+            print entry
+            counter += 1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     print '>>> done!'
 
 
@@ -48,15 +91,59 @@ def JSONToDict(data):
 #		main data points functions
 #------------------------------------------------------------------------------
 
+
+# gets camera and or software device information
+# returns a list of (cameraMake, cameraModel, serialNumber, softwareName)
+# defaults to 'NONE' if a piece of information can not be found
 def getCameraModel(data):
     print '>>> getting camera info...'
 
+    # we want make, model, serial number, software
+    cameraMake = 'NONE'
+    cameraModel  = 'NONE'
+    serialNumber = 'NONE'
+    softwareName = 'NONE'
+
+    for key,value in data.iteritems():
+        # get serial number string i.e. '192029004068'
+        if 'exif:serialnumber' in key.lower():
+            serialNumber = str(data[key])
+        # get make string i.e. 'Canon'
+        if 'exif:make' in key.lower():
+            cameraMake = str(data[key])
+        # get model string i.e. 'Canon EOS 5D Mark III'
+        if 'exif:model' in key.lower():
+            cameraModel = str(data[key])
+        # get software string i.e. 'Adobe Photoshop Lightroom 6.3 (Macintosh)''
+        if 'exif:software' in key.lower():
+            softwareName = str(data[key])
+
+    # special case for iOS devices reporting software version
+    if cameraMake.lower() == 'apple':
+        softwareName = 'iOS %s' % softwareName
+
+
+    print 'cameraMake:\t%s' % cameraMake
+    print 'cameraModel :\t%s' % cameraModel
+    print 'serialNumber:\t%s' % serialNumber
+    print 'softwareName:\t%s' % softwareName
+
+    print
+
+
+
+
     print '>>> done!'
-
-    # get tags with the word 'date' in them
-
+    return (cameraMake, cameraModel, serialNumber, softwareName)
 
 
+
+
+
+
+
+# gets earlist date time tag, excludes dates in photoshop or camera profiles
+# returns a list of (dateTimeTag, dateTimeValue)
 def getMediaDateTimeStamp(data):
     print '>>> getting earliest media time stamp...'
 
@@ -206,12 +293,24 @@ def main():
     spacer()
     exifTagsDict = JSONToDict(p.get_json(filename))
 
-    # spacer()
-    # prettyPrintTags(exifTagsDict)
 
     spacer()
     dateTimeStamp = getMediaDateTimeStamp(exifTagsDict)
     print dateTimeStamp
+
+
+
+    spacer()
+    cameraModel = getCameraModel(exifTagsDict)
+    print cameraModel
+
+
+
+
+
+    # spacer()
+    # prettyPrintTags(exifTagsDict)
+
 
 
     # all done!
