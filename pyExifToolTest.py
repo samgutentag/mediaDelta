@@ -314,7 +314,7 @@ def prettyPrintTags(dataDictionary):
 
 
 
-# print tags
+# print dateTime tags
 def prettyPrintDateTimeTags(dataDictionary):
     # print dataDictionary
     print '>>> pretty printing EXIF tags'
@@ -352,12 +352,6 @@ def prettyPrintDateTimeTags(dataDictionary):
     print '>>> done!'
 
 
-
-
-
-
-
-
 #------------------------------------------------------------------------------
 #		file processing functions
 #------------------------------------------------------------------------------
@@ -388,7 +382,7 @@ def processMediaFile(mediaFile, userName):
 
     spacer()
     destinationDir = '/DESTINATION_DIRECTORY'
-    correctedFilePath = getFilePath(destinationDir, dateTimeStamp, cameraInfo, userName, extension)
+    correctedFilePath = getFilePath(destinationDir, dateTimeStamp, cameraInfo, userName.lower(), extension)
 
     print originalFilePath
     print correctedFilePath
