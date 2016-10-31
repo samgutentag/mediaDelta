@@ -6,6 +6,30 @@ import json
 import os
 
 #------------------------------------------------------------------------------
+#		classes
+#------------------------------------------------------------------------------
+
+class cameraObject:
+
+    def __init__(self, make, model, serial, software):
+        self.make = make
+        self.model = str(model).replace(' ','')
+        self.serial = serial
+        self.software = str(software).split('(')[0]
+
+    def printInfo(self):
+        print 'Camera Make:\t%s' % self.make
+        print 'Camera Model:\t%s' % self.model
+        print 'Serial Number:\t%s' % self.serial
+        print 'Software:\t\t%s' % self.software
+
+
+
+
+
+
+
+#------------------------------------------------------------------------------
 #		functions
 #------------------------------------------------------------------------------
 
@@ -86,9 +110,34 @@ def JSONToDict(data):
         print '>>> done!'
         return dataDict
 
+# gets contents of a directory
+def getDirectoryContents(dir):
+    print ">>> getting contents of directory '%s'" % dir
+
+    for item in dir:
+        # if item is a file
+        if os.path.isfile(item):
+            print '%s is a file!' % item
+
+        # if item is a directory
+        elif os.path.isdir(item):
+            print '%s is a directory!' % item
+            getDirectoryContents(item)
+
+        else:
+            print 'not sure what happened...'
+
+
+
+
+
+
+
+
+
 
 #------------------------------------------------------------------------------
-#		main data points functions
+#		main exif tag formatting functions
 #------------------------------------------------------------------------------
 
 
@@ -122,25 +171,13 @@ def getCameraModel(data):
     if cameraMake.lower() == 'apple':
         softwareName = 'iOS %s' % softwareName
 
+    cameraInfo = cameraObject(cameraMake, cameraModel, serialNumber, softwareName)
 
-    print 'cameraMake:\t%s' % cameraMake
-    print 'cameraModel :\t%s' % cameraModel
-    print 'serialNumber:\t%s' % serialNumber
-    print 'softwareName:\t%s' % softwareName
-
-    print
-
-
-
+    # cameraInfo.printInfo()
 
     print '>>> done!'
-    return (cameraMake, cameraModel, serialNumber, softwareName)
 
-
-
-
-
-
+    return cameraInfo
 
 # gets earlist date time tag, excludes dates in photoshop or camera profiles
 # returns a list of (dateTimeTag, dateTimeValue)
@@ -233,27 +270,76 @@ def getMediaDateTimeStamp(data):
             earliestTag = str(entry[0])
             earliestDateTimeStamp = dateTimeFormattedStampINT
 
+        # break string back into components
+        yearStamp = str(earliestDateTimeStamp)[0:4]
+        monthStamp = str(earliestDateTimeStamp)[4:6]
+        dayStamp = str(earliestDateTimeStamp)[6:8]
+        hourStamp = str(earliestDateTimeStamp)[8:10]
+        minuteStamp = str(earliestDateTimeStamp)[10:12]
+        secondStamp = str(earliestDateTimeStamp)[12:14]
+        millisecondStamp = str(earliestDateTimeStamp)[14:17]
 
     print '>>> done!'
-    return (earliestTag, earliestDateTimeStamp)
-
-
-
-
-
-
-
+    return (yearStamp, monthStamp, dayStamp, hourStamp, minuteStamp, secondStamp, millisecondStamp)
 
 def getCameraOperator(data, name):
     print '>>> getting camera operator/photographer information...'
 
     print '>>> done!'
 
+#------------------------------------------------------------------------------
+#		file processing functions
+#------------------------------------------------------------------------------
+def processMediaFile(mediaFile):
+    fileName = str(mediaFile).split("'")[1]
+    print ">>> processing '%s'" % fileName
+    extension = str(fileName.split('.')[-1])
+
+    newFileName = ''
+    newFilePath = ''
+
+    spacer()
+    exifTagsDict = JSONToDict(p.get_json(fileName))
+
+    spacer()
+    dateTimeStamp = getMediaDateTimeStamp(exifTagsDict)
+    print dateTimeStamp
+
+    spacer()
+    cameraInfo = getCameraModel(exifTagsDict)
+
+
+    # spacer()
+    # prettyPrintTags(exifTagsDict)
+
+    # all done!
+    spacer()
+
+    year = dateTimeStamp[0]
+    month = dateTimeStamp[1]
+    day = dateTimeStamp[2]
+    hour = dateTimeStamp[3]
+    minute = dateTimeStamp[4]
+    second = dateTimeStamp[5]
+    millisecond = dateTimeStamp[6]
+
+    newFilePath = '/dest/%s/%s/%s/' % (year, month, day)
+    newFileName_Date = '%s%s%s%s%s%s%s' % (year, month, day, hour, minute, second, millisecond)
+    newFileName_User = 'samgutentag'
+
+
+    newFileName_Camera = '%s%s' % (cameraInfo.model, cameraInfo.serial)
+
+    newFileName = '%s_%s_%s' % (newFileName_Date, newFileName_User, newFileName_Camera)
+
+    destination = newFilePath + newFileName + '.' + extension
+
+    print destination
 
 
 
-
-
+    print '>>> done!'
+    return newFileName
 
 
 #------------------------------------------------------------------------------
@@ -267,7 +353,7 @@ def main():
 
     # script uses the artist name to help createu uinique file names
     parser.add_argument('-a', '--artistName',
-                        required=True,
+                        required=False,
                         help='default artist name',
                         metavar='ARTIST_NAME')
 
@@ -286,45 +372,14 @@ def main():
 
     args = vars(parser.parse_args())
 
-    spacer()
-    print 'file: %s' % str(args['mediaFile']).split("'")[1]
-    filename = str(args['mediaFile']).split("'")[1]
+    print args
 
     spacer()
-    exifTagsDict = JSONToDict(p.get_json(filename))
 
-
-    spacer()
-    dateTimeStamp = getMediaDateTimeStamp(exifTagsDict)
-    print dateTimeStamp
-
-
-
-    spacer()
-    cameraModel = getCameraModel(exifTagsDict)
-    print cameraModel
-
-
-
-
-
-    # spacer()
-    # prettyPrintTags(exifTagsDict)
-
-
-
-    # all done!
-    spacer()
-
-
-
-
-
-
-
-
-
-
+    try:
+        processMediaFile(args['mediaFile'])
+    except:
+        print '>>> no files to process... all done!'
 
 
 if __name__ == '__main__':
