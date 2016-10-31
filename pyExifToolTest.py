@@ -140,23 +140,15 @@ def getDirectoryContents(dir):
 # compare two mediaDateTimeObjects and return earlier one
 def getEarlierDateTime(tagA, tagB):
 
-    # check components in order largest to smallest interval
-    # to see which came first
-    if int(tagA.year) < int(tagB.year):
-        return tagA
-    if int(tagA.month) < int(tagB.month):
-        return tagA
-    if int(tagA.day) < int(tagB.day):
-        return tagA
-    if int(tagA.hour) < int(tagB.hour):
-        return tagA
-    if int(tagA.minute) < int(tagB.minute):
-        return tagA
-    # this case is special because if tagB matches tagA, then stay with tagA
-    if int(tagA.second) <= int(tagB.second):
+    # convert tag parts to an int from a concatenated string of the parts
+    tagAINT = int(tagA.year + tagA.month + tagA.day + tagA.hour + tagA.minute + tagA.second + tagA.millisecond)
+    tagBINT = int(tagB.year + tagB.month + tagB.day + tagB.hour + tagB.minute + tagB.second + tagB.millisecond)
+
+    if tagAINT <= tagBINT:
         return tagA
     else:
         return tagB
+
 
 # gets earlist date time tag, excludes dates in photoshop or camera profiles
 # returns a list of (dateTimeTag, dateTimeValue)
@@ -172,12 +164,12 @@ def getMediaDateTimeStamp(data):
     # select dateTime key  value pairs as a subset
     for key, value in data.iteritems():
         if 'date' in key.lower():
-            # print 'found \'%s\' tag...'
             if 'icc' not in key.lower():
                 dateTimeTags.append([key, value])
 
     # go through dateTime tags to determine the earliest one
     for entry in dateTimeTags:
+
 
         # default values
         entryInfo = mediaDateTimeObject('NONE', '9999', '99', '99', '99', '99', '99', '999')
@@ -185,6 +177,10 @@ def getMediaDateTimeStamp(data):
         # set entry tag
         entryInfo.tag = str(entry[0])
         dateTimeStamp = entry[1]
+
+        # if year is '0000', we dont want it, break out!
+        if dateTimeStamp.split(':')[0] == '0000':
+            break
 
         # remove timezone adjustment if it exists
         try:
@@ -235,6 +231,8 @@ def getMediaDateTimeStamp(data):
 
         while len(entryInfo.millisecond) < 3:
             entryInfo.millisecond = '0' + entryInfo.millisecond
+
+        # entryInfo.printInfo()
 
         earlyDateTimeInfo = getEarlierDateTime(earlyDateTimeInfo, entryInfo)
 
@@ -315,6 +313,51 @@ def prettyPrintTags(dataDictionary):
     print '>>> done!'
 
 
+
+# print tags
+def prettyPrintDateTimeTags(dataDictionary):
+    # print dataDictionary
+    print '>>> pretty printing EXIF tags'
+    # for key, value in dataDictionary.iteritems():
+    #     print '%s\t:\t%s' % (key, value)
+
+
+    counter = 0
+    longestTag = 0
+
+    # get string length of longest key
+    # assit in pretty printing
+    for key in dataDictionary.keys():
+        if len(key) > longestTag:
+            longestTag = len(key)
+
+    # pretty print exif tags
+    for tag, entry in sorted(dataDictionary.iteritems()):
+        # excludes text encoded tags
+        # these are just a ton of garbage data we dont need
+        if 'date' in tag.lower():
+
+            # calculate number of tab characters needed to pretty print
+            tabsNeeded = ((longestTag - len(tag))/4) + 1
+
+            # print all in line and numbered
+            if counter < 100:
+                print '%s:\t\t%s:' % (counter, tag),
+            else:
+                print '%s:\t%s:' % (counter, tag),
+            print '\t' * tabsNeeded,
+            print entry
+            counter += 1
+
+    print '>>> done!'
+
+
+
+
+
+
+
+
 #------------------------------------------------------------------------------
 #		file processing functions
 #------------------------------------------------------------------------------
@@ -337,8 +380,11 @@ def processMediaFile(mediaFile, userName):
     cameraInfo = getCameraModel(exifTagsDict)
     cameraInfo.printInfo()
 
+    # spacer()
+    # prettyPrintTags(exifTagsDict)
+
     spacer()
-    prettyPrintTags(exifTagsDict)
+    prettyPrintDateTimeTags(exifTagsDict)
 
     spacer()
     destinationDir = '/DESTINATION_DIRECTORY'
@@ -384,12 +430,12 @@ def main():
 
     print args
 
-    # processMediaFile(args['mediaFile'], args['artistName'])
+    processMediaFile(args['mediaFile'], args['artistName'])
 
-    try:
-        processMediaFile(args['mediaFile'], args['artistName'])
-    except:
-        print '>>> no files to process... all done!'
+    # try:
+    #     processMediaFile(args['mediaFile'], args['artistName'])
+    # except:
+    #     print '>>> no files to process... all done!'
 
 
 if __name__ == '__main__':
