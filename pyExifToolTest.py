@@ -24,7 +24,27 @@ class cameraObject:
         print 'Software:\t\t%s' % self.software
 
 
+class mediaDateTimeObject:
 
+    def __init__(self, tag, year, month, day, hour, minute, second, millisecond):
+        self.tag = tag
+        self.year = year
+        self.month = month
+        self.day = day
+        self.hour = hour
+        self.minute = minute
+        self.second = second
+        self.millisecond = millisecond
+
+    def printInfo(self):
+        print 'tag:\t\t\t%s' % self.tag
+        print 'year:\t\t\t%s' % self.year
+        print 'month:\t\t\t%s' % self.month
+        print 'day:\t\t\t%s' % self.day
+        print 'hour:\t\t\t%s' % self.hour
+        print 'minute:\t\t\t%s' % self.minute
+        print 'second:\t\t\t%s' % self.second
+        print 'millisecond:\t%s' % self.millisecond
 
 
 
@@ -97,7 +117,6 @@ def prettyPrintTags(dataDictionary):
 
     print '>>> done!'
 
-
 def JSONToDict(data):
     print '>>> creating exifDict from json data...'
 
@@ -127,10 +146,22 @@ def getDirectoryContents(dir):
         else:
             print 'not sure what happened...'
 
+def getEarlierDateTime(tagA, tagB):
+
+    print 'TAG:\t\t\t%s\t%s' % (tagA.tag, tagB.tag)
+    print 'YEAR:\t\t\t%s\t%s' % (tagA.year, tagB.year)
+    print 'MONTH:\t\t\t%s\t\t%s' % (tagA.month, tagB.month)
+    print 'DAY:\t\t\t%s\t\t%s' % (tagA.day, tagB.day)
+    print 'HOUR:\t\t\t%s\t\t%s' % (tagA.hour, tagB.hour)
+    print 'MINUTE:\t\t\t%s\t\t%s' % (tagA.minute, tagB.minute)
+    print 'SECOND:\t\t\t%s\t\t%s' % (tagA.second, tagB.second)
+    print 'MILLISECOND:\t%s\t\t%s' % (tagA.millisecond, tagB.millisecond)
+
+    print '-' * 20
 
 
 
-
+    return tagB
 
 
 
@@ -184,7 +215,21 @@ def getCameraModel(data):
 def getMediaDateTimeStamp(data):
     print '>>> getting earliest media time stamp...'
 
-    # collect all date relted keys and values
+    # # default date time information
+    tag = 'NONE'
+    year = '9999'
+    month = '99'
+    day = '99'
+    hour = '99'
+    minute = '99'
+    second = '99'
+    millisecond = '999'
+
+
+    entryInfo = mediaDateTimeObject(tag, year, month, day, hour, minute, second, millisecond)
+    earlyDateTimeInfo = mediaDateTimeObject(tag, year, month, day, hour, minute, second, millisecond)
+
+    # collect all date related keys and values
     dateTimeTags = []
 
     for key, value in data.iteritems():
@@ -193,14 +238,9 @@ def getMediaDateTimeStamp(data):
             if 'icc' not in key.lower():
                 dateTimeTags.append([key, value])
 
-    # find earliest 'dateTimeTag'
-    earliestTag = ''
-
-    # formatted earliestDateTimeStamp YYYYMMDDHHmmSSsss
-    earliestDateTimeStamp = 999999999999999999999999999
-
-
     for entry in dateTimeTags:
+
+        entryInfo.tag = str(entry[0])
         dateTimeStamp = entry[1]
 
         # remove timezone adjustment if it exists
@@ -209,21 +249,13 @@ def getMediaDateTimeStamp(data):
         except:
             pass
 
-        # default values for each to fall back on
-        yearStamp = ''
-        monthStamp = ''
-        dayStamp = ''
-        hourStamp = ''
-        minuteStamp = ''
-        secondStamp = ''
-        millisecondStamp = ''
-
-        # try to split into dateStamp and timeStamp
+        # try to split into dateStamp and timeStamp, get dateStamp
         try:
             dateStamp = dateTimeStamp.split(' ')[0]
         except:
             dateStamp = '9999:99:99'
 
+        # try to split into dateStamp and timeStamp, get timeStamp
         try:
             timeStamp = dateTimeStamp.split(' ')[1]
 
@@ -234,53 +266,54 @@ def getMediaDateTimeStamp(data):
             timeStamp = '23:59:99'
 
         # update values for each
-        yearStamp = dateStamp.split(':')[0]
-        monthStamp = dateStamp.split(':')[1]
-        dayStamp = dateStamp.split(':')[2]
-        hourStamp = timeStamp.split(':')[0]
-        minuteStamp = timeStamp.split(':')[1]
-        secondStamp = timeStamp.split(':')[2]
+        entryInfo.year = dateStamp.split(':')[0]
+        entryInfo.month = dateStamp.split(':')[1]
+        entryInfo.day = dateStamp.split(':')[2]
+        entryInfo.hour = timeStamp.split(':')[0]
+        entryInfo.minute = timeStamp.split(':')[1]
+        entryInfo.second = timeStamp.split(':')[2]
 
         # try splitting secondStamp into secondStamp and millisecondStamp
         try:
-            millisecondStamp = secondStamp.split('.')[1]
-            secondStamp = secondStamp.split('.')[0]
+            entryInfo.millisecond = entryInfo.second.split('.')[1]
+            entryInfo.second = entryInfo.second.split('.')[0]
 
             # some time stamps come through with an alpha character(s) suffix
             # lets remove those if they exist
-            while millisecondStamp[len(millisecondStamp)-1].isalpha():
-                millisecondStamp = millisecondStamp[:-1]
+            while entryInfo.millisecond[len(entryInfo.millisecond)-1].isalpha():
+                entryInfo.millisecond = entryInfo.millisecond[:-1]
 
         except:
-            millisecondStamp = '999'
+            entryInfo.millisecond = '999'
 
         # format millisecondStamp to be a fixed length
-        if len(millisecondStamp) > 3:
-            millisecondStamp = millisecondStamp[:4]
+        if len(entryInfo.millisecond) > 3:
+            entryInfo.millisecond = entryInfo.millisecond[:4]
 
-        while len(millisecondStamp) < 3:
-            millisecondStamp = millisecondStamp + '0'
+        while len(entryInfo.millisecond) < 3:
+            entryInfo.millisecond = '0' + entryInfo.millisecond
 
-        # format dateTimeStamp for integer comparison
-        dateTimeFormattedStamp = '%s%s%s%s%s%s%s' % (yearStamp,monthStamp,dayStamp,hourStamp,minuteStamp,secondStamp,millisecondStamp)
-        dateTimeFormattedStampINT = int(dateTimeFormattedStamp)
+        # earlyDateTimeInfo = getEarlierDateTime(earlyDateTimeInfo, entryInfo)
+        early
 
-        # check if dateTimeINT is earlier than previous earliestTag
-        if dateTimeFormattedStampINT < earliestDateTimeStamp:
-            earliestTag = str(entry[0])
-            earliestDateTimeStamp = dateTimeFormattedStampINT
 
-        # break string back into components
-        yearStamp = str(earliestDateTimeStamp)[0:4]
-        monthStamp = str(earliestDateTimeStamp)[4:6]
-        dayStamp = str(earliestDateTimeStamp)[6:8]
-        hourStamp = str(earliestDateTimeStamp)[8:10]
-        minuteStamp = str(earliestDateTimeStamp)[10:12]
-        secondStamp = str(earliestDateTimeStamp)[12:14]
-        millisecondStamp = str(earliestDateTimeStamp)[14:17]
 
-    print '>>> done!'
-    return (yearStamp, monthStamp, dayStamp, hourStamp, minuteStamp, secondStamp, millisecondStamp)
+    print'\n\n'
+    print 'EARLIEST TAG IS: '
+    earlyDateTimeInfo.printInfo()
+
+
+
+    print '>>> done!!!'
+    # # return earlyDateTimeInfo
+    return True
+
+
+
+
+
+
+
 
 def getCameraOperator(data, name):
     print '>>> getting camera operator/photographer information...'
@@ -298,7 +331,7 @@ def processMediaFile(mediaFile):
     newFileName = ''
     newFilePath = ''
 
-    spacer()
+    # spacer()
     exifTagsDict = JSONToDict(p.get_json(fileName))
 
     spacer()
@@ -313,7 +346,7 @@ def processMediaFile(mediaFile):
     # prettyPrintTags(exifTagsDict)
 
     # all done!
-    spacer()
+    # spacer()
 
     year = dateTimeStamp[0]
     month = dateTimeStamp[1]
