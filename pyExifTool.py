@@ -131,8 +131,6 @@ def getDirectoryContents(dir):
             print 'not sure what happened...'
 
 
-
-
 #------------------------------------------------------------------------------
 #		main exif tag formatting functions
 #------------------------------------------------------------------------------
@@ -148,7 +146,6 @@ def getEarlierDateTime(tagA, tagB):
         return tagA
     else:
         return tagB
-
 
 # gets earlist date time tag, excludes dates in photoshop or camera profiles
 # returns a list of (dateTimeTag, dateTimeValue)
@@ -312,8 +309,6 @@ def prettyPrintTags(dataDictionary):
 
     print '>>> done!'
 
-
-
 # print dateTime tags
 def prettyPrintDateTimeTags(dataDictionary):
     # print dataDictionary
@@ -355,6 +350,7 @@ def prettyPrintDateTimeTags(dataDictionary):
 #------------------------------------------------------------------------------
 #		file processing functions
 #------------------------------------------------------------------------------
+
 def processMediaFile(mediaFile, userName):
     originalFilePath = str(mediaFile).split("'")[1]
     print ">>> processing '%s'" % originalFilePath
@@ -423,14 +419,14 @@ def main():
     args = vars(parser.parse_args())
 
     print args
+    spacer()
 
-    processMediaFile(args['mediaFile'], args['artistName'])
-
-    # try:
-    #     processMediaFile(args['mediaFile'], args['artistName'])
-    # except:
-    #     print '>>> no files to process... all done!'
-
+    # keep this next line for testing, forces the loop, instead of just trying it...
+    # processMediaFile(args['mediaFile'], args['artistName'])
+    try:
+        processMediaFile(args['mediaFile'], args['artistName'])
+    except:
+        print '>>> no files to process... all done!'
 
 if __name__ == '__main__':
     main()

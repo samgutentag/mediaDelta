@@ -1,5 +1,3 @@
-
-
 Assumptions
 
 	First ExifTool should be installed on the host machine, it can be downloaded here
