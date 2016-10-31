@@ -202,7 +202,7 @@ def getMediaDateTimeStamp(data):
             while timeStamp[len(timeStamp)-1].isalpha():
                 timeStamp = timeStamp[:-1]
         except:
-            timeStamp = '23:59:99'
+            timeStamp = '23:59:99.999'
 
         # set values for each
         entryInfo.year = dateStamp.split(':')[0]
