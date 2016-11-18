@@ -105,7 +105,7 @@ def getFilePath(destinationDir, dateTimeStamp, cameraInfo, userName, extension):
     #                                              dateTimeStamp.month,
     #                                              dateTimeStamp.day)
 
-    filePath = '/photos/%s/fullRes/%s.%s.%s/%s.%s.%s/' % (extension,
+    filePath = '/photos/%s/fullRes/%s.%s.%s/%s.%s.%s/' % (extension.upper(),
                                                         dateTimeStamp.year,
                                                         dateTimeStamp.month,
                                                         dateTimeStamp.day,
@@ -423,8 +423,8 @@ def processMediaFile(mediaFile, userName):
     destinationDir = '/DESTINATION_DIRECTORY'
     correctedFilePath = getFilePath(destinationDir, dateTimeStamp, cameraInfo, userName.lower(), extension)
 
-    print '\t\tmoving\t%s' % originalFilePath
-    print '\t\tto\t\t%s' % correctedFilePath
+    print '\tmoving\t%s' % originalFilePath
+    print '\tto\t\t%s' % correctedFilePath
 
 
     # print '>>> done!'
@@ -463,7 +463,7 @@ def main():
     args = vars(parser.parse_args())
 
     print args
-    spacer()
+    # spacer()
 
     # attempt to process a file if only one is given
     # keep this next line for testing, forces the loop, instead of just trying it...
@@ -481,18 +481,18 @@ def main():
         filesToProcess = getDirectoryContents(args['mediaDirectory'])
 
         for file in filesToProcess:
-            bigSpacer()
+            spacer()
             # processMediaFile(file, args['artistName'])
             try:
                 processMediaFile(file, args['artistName'])
             except:
                 print 'unable to process %s' % file
 
-    spacer()
+    bigSpacer()
 
     print 'ALL DONE!'
 
-    spacer()
+    bigSpacer()
 
 
 if __name__ == '__main__':
