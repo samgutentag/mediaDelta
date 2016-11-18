@@ -60,13 +60,27 @@ def spacer():
     print '\n'
     print '#' + '-'*79
     print '\n'
+def  bigSpacer():
+    print '\n'
+    print '#' + '!'*124
+    print '#' + '!'*124
+    print '\n'
 
-# def openMediaFile
+# checks that a given file exists, and opens it
 def openMediaFile(parser, arg):
     if not os.path.exists(arg):
         parser.error('The file %s does not exist' % arg)
     else:
         return open(arg, 'rb')
+
+# def checks that a given directory exists
+def openMediaDirectory(parser, arg):
+    if not os.path.exists(arg):
+        parser.error('The directory %s does not exist' % arg)
+    else:
+        return arg
+
+
 
 def JSONToDict(data):
     print '>>> creating exifDict from json data...'
@@ -132,18 +146,19 @@ def getFilePath(destinationDir, dateTimeStamp, cameraInfo, userName, extension):
 def getDirectoryContents(dir):
     print ">>> getting contents of directory '%s'" % dir
 
-    for item in dir:
-        # if item is a file
-        if os.path.isfile(item):
-            print '%s is a file!' % item
+    directory_contents = []
 
-        # if item is a directory
-        elif os.path.isdir(item):
-            print '%s is a directory!' % item
-            getDirectoryContents(item)
+    for root, directories, files in os.walk(dir):
+        for filename in files:
+            filePath = os.path.join(root, filename)
+            directory_contents.append(filePath)
+    #
+    #
+    # for item in directory_contents:
+    #     print item
 
-        else:
-            print 'not sure what happened...'
+    return directory_contents
+
 
 
 #------------------------------------------------------------------------------
@@ -222,7 +237,10 @@ def getMediaDateTimeStamp(data):
         entryInfo.day = dateStamp.split(':')[2]
         entryInfo.hour = timeStamp.split(':')[0]
         entryInfo.minute = timeStamp.split(':')[1]
-        entryInfo.second = timeStamp.split(':')[2]
+        try:
+            entryInfo.second = timeStamp.split(':')[2]
+        except:
+            entryInfo.second = '99.999'
 
         # try splitting secondStamp into secondStamp and millisecondStamp
         try:
@@ -367,9 +385,23 @@ def prettyPrintDateTimeTags(dataDictionary):
 #------------------------------------------------------------------------------
 
 def processMediaFile(mediaFile, userName):
-    originalFilePath = str(mediaFile).split("'")[1]
+    # originalFilePath = str(mediaFile).split("'")[1]
+    # when a single file is passed, the file name needs to be trimmed
+    try:
+        originalFilePath = str(mediaFile).split("'")[1]
+    # when a file is passed as part of a ridrectory, it does not need to be trimmed
+    except:
+        originalFilePath = mediaFile
+
     print ">>> processing '%s'" % originalFilePath
     extension = str(originalFilePath.split('.')[-1])
+
+    # ignore dot files i.e. '.DS_Store'
+    if originalFilePath.split('.')[0].endswith('/'):
+        print 'ignoring %s' % originalFilePath
+        return 'IGNORE'
+
+
 
     newFileName = ''
     newFilePath = ''
@@ -377,27 +409,26 @@ def processMediaFile(mediaFile, userName):
     # spacer()
     exifTagsDict = JSONToDict(p.get_json(originalFilePath))
 
-    spacer()
+    # spacer()
     dateTimeStamp = getMediaDateTimeStamp(exifTagsDict)
-    dateTimeStamp.printInfo()
+    # dateTimeStamp.printInfo()
 
-    spacer()
+    # spacer()
     cameraInfo = getCameraModel(exifTagsDict)
-    cameraInfo.printInfo()
+    # cameraInfo.printInfo()
 
     # spacer()
     # prettyPrintTags(exifTagsDict)
 
-    spacer()
+    # spacer()
     # prettyPrintDateTimeTags(exifTagsDict)
-    prettyPrintTags(exifTagsDict)
 
-    spacer()
+    # spacer()
     destinationDir = '/DESTINATION_DIRECTORY'
     correctedFilePath = getFilePath(destinationDir, dateTimeStamp, cameraInfo, userName.lower(), extension)
 
-    print originalFilePath
-    print correctedFilePath
+    print '\t\tmoving\t%s' % originalFilePath
+    print '\t\tto\t\t%s' % correctedFilePath
 
 
     print '>>> done!'
@@ -410,7 +441,7 @@ def processMediaFile(mediaFile, userName):
 
 def main():
     # setup parser
-    parser = argparse.ArgumentParser(description='Read EXIF data ofa  given media file, update filename and sort into structured directory')
+    parser = argparse.ArgumentParser(description='Read EXIF data of a given media file, update filename and sort into structured directory')
 
     # script uses the artist name to help createu uinique file names
     parser.add_argument('-a', '--artistName', dest='artistName',
@@ -430,19 +461,43 @@ def main():
     parser.add_argument('-d', '--mediaDirectory', dest='mediaDirectory',
                         required=False,
                         help='pass a directory of files to process, WARNING: RECURSIVE',
-                        metavar='MEDIA_DIRECTORY', type=lambda x: spacer())
+                        metavar='MEDIA_DIRECTORY',
+                        type=lambda x: openMediaDirectory(parser, x))
 
     args = vars(parser.parse_args())
 
     print args
     spacer()
 
+    # attempt to process a file if only one is given
     # keep this next line for testing, forces the loop, instead of just trying it...
     # processMediaFile(args['mediaFile'], args['artistName'])
-    try:
-        processMediaFile(args['mediaFile'], args['artistName'])
-    except:
-        print '>>> no files to process... all done!'
+
+    if args['mediaFile']:
+        try:
+            processMediaFile(args['mediaFile'], args['artistName'])
+        except:
+            print '>>> no files to process... all done!'
+    elif args['mediaDirectory']:
+
+
+        # process a directory of files
+        filesToProcess = getDirectoryContents(args['mediaDirectory'])
+
+        for file in filesToProcess:
+            bigSpacer()
+            # processMediaFile(file, args['artistName'])
+            try:
+                processMediaFile(file, args['artistName'])
+            except:
+                print 'unable to process %s' % file
+
+    spacer()
+
+    print 'ALL DONE!'
+
+    spacer()
+
 
 if __name__ == '__main__':
     main()
