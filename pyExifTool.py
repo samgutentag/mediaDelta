@@ -84,7 +84,7 @@ def openMediaDirectory(parser, arg):
 
 
 def JSONToDict(data):
-    print '>>> creating exifDict from json data...'
+    # print '>>> creating exifDict from json data...'
 
     if len(data) < 1:
         print '>>> this file has no exif data'
@@ -92,7 +92,7 @@ def JSONToDict(data):
     else:
         # dataDict = dict(sorted(data[0].iteritems()))
         dataDict = dict(sorted(data[0].iteritems()))
-        print '>>> done!'
+        # print '>>> done!'
         return dataDict
 
 # construct file path and name of 'correctly' named file
@@ -145,7 +145,7 @@ def getFilePath(destinationDir, dateTimeStamp, cameraInfo, userName, extension):
 
 # gets contents of a directory
 def getDirectoryContents(dir):
-    print ">>> getting contents of directory '%s'" % dir
+    # print ">>> getting contents of directory '%s'" % dir
 
     directory_contents = []
 
@@ -176,7 +176,7 @@ def getEarlierDateTime(tagA, tagB):
 # gets earlist date time tag, excludes dates in photoshop or camera profiles
 # returns a list of (dateTimeTag, dateTimeValue)
 def getMediaDateTimeStamp(data):
-    print '>>> getting earliest media time stamp...'
+    # print '>>> getting earliest media time stamp...'
 
     # entryInfo = mediaDateTimeObject(tag, year, month, day, hour, minute, second, millisecond)
     earlyDateTimeInfo = mediaDateTimeObject('NONE', '9999', '99', '99', '99', '99', '99', '999')
@@ -262,14 +262,14 @@ def getMediaDateTimeStamp(data):
 
         earlyDateTimeInfo = getEarlierDateTime(earlyDateTimeInfo, entryInfo)
 
-    print '>>> done!'
+    # print '>>> done!'
     return earlyDateTimeInfo
 
 # gets camera and or software device information
 # returns a list of (cameraMake, cameraModel, serialNumber, softwareName)
 # defaults to 'NONE' if a piece of information can not be found
 def getCameraModel(data):
-    print '>>> getting camera info...'
+    # print '>>> getting camera info...'
 
     # we want make, model, serial number, software
     cameraMake = 'NONE'
@@ -297,14 +297,14 @@ def getCameraModel(data):
 
     cameraInfo = cameraObject(cameraMake, cameraModel, serialNumber, softwareName)
 
-    print '>>> done!'
+    # print '>>> done!'
 
     return cameraInfo
 
 # print tags
 def prettyPrintTags(dataDictionary):
     # print dataDictionary
-    print '>>> pretty printing EXIF tags'
+    # print '>>> pretty printing EXIF tags'
     # for key, value in dataDictionary.iteritems():
     #     print '%s\t:\t%s' % (key, value)
 
@@ -336,12 +336,12 @@ def prettyPrintTags(dataDictionary):
             print entry
             counter += 1
 
-    print '>>> done!'
+    # print '>>> done!'
 
 # print dateTime tags
 def prettyPrintDateTimeTags(dataDictionary):
     # print dataDictionary
-    print '>>> pretty printing EXIF tags'
+    # print '>>> pretty printing EXIF tags'
     # for key, value in dataDictionary.iteritems():
     #     print '%s\t:\t%s' % (key, value)
 
@@ -373,7 +373,7 @@ def prettyPrintDateTimeTags(dataDictionary):
             print entry
             counter += 1
 
-    print '>>> done!'
+    # print '>>> done!'
 
 
 #------------------------------------------------------------------------------
@@ -427,7 +427,7 @@ def processMediaFile(mediaFile, userName):
     print '\t\tto\t\t%s' % correctedFilePath
 
 
-    print '>>> done!'
+    # print '>>> done!'
     return newFileName
 
 
