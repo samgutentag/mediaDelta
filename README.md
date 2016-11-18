@@ -26,14 +26,9 @@ Current Sample Folder Structure
 
 Goal Sample Folder Structure
 
-	HardDrive
-		Images
-			2015
-				03
-					20150322120000_username_cameramodel.JPG
-					20150322120100_username_cameramodel.JPG
-					20150322120200_username_cameramodel.JPG
-			2013
-				04
-					20130413120000_username_cameramodel.JPG
-					20130420120000_username_cameramodel.JPG
+	photos
+		<extension>
+			fullRes
+				<YYYY.MM.DD>
+					<cameraModel>.<artist>.<cameraSerial>
+						<YYYYMMDD>_<HHmmSS>.<sss>.<extension>

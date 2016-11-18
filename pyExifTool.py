@@ -13,9 +13,9 @@ class cameraObject:
 
     def __init__(self, make, model, serial, software):
         self.make = make
-        self.model = str(model).replace(' ','')
+        self.model = str(model).replace(' ','.')
         self.serial = serial
-        self.software = str(software).split('(')[0].replace(' ', '').replace('.', '')
+        self.software = str(software).split('(')[0].replace(' ', '.')
 
     def printInfo(self):
         print 'Camera Make:\t%s' % self.make
@@ -85,10 +85,18 @@ def getFilePath(destinationDir, dateTimeStamp, cameraInfo, userName, extension):
     fileName = ''
     filePath = ''
 
-    # example : /DESTINATION_DIRECTORY/2016/10/31/
-    filePath = '%s/%s/%s/%s/' % (destinationDir, dateTimeStamp.year,
-                                                 dateTimeStamp.month,
-                                                 dateTimeStamp.day)
+    # formatting : photos/<ext>/fullRes/YYYY.MM.DD/<cameraModel>.<artist>.<cameraSerial>/
+    # filePath = '%s/%s/%s/%s/' % (destinationDir, dateTimeStamp.year,
+    #                                              dateTimeStamp.month,
+    #                                              dateTimeStamp.day)
+
+    filePath = '/photos/%s/fullRes/%s.%s.%s/%s.%s.%s/' % (extension,
+                                                        dateTimeStamp.year,
+                                                        dateTimeStamp.month,
+                                                        dateTimeStamp.day,
+                                                        cameraInfo.model,
+                                                        userName,
+                                                        cameraInfo.serial)
 
     # camera model may not be known,
     if cameraInfo.model == 'NONE':
@@ -101,12 +109,19 @@ def getFilePath(destinationDir, dateTimeStamp, cameraInfo, userName, extension):
     else:
         cameraName = '_' + cameraInfo.model
 
-    # example : 20161031120130000_username_cameramodel.extension
-    fileName = '%s_%s%s' % (dateTimeStamp.toString(), userName, cameraName)
+    # formatting : YYYYMMDD_HHmmSS.sss.<ext>
+    # fileName = '%s_%s%s' % (dateTimeStamp.toString(), userName, cameraName)
+    fileName = '%s%s%s_%s%s%s.%s.%s' % (dateTimeStamp.year,
+                                        dateTimeStamp.month,
+                                        dateTimeStamp.day,
+                                        dateTimeStamp.hour,
+                                        dateTimeStamp.minute,
+                                        dateTimeStamp.second,
+                                        dateTimeStamp.millisecond,
+                                        extension)
 
-    extension = '.' + extension
 
-    return filePath + fileName + extension
+    return filePath + fileName
 
 
 #------------------------------------------------------------------------------
@@ -374,7 +389,8 @@ def processMediaFile(mediaFile, userName):
     # prettyPrintTags(exifTagsDict)
 
     spacer()
-    prettyPrintDateTimeTags(exifTagsDict)
+    # prettyPrintDateTimeTags(exifTagsDict)
+    prettyPrintTags(exifTagsDict)
 
     spacer()
     destinationDir = '/DESTINATION_DIRECTORY'
