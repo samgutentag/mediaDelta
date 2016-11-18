@@ -4,6 +4,7 @@ import pyexifinfo as p
 import argparse
 import json
 import os
+import shutil
 
 #------------------------------------------------------------------------------
 #		classes
@@ -73,7 +74,7 @@ def openMediaFile(parser, arg):
     else:
         return open(arg, 'rb')
 
-# def checks that a given directory exists
+# checks that a given directory exists
 def openMediaDirectory(parser, arg):
     if not os.path.exists(arg):
         parser.error('The directory %s does not exist' % arg)
@@ -152,11 +153,6 @@ def getDirectoryContents(dir):
         for filename in files:
             filePath = os.path.join(root, filename)
             directory_contents.append(filePath)
-    #
-    #
-    # for item in directory_contents:
-    #     print item
-
     return directory_contents
 
 
