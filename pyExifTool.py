@@ -385,7 +385,7 @@ def processMediaFile(mediaFile, userName):
     # when a single file is passed, the file name needs to be trimmed
     try:
         originalFilePath = str(mediaFile).split("'")[1]
-    # when a file is passed as part of a ridrectory, it does not need to be trimmed
+    # when a file is passed as part of a directory, it does not need to be trimmed
     except:
         originalFilePath = mediaFile
 
@@ -396,11 +396,6 @@ def processMediaFile(mediaFile, userName):
     if originalFilePath.split('.')[0].endswith('/'):
         print 'ignoring %s' % originalFilePath
         return 'IGNORE'
-
-
-
-    newFileName = ''
-    newFilePath = ''
 
     # spacer()
     exifTagsDict = JSONToDict(p.get_json(originalFilePath))
@@ -426,9 +421,34 @@ def processMediaFile(mediaFile, userName):
     print '\tmoving\t%s' % originalFilePath
     print '\tto\t\t%s' % correctedFilePath
 
-
     # print '>>> done!'
-    return newFileName
+    return True
+
+def getUniqueCameras(mediaFile):
+    # originalFilePath = str(mediaFile).split("'")[1]
+    # when a single file is passed, the file name needs to be trimmed
+    try:
+        originalFilePath = str(mediaFile).split("'")[1]
+    # when a file is passed as part of a directory, it does not need to be trimmed
+    except:
+        originalFilePath = mediaFile
+
+    print ">>> getting camera info for '%s'" % originalFilePath
+    extension = str(originalFilePath.split('.')[-1])
+
+    # ignore dot files i.e. '.DS_Store'
+    if originalFilePath.split('.')[0].endswith('/'):
+        print 'ignoring %s' % originalFilePath
+        return 'IGNORE'
+
+    # spacer()
+    exifTagsDict = JSONToDict(p.get_json(originalFilePath))
+
+    # spacer()
+    cameraInfo = getCameraModel(exifTagsDict)
+    # cameraInfo.printInfo()
+
+    return cameraInfo
 
 
 #------------------------------------------------------------------------------
@@ -465,6 +485,11 @@ def main():
     print args
     # spacer()
 
+
+    cameraDict = {}
+
+
+
     # attempt to process a file if only one is given
     # keep this next line for testing, forces the loop, instead of just trying it...
     # processMediaFile(args['mediaFile'], args['artistName'])
@@ -480,13 +505,38 @@ def main():
         # process a directory of files
         filesToProcess = getDirectoryContents(args['mediaDirectory'])
 
+        fileProcessCounter = 1
         for file in filesToProcess:
-            spacer()
+            # spacer()
             # processMediaFile(file, args['artistName'])
             try:
-                processMediaFile(file, args['artistName'])
+                # processMediaFile(file, args['artistName'])
+
+                # build list of unique cameraInfo with counters
+                print '%s of %s' % (fileProcessCounter, len(filesToProcess))
+                cameraInfo = getUniqueCameras(file)
+                # cameraInfo.printInfo()
+
+                cameraString = '%s_%s_%s_%s' % (cameraInfo.make, cameraInfo.model, cameraInfo.serial, cameraInfo.software)
+
+                if cameraString in cameraDict:
+                    pass
+                else:
+                    cameraDict[cameraString] = file
+
             except:
                 print 'unable to process %s' % file
+
+            fileProcessCounter += 1
+
+        spacer()
+        for key, value in cameraDict.iteritems():
+            print '%s\t%s' % (key, value)
+
+
+
+
+
 
     bigSpacer()
 
