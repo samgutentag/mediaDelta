@@ -7,7 +7,7 @@ import os
 import shutil
 import utils
 
-# special stuff to handle known non ascii cahracters, blame sony! (not really)
+
 import sys  # import sys package, if not already imported
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -218,14 +218,14 @@ def makeCopy(sourceFile, destinationFile):
             counter += 1
 
         # copy file
-        shutil.copy2(sourceFile, destinationFile_adjusted)
+        # shutil.copy2(sourceFile, destinationFile_adjusted)
 
         return destinationFile_adjusted
 
 
     else:
         # print 'would have been copied'
-        shutil.copy2(sourceFile, destinationFile)
+        # shutil.copy2(sourceFile, destinationFile)
         return destinationFile
 
 
@@ -400,7 +400,7 @@ def prettyPrintTags(dataDictionary):
             else:
                 print '%s:\t%s:' % (counter, tag),
             print '\t' * tabsNeeded,
-            print entry
+            print str(entry)
             counter += 1
 
 # print dateTime tags
@@ -499,7 +499,6 @@ def cameraLabelCleaner(camera, userName):
 
     return cleanCameraString
 
-
 #------------------------------------------------------------------------------
 #		file processing functions
 #------------------------------------------------------------------------------
@@ -527,6 +526,12 @@ def processMediaFile(mediaFile, userName, destinationDir):
     exifTagsDict = JSONToDict(p.get_json(originalFilePath))
     dateTimeStamp = getMediaDateTimeStamp(exifTagsDict)
     cameraInfo = getCameraModel(exifTagsDict)
+
+
+    # print information
+    prettyPrintTags(exifTagsDict)
+    cameraInfo.printInfo()
+    dateTimeStamp.printInfo()
 
     # build file path for media file to be copied to
     correctedFilePath = getFilePath(destinationDir, dateTimeStamp, cameraInfo, userName.lower(), extension)
@@ -613,11 +618,12 @@ def main():
 
     # attempt to process a passed file
     if args['mediaFile']:
-        try:
-            processMediaFile(args['mediaFile'], args['artistName'], args['outputDirectory'])
-
-        except:
-            print '>>> Could not process file'
+        # try:
+        #     processMediaFile(args['mediaFile'], args['artistName'], args['outputDirectory'])
+        #
+        # except:
+        #     print '>>> Could not process file'
+        processMediaFile(args['mediaFile'], args['artistName'], args['outputDirectory'])
 
     # attempts to process a directory of files
     elif args['mediaDirectory']:
@@ -633,25 +639,10 @@ def main():
                 print '\n%s of %s' % (fileProcessCounter, len(filesToProcess))
                 processMediaFile(file, args['artistName'], args['outputDirectory'])
 
-                # build list of unique cameraInfo with counters
-                # cameraInfo = getUniqueCameras(file)
-
-                # cameraString = '%s_%s_%s_%s' % (cameraInfo.make, cameraInfo.model, cameraInfo.serial, cameraInfo.software)
-                #
-                # if cameraString in cameraDict:
-                #     pass
-                # else:
-                #     cameraDict[cameraString] = file
-
             except:
                 print 'skipping %s' % file
 
             fileProcessCounter += 1
-
-        bigSpacer()
-        # for key, value in sorted(cameraDict.iteritems()):
-        #     print '%s\t%s' % (key, value)
-        # prettyPrintDict(cameraDict)
 
     bigSpacer()
 
