@@ -154,6 +154,25 @@ def getFilePath(destinationDir, dateTimeStamp, cameraInfo, userName, extension):
     return filePath + fileName
 
 
+# copy files and preserve metadata
+def makeCopy(sourceFile, destinationFile):
+
+    destinationFileName = destinationFile.split('/')[-1]
+
+    destinationFileDirectory = destinationFile[:-len(destinationFileName)]
+
+    # check that destination directory exists, else create it:
+    if not os.path.exists(destinationFileDirectory):
+        os.makedirs(destinationFileDirectory)
+
+    # check if file exists, do not copy if it does
+    if os.path.isfile(destinationFile):
+        print 'file already exists... skipping' % destinationFile
+    else:
+        shutil.copy2(sourceFile, destinationFile)
+
+
+
 #------------------------------------------------------------------------------
 #		main exif tag formatting functions
 #------------------------------------------------------------------------------
@@ -376,6 +395,25 @@ def prettyPrintDateTimeTags(dataDictionary):
 
     # print '>>> done!'
 
+# pretty print a dictionary in key value pairs, well spaced
+def prettyPrintDict(dictionary):
+
+    longestKey = 0
+
+    for key in dictionary:
+        if len(key) > longestKey:
+            longestKey = len(key)
+
+    for key, value in sorted(dictionary.iteritems()):
+        spacesNeeded = longestKey - len(key) + 4
+        spaces = ' ' * spacesNeeded
+        print '%s%s%s' % (key, spaces, value)
+
+    return True
+
+
+
+
 # clean up camera information for file naming
 def cameraLabelCleaner(camera, userName):
 
@@ -424,9 +462,9 @@ def cameraLabelCleaner(camera, userName):
 
 
     else:
-        print 'camera make not was not an option...'
+        # print 'camera make not was not an option...'
         # camera.printInfo()
-        cleanCameraString = 'JUNKJUNKJUNK'
+        cleanCameraString = 'UNKNOWNCAMERA'
 
 
     return cleanCameraString
@@ -462,26 +500,18 @@ def processMediaFile(mediaFile, userName, destinationDir):
     dateTimeStamp = getMediaDateTimeStamp(exifTagsDict)
     cameraInfo = getCameraModel(exifTagsDict)
 
-
-    # dateTimeStamp.printInfo()
-    # spacer()
-    # cleanCameraString = cameraLabelCleaner(cameraInfo)
-    # print cleanCameraString
-    # spacer()
-
-    # spacer()
-    # prettyPrintTags(exifTagsDict)
-    #
-    # spacer()
-    # prettyPrintDateTimeTags(exifTagsDict)
-
-    # spacer()
-    # destinationDir = '/PHOTOS'
     correctedFilePath = getFilePath(destinationDir, dateTimeStamp, cameraInfo, userName.lower(), extension)
 
-    print '\tmoving\t%s' % originalFilePath
-    print '\tto\t\t%s' % correctedFilePath
+    # print '\tmoving\t%s' % originalFilePath
+    # print '\tto\t\t%s' % correctedFilePath
     # spacer()
+
+    try:
+        makeCopy(originalFilePath, correctedFilePath)
+        print '\tmoved\t%s' % originalFilePath
+        print '\tto\t\t%s' % correctedFilePath
+    except:
+        print 'skipping... already exsits...'
 
     # print '>>> done!'
     return True
@@ -549,7 +579,14 @@ def main():
                         metavar='OUTPUT_DIRECTORY')
 
     args = vars(parser.parse_args())
-    print args
+
+    bigSpacer()
+
+    print 'Arguments...'
+    # for key,value in sorted(args.iteritems()):
+    #     print '%s\t%s' % (key, value)
+
+    prettyPrintDict(args)
 
     cameraDict = {}
 
@@ -559,8 +596,7 @@ def main():
             processMediaFile(args['mediaFile'], args['artistName'], args['outputDirectory'])
 
         except:
-            print '>>> no files to process... all done!'
-
+            print '>>> Could not process file'
 
     # process a directory
     elif args['mediaDirectory']:
@@ -571,9 +607,8 @@ def main():
         fileProcessCounter = 1
         bigSpacer()
         for file in filesToProcess:
-            
-            try:
 
+            try:
                 print '\n%s of %s' % (fileProcessCounter, len(filesToProcess))
                 processMediaFile(file, args['artistName'], args['outputDirectory'])
 
@@ -589,13 +624,14 @@ def main():
                     cameraDict[cameraString] = file
 
             except:
-                print 'unable to process %s' % file
+                print 'skipping %s' % file
 
             fileProcessCounter += 1
 
         bigSpacer()
-        for key, value in sorted(cameraDict.iteritems()):
-            print '%s\t%s' % (key, value)
+        # for key, value in sorted(cameraDict.iteritems()):
+        #     print '%s\t%s' % (key, value)
+        prettyPrintDict(cameraDict)
 
     bigSpacer()
 
