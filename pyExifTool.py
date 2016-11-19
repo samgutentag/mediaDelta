@@ -5,6 +5,7 @@ import argparse
 import json
 import os
 import shutil
+import utils
 
 #------------------------------------------------------------------------------
 #		classes
@@ -52,19 +53,20 @@ class mediaDateTimeObject:
         print 'second:\t\t\t%s' % self.second
         print 'millisecond:\t%s' % self.millisecond
 
+
 #------------------------------------------------------------------------------
 #		functions
 #------------------------------------------------------------------------------
 
-# printing a spacer to console
+# uniform spacers
 def spacer():
     print '\n'
     print '#' + '-'*79
     print '\n'
-def  bigSpacer():
+def bigSpacer():
     print '\n'
-    print '#' + '!'*124
-    print '#' + '!'*124
+    print '#' + '!'*79
+    print '#' + '!'*79
     print '\n'
 
 # checks that a given file exists, and opens it
@@ -94,62 +96,6 @@ def JSONToDict(data):
         # print '>>> done!'
         return dataDict
 
-# construct file path and name of 'correctly' named file
-def getFilePath(destinationDir, dateTimeStamp, cameraInfo, userName, extension):
-    fileName = ''
-    filePath = ''
-
-    # formatting : photos/<ext>/fullRes/YYYY.MM.DD/<cameraModel>.<artist>.<cameraSerial>/
-    # filePath = '%s/%s/%s/%s/' % (destinationDir, dateTimeStamp.year,
-    #                                              dateTimeStamp.month,
-    #                                              dateTimeStamp.day)
-
-
-    cleanCameraString = cameraLabelCleaner(cameraInfo, userName)
-    # print cleanCameraString
-    # spacer()
-
-    # filePath = '/photos/%s/fullRes/%s.%s.%s/%s.%s.%s/' % (extension.upper(),
-    #                                                     dateTimeStamp.year,
-    #                                                     dateTimeStamp.month,
-    #                                                     dateTimeStamp.day,
-    #                                                     cameraInfo.model,
-    #                                                     userName,
-    #                                                     cameraInfo.serial)
-    filePath = '/photos/%s/fullRes/%s.%s.%s/%s/' % (extension.upper(),
-                                                    dateTimeStamp.year,
-                                                    dateTimeStamp.month,
-                                                    dateTimeStamp.day,
-                                                    cleanCameraString)
-
-
-
-
-    # camera model may not be known,
-    if cameraInfo.model == 'NONE':
-        # if it is not, try software,
-        if cameraInfo.software == 'NONE':
-            cameraName = ''
-        # if that is not known, leave blank
-        else:
-            cameraName = '_' + cameraInfo.software
-    else:
-        cameraName = '_' + cameraInfo.model
-
-    # formatting : YYYYMMDD_HHmmSS.sss.<ext>
-    # fileName = '%s_%s%s' % (dateTimeStamp.toString(), userName, cameraName)
-    fileName = '%s%s%s_%s%s%s.%s.%s' % (dateTimeStamp.year,
-                                        dateTimeStamp.month,
-                                        dateTimeStamp.day,
-                                        dateTimeStamp.hour,
-                                        dateTimeStamp.minute,
-                                        dateTimeStamp.second,
-                                        dateTimeStamp.millisecond,
-                                        extension)
-
-
-    return filePath + fileName
-
 
 #------------------------------------------------------------------------------
 #		file relocation functions
@@ -167,6 +113,45 @@ def getDirectoryContents(dir):
             directory_contents.append(filePath)
     return directory_contents
 
+# construct file path and name of 'correctly' named file
+def getFilePath(destinationDir, dateTimeStamp, cameraInfo, userName, extension):
+    fileName = ''
+    filePath = ''
+
+    # clean destinationDir to not include tail slashes
+    while destinationDir.endswith('/'):
+        destinationDir = destinationDir[:-1]
+
+    cleanCameraString = cameraLabelCleaner(cameraInfo, userName)
+    filePath = '%s/%s/fullRes/%s.%s.%s/%s/' % (destinationDir,
+                                                extension.upper(),
+                                                dateTimeStamp.year,
+                                                dateTimeStamp.month,
+                                                dateTimeStamp.day,
+                                                cleanCameraString)
+
+    # camera model may not be known,
+    if cameraInfo.model == 'NONE':
+        # if it is not, try software,
+        if cameraInfo.software == 'NONE':
+            cameraName = ''
+        # if that is not known, leave blank
+        else:
+            cameraName = '_' + cameraInfo.software
+    else:
+        cameraName = '_' + cameraInfo.model
+
+    # formatting : YYYYMMDD_HHmmSS.sss.<ext>
+    fileName = '%s%s%s_%s%s%s.%s.%s' % (dateTimeStamp.year,
+                                        dateTimeStamp.month,
+                                        dateTimeStamp.day,
+                                        dateTimeStamp.hour,
+                                        dateTimeStamp.minute,
+                                        dateTimeStamp.second,
+                                        dateTimeStamp.millisecond,
+                                        extension)
+
+    return filePath + fileName
 
 
 #------------------------------------------------------------------------------
@@ -176,10 +161,11 @@ def getDirectoryContents(dir):
 # compare two mediaDateTimeObjects and return earlier one
 def getEarlierDateTime(tagA, tagB):
 
-    # convert tag parts to an int from a concatenated string of the parts
+    # converts dateTime pieces into an integer for comparison
     tagAINT = int(tagA.year + tagA.month + tagA.day + tagA.hour + tagA.minute + tagA.second + tagA.millisecond)
     tagBINT = int(tagB.year + tagB.month + tagB.day + tagB.hour + tagB.minute + tagB.second + tagB.millisecond)
 
+    # return the larger tag
     if tagAINT <= tagBINT:
         return tagA
     else:
@@ -188,7 +174,6 @@ def getEarlierDateTime(tagA, tagB):
 # gets earlist date time tag, excludes dates in photoshop or camera profiles
 # returns a list of (dateTimeTag, dateTimeValue)
 def getMediaDateTimeStamp(data):
-    # print '>>> getting earliest media time stamp...'
 
     # entryInfo = mediaDateTimeObject(tag, year, month, day, hour, minute, second, millisecond)
     earlyDateTimeInfo = mediaDateTimeObject('NONE', '9999', '99', '99', '99', '99', '99', '999')
@@ -196,15 +181,15 @@ def getMediaDateTimeStamp(data):
     # collect all date related keys and values
     dateTimeTags = []
 
-    # select dateTime key  value pairs as a subset
+    # select dateTime key, value pairs as a subset
     for key, value in data.iteritems():
         if 'date' in key.lower():
+            # exclude some odd tag keys
             if 'icc' not in key.lower():
                 dateTimeTags.append([key, value])
 
     # go through dateTime tags to determine the earliest one
     for entry in dateTimeTags:
-
 
         # default values
         entryInfo = mediaDateTimeObject('NONE', '9999', '99', '99', '99', '99', '99', '999')
@@ -223,7 +208,7 @@ def getMediaDateTimeStamp(data):
         except:
             pass
 
-        # remove postitiv timezone adjustment value if it exists
+        # remove positive timezone adjustment value if it exists
         try:
             dateTimeStamp = dateTimeStamp.split('+')[0]
         except:
@@ -269,14 +254,12 @@ def getMediaDateTimeStamp(data):
         except:
             entryInfo.millisecond = '999'
 
-        # format millisecondStamp to be a fixed length
+        # format millisecondStamp to be a fixed length of 3 digits
         if len(entryInfo.millisecond) > 3:
             entryInfo.millisecond = entryInfo.millisecond[:4]
 
         while len(entryInfo.millisecond) < 3:
             entryInfo.millisecond = '0' + entryInfo.millisecond
-
-        # entryInfo.printInfo()
 
         earlyDateTimeInfo = getEarlierDateTime(earlyDateTimeInfo, entryInfo)
 
@@ -393,7 +376,6 @@ def prettyPrintDateTimeTags(dataDictionary):
 
     # print '>>> done!'
 
-
 # clean up camera information for file naming
 def cameraLabelCleaner(camera, userName):
 
@@ -450,17 +432,11 @@ def cameraLabelCleaner(camera, userName):
     return cleanCameraString
 
 
-
-
-
-
-    return True
-
 #------------------------------------------------------------------------------
 #		file processing functions
 #------------------------------------------------------------------------------
 
-def processMediaFile(mediaFile, userName):
+def processMediaFile(mediaFile, userName, destinationDir):
     # originalFilePath = str(mediaFile).split("'")[1]
     # when a single file is passed, the file name needs to be trimmed
     try:
@@ -500,7 +476,7 @@ def processMediaFile(mediaFile, userName):
     # prettyPrintDateTimeTags(exifTagsDict)
 
     # spacer()
-    destinationDir = '/DESTINATION_DIRECTORY'
+    # destinationDir = '/PHOTOS'
     correctedFilePath = getFilePath(destinationDir, dateTimeStamp, cameraInfo, userName.lower(), extension)
 
     print '\tmoving\t%s' % originalFilePath
@@ -566,30 +542,28 @@ def main():
                         metavar='MEDIA_DIRECTORY',
                         type=lambda x: openMediaDirectory(parser, x))
 
+    # output directory destination
+    parser.add_argument('-o', '--outputDirectory', dest='outputDirectory',
+                        required = True,
+                        help = 'this is root directory that photos will be copied to',
+                        metavar='OUTPUT_DIRECTORY')
+
     args = vars(parser.parse_args())
-
     print args
-    # spacer()
-
 
     cameraDict = {}
 
-
-
     # attempt to process a file if only one is given
-    # keep this next line for testing, forces the loop, instead of just trying it...
-    # processMediaFile(args['mediaFile'], args['artistName'])
-
     if args['mediaFile']:
         try:
-            processMediaFile(args['mediaFile'], args['artistName'])
+            processMediaFile(args['mediaFile'], args['artistName'], args['outputDirectory'])
 
         except:
             print '>>> no files to process... all done!'
 
 
+    # process a directory
     elif args['mediaDirectory']:
-
 
         # process a directory of files
         filesToProcess = getDirectoryContents(args['mediaDirectory'])
@@ -597,12 +571,11 @@ def main():
         fileProcessCounter = 1
         bigSpacer()
         for file in filesToProcess:
-            # spacer()
-            # processMediaFile(file, args['artistName'])
+            
             try:
 
                 print '\n%s of %s' % (fileProcessCounter, len(filesToProcess))
-                processMediaFile(file, args['artistName'])
+                processMediaFile(file, args['artistName'], args['outputDirectory'])
 
                 # build list of unique cameraInfo with counters
                 cameraInfo = getUniqueCameras(file)
@@ -629,6 +602,7 @@ def main():
     print 'ALL DONE!'
 
     bigSpacer()
+
 
 
 if __name__ == '__main__':

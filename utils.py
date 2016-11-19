@@ -1,11 +1,10 @@
 #!/usr/bin/end python
 
-import argparse
 import os
 
 
-# this is pretty much a staging file, ill start moving stuff over here once
-# ive got it all working in a monolithic file
+def main():
+    print 'this is a bunch of utility functions!'
 
-
-# bad form... i know....
+if __name__ == '__main__':
+    main()
