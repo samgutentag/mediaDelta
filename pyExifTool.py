@@ -109,9 +109,28 @@ def getDirectoryContents(dir):
 
     for root, directories, files in os.walk(dir):
         for filename in files:
-            filePath = os.path.join(root, filename)
-            directory_contents.append(filePath)
+            # only add files htat are a valid media file type
+            if isValidMediaFileType(filename):
+                filePath = os.path.join(root, filename)
+                directory_contents.append(filePath)
     return directory_contents
+
+# check if file is a known imag or video format
+def isValidMediaFileType(file):
+
+    extensionToCheck = file.split('.')[-1].upper()
+
+    validImageFileExtensions = ['JPG', 'PNG', 'TIFF']
+    validVideoFileExtensions = ['MOV', 'MP4', 'MPG', 'M4V']
+
+    if extensionToCheck in validVideoFileExtensions:
+        return True
+    elif extensionToCheck in validImageFileExtensions:
+        return True
+    else:
+        return False
+
+    print '%s was found!' % file
 
 # construct file path and name of 'correctly' named file
 def getFilePath(destinationDir, dateTimeStamp, cameraInfo, userName, extension):
@@ -169,7 +188,8 @@ def makeCopy(sourceFile, destinationFile):
     if os.path.isfile(destinationFile):
         print 'file already exists... skipping' % destinationFile
     else:
-        shutil.copy2(sourceFile, destinationFile)
+        print 'would have been copied'
+        # shutil.copy2(sourceFile, destinationFile)
 
 
 
