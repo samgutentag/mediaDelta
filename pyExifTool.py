@@ -81,8 +81,7 @@ def openMediaDirectory(parser, arg):
     else:
         return arg
 
-
-
+# convert json information gathered by exif tools into a dictionary
 def JSONToDict(data):
     # print '>>> creating exifDict from json data...'
 
@@ -105,13 +104,26 @@ def getFilePath(destinationDir, dateTimeStamp, cameraInfo, userName, extension):
     #                                              dateTimeStamp.month,
     #                                              dateTimeStamp.day)
 
-    filePath = '/photos/%s/fullRes/%s.%s.%s/%s.%s.%s/' % (extension.upper(),
-                                                        dateTimeStamp.year,
-                                                        dateTimeStamp.month,
-                                                        dateTimeStamp.day,
-                                                        cameraInfo.model,
-                                                        userName,
-                                                        cameraInfo.serial)
+
+    cleanCameraString = cameraLabelCleaner(cameraInfo, userName)
+    # print cleanCameraString
+    # spacer()
+
+    # filePath = '/photos/%s/fullRes/%s.%s.%s/%s.%s.%s/' % (extension.upper(),
+    #                                                     dateTimeStamp.year,
+    #                                                     dateTimeStamp.month,
+    #                                                     dateTimeStamp.day,
+    #                                                     cameraInfo.model,
+    #                                                     userName,
+    #                                                     cameraInfo.serial)
+    filePath = '/photos/%s/fullRes/%s.%s.%s/%s/' % (extension.upper(),
+                                                    dateTimeStamp.year,
+                                                    dateTimeStamp.month,
+                                                    dateTimeStamp.day,
+                                                    cleanCameraString)
+
+
+
 
     # camera model may not be known,
     if cameraInfo.model == 'NONE':
@@ -205,9 +217,15 @@ def getMediaDateTimeStamp(data):
         if dateTimeStamp.split(':')[0] == '0000':
             break
 
-        # remove timezone adjustment if it exists
+        # remove negative timezone adjustment if it exists
         try:
             dateTimeStamp = dateTimeStamp.split('-')[0]
+        except:
+            pass
+
+        # remove postitiv timezone adjustment value if it exists
+        try:
+            dateTimeStamp = dateTimeStamp.split('+')[0]
         except:
             pass
 
@@ -376,6 +394,68 @@ def prettyPrintDateTimeTags(dataDictionary):
     # print '>>> done!'
 
 
+# clean up camera information for file naming
+def cameraLabelCleaner(camera, userName):
+
+    # camera.printInfo()
+
+    cleanCameraString = ''
+
+
+    # special cases for known cameras
+    # adjustments for Apple cameras, (iPhones, iPads, etc)
+    if camera.make == 'Apple':
+        cleanCameraString = camera.make + '.' + camera.model + '.' + userName
+
+    # adjustments for Canon cameras
+    elif camera.make == 'Canon':
+        # left pad all canon serial numbers with zeros to be 12 digits long
+        if camera.serial == 'NONE':
+            tempSerialNumber = ''
+        else:
+            tempSerialNumber = camera.serial
+
+        while len(tempSerialNumber) < 13:
+            tempSerialNumber = '0' + tempSerialNumber
+
+        cleanCameraString = camera.model + '.' + userName + '.' + tempSerialNumber
+
+    # adjustments for Kodak cameras
+    elif camera.make == 'EASTMAN KODAK COMPANY':
+        cleanCameraString = camera.model
+
+    # adjustments for GoPro cameras
+    elif camera.make == 'GoPro':
+        cleanCameraString = camera.make + '.' + camera.model + '.' + userName
+
+    # adjustments for Sony cameras
+    elif camera.make == 'Sony':
+        # sony camera models tend to have '-' in them, replace with '.'
+        tempModel = camera.model
+        tempModel = tempModel.replace('-', '.')
+
+        cleanCameraString = camera.make + '.' + tempModel + '.' + userName
+
+    # adjustments for Nikon cameras
+    elif camera.make == 'NIKON CORPORATION':
+        cleanCameraString = camera.model + '.' + userName
+
+
+    else:
+        print 'camera make not was not an option...'
+        # camera.printInfo()
+        cleanCameraString = 'JUNKJUNKJUNK'
+
+
+    return cleanCameraString
+
+
+
+
+
+
+    return True
+
 #------------------------------------------------------------------------------
 #		file processing functions
 #------------------------------------------------------------------------------
@@ -389,28 +469,33 @@ def processMediaFile(mediaFile, userName):
     except:
         originalFilePath = mediaFile
 
+    # spacer()
     print ">>> processing '%s'" % originalFilePath
     extension = str(originalFilePath.split('.')[-1])
 
     # ignore dot files i.e. '.DS_Store'
     if originalFilePath.split('.')[0].endswith('/'):
         print 'ignoring %s' % originalFilePath
-        return 'IGNORE'
+        return False
 
     # spacer()
     exifTagsDict = JSONToDict(p.get_json(originalFilePath))
 
     # spacer()
-    dateTimeStamp = getMediaDateTimeStamp(exifTagsDict)
-    # dateTimeStamp.printInfo()
 
-    # spacer()
+    dateTimeStamp = getMediaDateTimeStamp(exifTagsDict)
     cameraInfo = getCameraModel(exifTagsDict)
-    # cameraInfo.printInfo()
+
+
+    # dateTimeStamp.printInfo()
+    # spacer()
+    # cleanCameraString = cameraLabelCleaner(cameraInfo)
+    # print cleanCameraString
+    # spacer()
 
     # spacer()
     # prettyPrintTags(exifTagsDict)
-
+    #
     # spacer()
     # prettyPrintDateTimeTags(exifTagsDict)
 
@@ -420,6 +505,7 @@ def processMediaFile(mediaFile, userName):
 
     print '\tmoving\t%s' % originalFilePath
     print '\tto\t\t%s' % correctedFilePath
+    # spacer()
 
     # print '>>> done!'
     return True
@@ -433,12 +519,12 @@ def getUniqueCameras(mediaFile):
     except:
         originalFilePath = mediaFile
 
-    print ">>> getting camera info for '%s'" % originalFilePath
+    # print ">>> getting camera info for '%s'" % originalFilePath
     extension = str(originalFilePath.split('.')[-1])
 
     # ignore dot files i.e. '.DS_Store'
     if originalFilePath.split('.')[0].endswith('/'):
-        print 'ignoring %s' % originalFilePath
+        # print 'ignoring %s' % originalFilePath
         return 'IGNORE'
 
     # spacer()
@@ -497,8 +583,11 @@ def main():
     if args['mediaFile']:
         try:
             processMediaFile(args['mediaFile'], args['artistName'])
+
         except:
             print '>>> no files to process... all done!'
+
+
     elif args['mediaDirectory']:
 
 
@@ -506,14 +595,16 @@ def main():
         filesToProcess = getDirectoryContents(args['mediaDirectory'])
 
         fileProcessCounter = 1
+        bigSpacer()
         for file in filesToProcess:
             # spacer()
             # processMediaFile(file, args['artistName'])
             try:
-                # processMediaFile(file, args['artistName'])
+
+                print '\n%s of %s' % (fileProcessCounter, len(filesToProcess))
+                processMediaFile(file, args['artistName'])
 
                 # build list of unique cameraInfo with counters
-                print '%s of %s' % (fileProcessCounter, len(filesToProcess))
                 cameraInfo = getUniqueCameras(file)
                 # cameraInfo.printInfo()
 
@@ -529,14 +620,9 @@ def main():
 
             fileProcessCounter += 1
 
-        spacer()
-        for key, value in cameraDict.iteritems():
+        bigSpacer()
+        for key, value in sorted(cameraDict.iteritems()):
             print '%s\t%s' % (key, value)
-
-
-
-
-
 
     bigSpacer()
 
