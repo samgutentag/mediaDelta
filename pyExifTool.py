@@ -120,7 +120,7 @@ def isValidMediaFileType(file):
 
     extensionToCheck = file.split('.')[-1].upper()
 
-    validImageFileExtensions = ['JPG', 'PNG', 'TIFF']
+    validImageFileExtensions = ['JPG', 'PNG', 'TIFF', 'CR2']
     validVideoFileExtensions = ['MOV', 'MP4', 'MPG', 'M4V']
 
     if extensionToCheck in validVideoFileExtensions:
@@ -176,8 +176,22 @@ def getFilePath(destinationDir, dateTimeStamp, cameraInfo, userName, extension):
 # copy files and preserve metadata
 def makeCopy(sourceFile, destinationFile):
 
-    destinationFileName = destinationFile.split('/')[-1]
+    def make_str(counter):
+        # trim leading zeros
 
+        try:
+            counter_temp = counter.split('0')[-1]
+            counterTemp = int(counter_temp) + 1
+        except:
+            counterTemp = int(counter) + 1
+
+        # format to 3 digits
+        while len(str(counterTemp)) < 3:
+            counterTemp = '0' + str(counterTemp)
+
+        return counterTemp
+
+    destinationFileName = destinationFile.split('/')[-1]
     destinationFileDirectory = destinationFile[:-len(destinationFileName)]
 
     # check that destination directory exists, else create it:
@@ -186,10 +200,28 @@ def makeCopy(sourceFile, destinationFile):
 
     # check if file exists, do not copy if it does
     if os.path.isfile(destinationFile):
-        print 'file already exists... skipping' % destinationFile
+        print 'file already exists... trying to make another copy...'
+
+        destinationFile_adjusted = destinationFile
+
+        counter = 0
+        destinationFile_adjusted = destinationFile_adjusted + '.copy' + make_str(counter)
+
+        while os.path.isfile(destinationFile_adjusted):
+            destinationFile_adjusted = destinationFile_adjusted[:-3] + make_str(counter)
+            # print destinationFile_adjusted
+            counter += 1
+
+        # copy file
+        shutil.copy2(sourceFile, destinationFile_adjusted)
+
+        return destinationFile_adjusted
+
+
     else:
-        print 'would have been copied'
-        # shutil.copy2(sourceFile, destinationFile)
+        # print 'would have been copied'
+        shutil.copy2(sourceFile, destinationFile)
+        return destinationFile
 
 
 
@@ -302,15 +334,12 @@ def getMediaDateTimeStamp(data):
 
         earlyDateTimeInfo = getEarlierDateTime(earlyDateTimeInfo, entryInfo)
 
-    # print '>>> done!'
     return earlyDateTimeInfo
 
 # gets camera and or software device information
 # returns a list of (cameraMake, cameraModel, serialNumber, softwareName)
 # defaults to 'NONE' if a piece of information can not be found
 def getCameraModel(data):
-    # print '>>> getting camera info...'
-
     # we want make, model, serial number, software
     cameraMake = 'NONE'
     cameraModel  = 'NONE'
@@ -337,17 +366,10 @@ def getCameraModel(data):
 
     cameraInfo = cameraObject(cameraMake, cameraModel, serialNumber, softwareName)
 
-    # print '>>> done!'
-
     return cameraInfo
 
-# print tags
+# print "most" exif tags, skips encoding tags
 def prettyPrintTags(dataDictionary):
-    # print dataDictionary
-    # print '>>> pretty printing EXIF tags'
-    # for key, value in dataDictionary.iteritems():
-    #     print '%s\t:\t%s' % (key, value)
-
 
     counter = 0
     longestTag = 0
@@ -376,15 +398,8 @@ def prettyPrintTags(dataDictionary):
             print entry
             counter += 1
 
-    # print '>>> done!'
-
 # print dateTime tags
 def prettyPrintDateTimeTags(dataDictionary):
-    # print dataDictionary
-    # print '>>> pretty printing EXIF tags'
-    # for key, value in dataDictionary.iteritems():
-    #     print '%s\t:\t%s' % (key, value)
-
 
     counter = 0
     longestTag = 0
@@ -413,8 +428,6 @@ def prettyPrintDateTimeTags(dataDictionary):
             print entry
             counter += 1
 
-    # print '>>> done!'
-
 # pretty print a dictionary in key value pairs, well spaced
 def prettyPrintDict(dictionary):
 
@@ -431,16 +444,10 @@ def prettyPrintDict(dictionary):
 
     return True
 
-
-
-
 # clean up camera information for file naming
 def cameraLabelCleaner(camera, userName):
 
-    # camera.printInfo()
-
     cleanCameraString = ''
-
 
     # special cases for known cameras
     # adjustments for Apple cameras, (iPhones, iPads, etc)
@@ -480,12 +487,10 @@ def cameraLabelCleaner(camera, userName):
     elif camera.make == 'NIKON CORPORATION':
         cleanCameraString = camera.model + '.' + userName
 
-
     else:
         # print 'camera make not was not an option...'
         # camera.printInfo()
         cleanCameraString = 'UNKNOWNCAMERA'
-
 
     return cleanCameraString
 
@@ -494,6 +499,7 @@ def cameraLabelCleaner(camera, userName):
 #		file processing functions
 #------------------------------------------------------------------------------
 
+# main processing of media file, gets exif data, setups up destination directory and filename, copies file
 def processMediaFile(mediaFile, userName, destinationDir):
     # originalFilePath = str(mediaFile).split("'")[1]
     # when a single file is passed, the file name needs to be trimmed
@@ -512,30 +518,23 @@ def processMediaFile(mediaFile, userName, destinationDir):
         print 'ignoring %s' % originalFilePath
         return False
 
-    # spacer()
+    # get information from exif tags, format dateTime, and Camera class objects
     exifTagsDict = JSONToDict(p.get_json(originalFilePath))
-
-    # spacer()
-
     dateTimeStamp = getMediaDateTimeStamp(exifTagsDict)
     cameraInfo = getCameraModel(exifTagsDict)
 
+    # build file path for media file to be copied to
     correctedFilePath = getFilePath(destinationDir, dateTimeStamp, cameraInfo, userName.lower(), extension)
 
-    # print '\tmoving\t%s' % originalFilePath
-    # print '\tto\t\t%s' % correctedFilePath
-    # spacer()
+    # build file name for meida file to be copied as, appends '.copy' and a counter if it already exists
+    destFile = makeCopy(originalFilePath, correctedFilePath)
 
-    try:
-        makeCopy(originalFilePath, correctedFilePath)
-        print '\tmoved\t%s' % originalFilePath
-        print '\tto\t\t%s' % correctedFilePath
-    except:
-        print 'skipping... already exsits...'
+    print '\tmoved\t%s' % originalFilePath
+    print '\tto\t\t%s' % destFile
 
-    # print '>>> done!'
     return True
 
+# builds a dictionary of all unique camera objects found, and a file sample to match
 def getUniqueCameras(mediaFile):
     # originalFilePath = str(mediaFile).split("'")[1]
     # when a single file is passed, the file name needs to be trimmed
@@ -603,14 +602,11 @@ def main():
     bigSpacer()
 
     print 'Arguments...'
-    # for key,value in sorted(args.iteritems()):
-    #     print '%s\t%s' % (key, value)
-
     prettyPrintDict(args)
 
     cameraDict = {}
 
-    # attempt to process a file if only one is given
+    # attempt to process a passed file
     if args['mediaFile']:
         try:
             processMediaFile(args['mediaFile'], args['artistName'], args['outputDirectory'])
@@ -618,7 +614,7 @@ def main():
         except:
             print '>>> Could not process file'
 
-    # process a directory
+    # attempts to process a directory of files
     elif args['mediaDirectory']:
 
         # process a directory of files
@@ -633,15 +629,14 @@ def main():
                 processMediaFile(file, args['artistName'], args['outputDirectory'])
 
                 # build list of unique cameraInfo with counters
-                cameraInfo = getUniqueCameras(file)
-                # cameraInfo.printInfo()
+                # cameraInfo = getUniqueCameras(file)
 
-                cameraString = '%s_%s_%s_%s' % (cameraInfo.make, cameraInfo.model, cameraInfo.serial, cameraInfo.software)
-
-                if cameraString in cameraDict:
-                    pass
-                else:
-                    cameraDict[cameraString] = file
+                # cameraString = '%s_%s_%s_%s' % (cameraInfo.make, cameraInfo.model, cameraInfo.serial, cameraInfo.software)
+                #
+                # if cameraString in cameraDict:
+                #     pass
+                # else:
+                #     cameraDict[cameraString] = file
 
             except:
                 print 'skipping %s' % file
@@ -651,7 +646,7 @@ def main():
         bigSpacer()
         # for key, value in sorted(cameraDict.iteritems()):
         #     print '%s\t%s' % (key, value)
-        prettyPrintDict(cameraDict)
+        # prettyPrintDict(cameraDict)
 
     bigSpacer()
 
