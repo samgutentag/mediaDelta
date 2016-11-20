@@ -194,7 +194,7 @@ def makeCopy(sourceFile, destinationFile):
         while len(str(counterTemp)) < 3:
             counterTemp = '0' + str(counterTemp)
 
-        return counterTemp
+        return str(counterTemp)
 
     destinationFileName = destinationFile.split('/')[-1]
     destinationFileDirectory = destinationFile[:-len(destinationFileName)]
@@ -503,7 +503,7 @@ def cameraLabelCleaner(camera, userName):
 
     else:
         # print 'camera make not was not an option...'
-        camera.printInfo()
+        # camera.printInfo()
         cleanCameraString = 'UNKNOWNCAMERA'
 
 
