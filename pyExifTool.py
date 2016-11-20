@@ -344,10 +344,13 @@ def getMediaDateTimeStamp(data):
 # gets camera and or software device information
 # returns a list of (cameraMake, cameraModel, serialNumber, softwareName)
 # defaults to 'NONE' if a piece of information can not be found
-def getCameraModel(data):
+def getCameraInformation(data, cameraMake, cameraModel):
     # we want make, model, serial number, software
-    cameraMake = 'NONE'
-    cameraModel  = 'NONE'
+    if not cameraMake:
+        cameraMake = 'NONE'
+    if not cameraModel:
+        cameraModel  = 'NONE'
+
     serialNumber = 'NONE'
     softwareName = 'NONE'
 
@@ -492,10 +495,22 @@ def cameraLabelCleaner(camera, userName):
     elif camera.make.upper() == 'NIKON CORPORATION':
             cleanCameraString = camera.model + '.' + userName
 
+    elif camera.make != 'NONE':
+        cleanCameraString = cleanCameraString + '.' + camera.make
+
+    elif camera.model != 'NONE':
+        cleanCameraString = cleanCameraString + '.' + camera.model
+
     else:
         # print 'camera make not was not an option...'
-        # camera.printInfo()
+        camera.printInfo()
         cleanCameraString = 'UNKNOWNCAMERA'
+
+
+    # remove anly leading '.'
+    while cleanCameraString[0] == '.':
+        cleanCameraString = cleanCameraString[1:]
+
 
     return cleanCameraString
 
@@ -505,7 +520,7 @@ def cameraLabelCleaner(camera, userName):
 #------------------------------------------------------------------------------
 
 # main processing of media file, gets exif data, setups up destination directory and filename, copies file
-def processMediaFile(mediaFile, userName, destinationDir):
+def processMediaFile(mediaFile, userName, destinationDir, cameraMake, cameraModel):
     # originalFilePath = str(mediaFile).split("'")[1]
     # when a single file is passed, the file name needs to be trimmed
     try:
@@ -526,7 +541,7 @@ def processMediaFile(mediaFile, userName, destinationDir):
     # get information from exif tags, format dateTime, and Camera class objects
     exifTagsDict = JSONToDict(p.get_json(originalFilePath))
     dateTimeStamp = getMediaDateTimeStamp(exifTagsDict)
-    cameraInfo = getCameraModel(exifTagsDict)
+    cameraInfo = getCameraInformation(exifTagsDict, cameraMake, cameraModel)
 
     # build file path for media file to be copied to
     correctedFilePath = getFilePath(destinationDir, dateTimeStamp, cameraInfo, userName.lower(), extension)
@@ -561,7 +576,8 @@ def getUniqueCameras(mediaFile):
     exifTagsDict = JSONToDict(p.get_json(originalFilePath))
 
     # spacer()
-    cameraInfo = getCameraModel(exifTagsDict)
+    # cameraInfo = getCameraInformation(exifTagsDict)
+    cameraInfo = getCameraInformation(exifTagsDict, cameraMake, cameraModel)
     # cameraInfo.printInfo()
 
     return cameraInfo
@@ -602,6 +618,16 @@ def main():
                         help = 'this is root directory that photos will be copied to',
                         metavar='OUTPUT_DIRECTORY')
 
+    parser.add_argument('-make', '--cameraMake', dest='cameraMake',
+                        required = False,
+                        help = 'user provided camera make override, be careful, this is a dominant override',
+                        metavar='CAMERA_MAKE')
+
+    parser.add_argument('-model', '--cameraModel', dest='cameraModel',
+                        required = False,
+                        help = 'user provided camera model override, be careful, this is a dominant override',
+                        metavar='CAMERA_MODEL')
+
     args = vars(parser.parse_args())
 
     bigSpacer()
@@ -609,12 +635,10 @@ def main():
     print 'Arguments...'
     prettyPrintDict(args)
 
-    cameraDict = {}
-
     # attempt to process a passed file
     if args['mediaFile']:
         try:
-            processMediaFile(args['mediaFile'], args['artistName'], args['outputDirectory'])
+            processMediaFile(file, args['artistName'], args['outputDirectory'], args['cameraMake'], args['cameraModel'])
 
         except:
             print '>>> Could not process file'
@@ -629,29 +653,12 @@ def main():
         bigSpacer()
         for file in filesToProcess:
 
-            try:
-                print '\n%s of %s' % (fileProcessCounter, len(filesToProcess))
-                processMediaFile(file, args['artistName'], args['outputDirectory'])
-
-                # build list of unique cameraInfo with counters
-                # cameraInfo = getUniqueCameras(file)
-
-                # cameraString = '%s_%s_%s_%s' % (cameraInfo.make, cameraInfo.model, cameraInfo.serial, cameraInfo.software)
-                #
-                # if cameraString in cameraDict:
-                #     pass
-                # else:
-                #     cameraDict[cameraString] = file
-
-            except:
-                print 'skipping %s' % file
+            print '\n%s of %s' % (fileProcessCounter, len(filesToProcess))
+            processMediaFile(file, args['artistName'], args['outputDirectory'], args['cameraMake'], args['cameraModel'])
 
             fileProcessCounter += 1
 
         bigSpacer()
-        # for key, value in sorted(cameraDict.iteritems()):
-        #     print '%s\t%s' % (key, value)
-        # prettyPrintDict(cameraDict)
 
     bigSpacer()
 
