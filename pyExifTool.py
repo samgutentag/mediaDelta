@@ -22,7 +22,6 @@ import argparse
 import json
 import os
 import shutil
-import utils
 
 # special stuff to handle known non ascii cahracters, blame sony! (not really)
 import sys  # import sys package, if not already imported
@@ -84,12 +83,12 @@ class mediaDateTimeObject:
 def spacer():
     print '\n'
     print '#' + '-'*79
-    print '\n'
+
 def bigSpacer():
     print '\n'
     print '#' + '!'*79
     print '#' + '!'*79
-    print '\n'
+
 
 # checks that a given file exists, and opens it
 def openMediaFile(parser, arg):
@@ -363,7 +362,7 @@ def getMediaDateTimeStamp(data):
 # gets camera and or software device information
 # returns a list of (cameraMake, cameraModel, serialNumber, softwareName)
 # defaults to 'NONE' if a piece of information can not be found
-def getCameraInformation(data, cameraMake, cameraModel):
+def getCameraInformation(data, cameraMake = 'NONE', cameraModel = 'NONE'):
     # we want make, model, serial number, software
     if not cameraMake:
         cameraMake = 'NONE'
@@ -656,8 +655,9 @@ def main():
 
     # attempt to process a passed file
     if args['mediaFile']:
+        # processMediaFile(args['mediaFile'], args['artistName'], args['outputDirectory'], args['cameraMake'], args['cameraModel'])
         try:
-            processMediaFile(file, args['artistName'], args['outputDirectory'], args['cameraMake'], args['cameraModel'])
+            processMediaFile(args['mediaFile'], args['artistName'], args['outputDirectory'], args['cameraMake'], args['cameraModel'])
 
         except:
             print '>>> Could not process file'
