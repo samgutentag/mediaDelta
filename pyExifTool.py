@@ -1,5 +1,22 @@
 #!/usr/bin/end python
 
+
+#------------------------------------------------------------------------------
+#		Sample Usage
+#------------------------------------------------------------------------------
+#
+#   > python pyExifTool.py -a samgutentag -d /Volumes/GoProBackUps/DateCorrected/correctedFiles/02b_M-N/ -o /Volumes/MacPak500GB/photos > ~/Desktop/pyExifLog_corrected_02b_take2.txt
+#
+#
+#
+#
+#------------------------------------------------------------------------------
+#
+#------------------------------------------------------------------------------
+
+
+
+
 import pyexifinfo as p
 import argparse
 import json
@@ -133,7 +150,9 @@ def isValidMediaFileType(file):
     elif extensionToCheck in validImageFileExtensions:
         return True
     else:
+        print '%s \t\tis not a valid file extension\n\t%s' % (extensionToCheck, file)
         return False
+
 
     print '%s was found!' % file
 
