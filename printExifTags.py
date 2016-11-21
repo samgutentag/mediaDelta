@@ -25,6 +25,8 @@ class cameraObject:
         self.software = str(software).split('(')[0].replace(' ', '.')
 
     def printInfo(self):
+        spacer()
+        print 'Camera Information'
         print 'Camera Make:\t%s' % self.make
         print 'Camera Model:\t%s' % self.model
         print 'Serial Number:\t%s' % self.serial
@@ -49,6 +51,8 @@ class mediaDateTimeObject:
         return dateTimeString
 
     def printInfo(self):
+        spacer()
+        print 'Date Information'
         print 'tag:\t\t\t%s' % self.tag
         print 'year:\t\t\t%s' % self.year
         print 'month:\t\t\t%s' % self.month
@@ -133,6 +137,7 @@ def isValidMediaFileType(file):
     elif extensionToCheck in validImageFileExtensions:
         return True
     else:
+        print '%s \t\tis not a valid file extension\n\t%s' % (extensionToCheck, file)
         return False
 
     print '%s was found!' % file
@@ -403,36 +408,6 @@ def prettyPrintTags(dataDictionary):
             print str(entry)
             counter += 1
 
-# print dateTime tags
-def prettyPrintDateTimeTags(dataDictionary):
-
-    counter = 0
-    longestTag = 0
-
-    # get string length of longest key
-    # assit in pretty printing
-    for key in dataDictionary.keys():
-        if len(key) > longestTag:
-            longestTag = len(key)
-
-    # pretty print exif tags
-    for tag, entry in sorted(dataDictionary.iteritems()):
-        # excludes text encoded tags
-        # these are just a ton of garbage data we dont need
-        if 'date' in tag.lower():
-
-            # calculate number of tab characters needed to pretty print
-            tabsNeeded = ((longestTag - len(tag))/4) + 1
-
-            # print all in line and numbered
-            if counter < 100:
-                print '%s:\t\t%s:' % (counter, tag),
-            else:
-                print '%s:\t%s:' % (counter, tag),
-            print '\t' * tabsNeeded,
-            print entry
-            counter += 1
-
 # pretty print a dictionary in key value pairs, well spaced
 def prettyPrintDict(dictionary):
 
@@ -449,63 +424,13 @@ def prettyPrintDict(dictionary):
 
     return True
 
-# clean up camera information for file naming
-def cameraLabelCleaner(camera, userName):
-
-    cleanCameraString = ''
-
-    # special cases for known cameras
-    # adjustments for Apple cameras, (iPhones, iPads, etc)
-    if camera.make.upper() == 'APPLE':
-        cleanCameraString = camera.make + '.' + camera.model + '.' + userName
-
-    # adjustments for Canon cameras
-    elif camera.make.upper() == 'CANON':
-            # left pad all canon serial numbers with zeros to be 12 digits long
-            if camera.serial == 'NONE':
-                tempSerialNumber = ''
-            else:
-                tempSerialNumber = camera.serial
-
-            while len(tempSerialNumber) < 13:
-                tempSerialNumber = '0' + tempSerialNumber
-
-            cleanCameraString = camera.model + '.' + userName + '.' + tempSerialNumber
-
-        # adjustments for Kodak cameras
-    elif camera.make.upper() == 'EASTMAN KODAK COMPANY':
-            cleanCameraString = camera.model
-
-        # adjustments for GoPro cameras
-    elif camera.make.upper() == 'GOPRO':
-            cleanCameraString = camera.make + '.' + camera.model + '.' + userName
-
-        # adjustments for Sony cameras
-    elif camera.make.upper() == 'SONY':
-            # sony camera models tend to have '-' in them, replace with '.'
-            tempModel = camera.model
-            tempModel = tempModel.replace('-', '.')
-
-            cleanCameraString = camera.make + '.' + tempModel + '.' + userName
-
-        # adjustments for Nikon cameras
-    elif camera.make.upper() == 'NIKON CORPORATION':
-            cleanCameraString = camera.model + '.' + userName
-
-    else:
-        # print 'camera make not was not an option...'
-        # camera.printInfo()
-        cleanCameraString = 'UNKNOWNCAMERA'
-
-    return cleanCameraString
-
 #------------------------------------------------------------------------------
 #		file processing functions
 #------------------------------------------------------------------------------
 
 # main processing of media file, gets exif data, setups up destination directory and filename, copies file
-def processMediaFile(mediaFile, userName, destinationDir):
-    # originalFilePath = str(mediaFile).split("'")[1]
+# def processMediaFile(mediaFile, userName, destinationDir):
+def processMediaFile(mediaFile):
     # when a single file is passed, the file name needs to be trimmed
     try:
         originalFilePath = str(mediaFile).split("'")[1]
@@ -529,47 +454,12 @@ def processMediaFile(mediaFile, userName, destinationDir):
 
 
     # print information
-    prettyPrintTags(exifTagsDict)
     cameraInfo.printInfo()
     dateTimeStamp.printInfo()
-
-    # build file path for media file to be copied to
-    correctedFilePath = getFilePath(destinationDir, dateTimeStamp, cameraInfo, userName.lower(), extension)
-
-    # build file name for meida file to be copied as, appends '.copy' and a counter if it already exists
-    destFile = makeCopy(originalFilePath, correctedFilePath)
-
-    print '\tmoved\t%s' % originalFilePath
-    print '\tto\t\t%s' % destFile
+    spacer()
+    prettyPrintTags(exifTagsDict)
 
     return True
-
-# builds a dictionary of all unique camera objects found, and a file sample to match
-def getUniqueCameras(mediaFile):
-    # originalFilePath = str(mediaFile).split("'")[1]
-    # when a single file is passed, the file name needs to be trimmed
-    try:
-        originalFilePath = str(mediaFile).split("'")[1]
-    # when a file is passed as part of a directory, it does not need to be trimmed
-    except:
-        originalFilePath = mediaFile
-
-    # print ">>> getting camera info for '%s'" % originalFilePath
-    extension = str(originalFilePath.split('.')[-1])
-
-    # ignore dot files i.e. '.DS_Store'
-    if originalFilePath.split('.')[0].endswith('/'):
-        # print 'ignoring %s' % originalFilePath
-        return 'IGNORE'
-
-    # spacer()
-    exifTagsDict = JSONToDict(p.get_json(originalFilePath))
-
-    # spacer()
-    cameraInfo = getCameraModel(exifTagsDict)
-    # cameraInfo.printInfo()
-
-    return cameraInfo
 
 
 #------------------------------------------------------------------------------
@@ -578,14 +468,7 @@ def getUniqueCameras(mediaFile):
 
 def main():
     # setup parser
-    parser = argparse.ArgumentParser(description='Read EXIF data of a given media file, update filename and sort into structured directory')
-
-    # script uses the artist name to help createu uinique file names
-    parser.add_argument('-a', '--artistName', dest='artistName',
-                        required=False,
-                        default=os.getlogin(),
-                        help='default artist name',
-                        metavar='ARTIST_NAME')
+    parser = argparse.ArgumentParser(description='Output EXIF data of a given media file or files in a directory')
 
     # passing a single file
     parser.add_argument('-f', '--mediaFile', dest='mediaFile',
@@ -601,12 +484,6 @@ def main():
                         metavar='MEDIA_DIRECTORY',
                         type=lambda x: openMediaDirectory(parser, x))
 
-    # output directory destination
-    parser.add_argument('-o', '--outputDirectory', dest='outputDirectory',
-                        required = True,
-                        help = 'this is root directory that photos will be copied to',
-                        metavar='OUTPUT_DIRECTORY')
-
     args = vars(parser.parse_args())
 
     bigSpacer()
@@ -618,12 +495,11 @@ def main():
 
     # attempt to process a passed file
     if args['mediaFile']:
-        # try:
-        #     processMediaFile(args['mediaFile'], args['artistName'], args['outputDirectory'])
-        #
-        # except:
-        #     print '>>> Could not process file'
-        processMediaFile(args['mediaFile'], args['artistName'], args['outputDirectory'])
+        try:
+            processMediaFile(args['mediaFile'])
+
+        except:
+            print '>>> Could not process file'
 
     # attempts to process a directory of files
     elif args['mediaDirectory']:
@@ -637,14 +513,14 @@ def main():
 
             try:
                 print '\n%s of %s' % (fileProcessCounter, len(filesToProcess))
-                processMediaFile(file, args['artistName'], args['outputDirectory'])
+                processMediaFile(file)
 
             except:
                 print 'skipping %s' % file
 
             fileProcessCounter += 1
 
-    bigSpacer()
+    spacer()
 
     print 'ALL DONE!'
 
