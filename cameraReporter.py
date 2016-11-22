@@ -14,9 +14,6 @@
 #
 #------------------------------------------------------------------------------
 
-
-
-
 import pyexifinfo as p
 import argparse
 import json
@@ -573,7 +570,7 @@ def processMediaFile(mediaFile, userName, destinationDir, cameraMake, cameraMode
     return True
 
 # builds a dictionary of all unique camera objects found, and a file sample to match
-def getUniqueCameras(mediaFile):
+def getUniqueCameras(mediaFile, cameraDict):
     # originalFilePath = str(mediaFile).split("'")[1]
     # when a single file is passed, the file name needs to be trimmed
     try:
@@ -594,12 +591,25 @@ def getUniqueCameras(mediaFile):
     exifTagsDict = JSONToDict(p.get_json(originalFilePath))
 
     # spacer()
-    # cameraInfo = getCameraInformation(exifTagsDict)
-    cameraInfo = getCameraInformation(exifTagsDict, cameraMake, cameraModel)
-    # cameraInfo.printInfo()
+    # cameraInfo = getCameraInformation(exifTagsDict, cameraMake, cameraModel)
+    cameraInfo = getCameraInformation(exifTagsDict)
+    cameraInfo.printInfo()
 
-    return cameraInfo
+    camString = '%s_%s_%s_%s' % (cameraInfo.make, cameraInfo.model, cameraInfo.serial, cameraInfo.software)
 
+    print '****'
+    print camString
+    print cameraInfo
+    print mediaFile
+
+    # if camera is not alrady in dictionary, add it
+    if camString not in cameraDict:
+        cameraDict[camString] = [cameraInfo, mediaFile]
+    # else the camera already exists, so append file to its list
+    else:
+        cameraDict[camString].append([cameraInfo, mediaFile])
+
+    return cameraDict
 
 #------------------------------------------------------------------------------
 #		main function
@@ -610,11 +620,11 @@ def main():
     parser = argparse.ArgumentParser(description='Read EXIF data of a given media file, update filename and sort into structured directory')
 
     # script uses the artist name to help createu uinique file names
-    parser.add_argument('-a', '--artistName', dest='artistName',
-                        required=False,
-                        default=os.getlogin(),
-                        help='default artist name',
-                        metavar='ARTIST_NAME')
+    # parser.add_argument('-a', '--artistName', dest='artistName',
+    #                     required=False,
+    #                     default=os.getlogin(),
+    #                     help='default artist name',
+    #                     metavar='ARTIST_NAME')
 
     # passing a single file
     parser.add_argument('-f', '--mediaFile', dest='mediaFile',
@@ -630,21 +640,21 @@ def main():
                         metavar='MEDIA_DIRECTORY',
                         type=lambda x: openMediaDirectory(parser, x))
 
-    # output directory destination
-    parser.add_argument('-o', '--outputDirectory', dest='outputDirectory',
-                        required = True,
-                        help = 'this is root directory that photos will be copied to',
-                        metavar='OUTPUT_DIRECTORY')
-
-    parser.add_argument('-make', '--cameraMake', dest='cameraMake',
-                        required = False,
-                        help = 'user provided camera make override, be careful, this is a dominant override',
-                        metavar='CAMERA_MAKE')
-
-    parser.add_argument('-model', '--cameraModel', dest='cameraModel',
-                        required = False,
-                        help = 'user provided camera model override, be careful, this is a dominant override',
-                        metavar='CAMERA_MODEL')
+    # # output directory destination
+    # parser.add_argument('-o', '--outputDirectory', dest='outputDirectory',
+    #                     required = True,
+    #                     help = 'this is root directory that photos will be copied to',
+    #                     metavar='OUTPUT_DIRECTORY')
+    #
+    # parser.add_argument('-make', '--cameraMake', dest='cameraMake',
+    #                     required = False,
+    #                     help = 'user provided camera make override, be careful, this is a dominant override',
+    #                     metavar='CAMERA_MAKE')
+    #
+    # parser.add_argument('-model', '--cameraModel', dest='cameraModel',
+    #                     required = False,
+    #                     help = 'user provided camera model override, be careful, this is a dominant override',
+    #                     metavar='CAMERA_MODEL')
 
     args = vars(parser.parse_args())
 
@@ -653,11 +663,13 @@ def main():
     print 'Arguments...'
     prettyPrintDict(args)
 
+    cameraDict = {}
+
     # attempt to process a passed file
     if args['mediaFile']:
-        # processMediaFile(args['mediaFile'], args['artistName'], args['outputDirectory'], args['cameraMake'], args['cameraModel'])
         try:
-            processMediaFile(args['mediaFile'], args['artistName'], args['outputDirectory'], args['cameraMake'], args['cameraModel'])
+            # processMediaFile(args['mediaFile'])
+            getUniqueCameras(args['mediaFile'], cameraDict)
 
         except:
             print '>>> Could not process file'
@@ -673,14 +685,21 @@ def main():
         for file in filesToProcess:
 
             print '\n%s of %s' % (fileProcessCounter, len(filesToProcess))
-            processMediaFile(file, args['artistName'], args['outputDirectory'], args['cameraMake'], args['cameraModel'])
+            # processMediaFile(file)
+            getUniqueCameras(file, cameraDict)
 
             fileProcessCounter += 1
 
         bigSpacer()
 
-        
+    # prettyPrintDict(cameraDict)
+    for item in cameraDict:
+        print '#----'
+        print item
+        # print '#----'
+        # item[0].printInfo()
 
+    print '#----'
     bigSpacer()
 
     print 'ALL DONE!'
