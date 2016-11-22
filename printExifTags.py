@@ -1,6 +1,6 @@
 #!/usr/bin/end python
 
-import pyExifTool
+import pyExifTools
 import pyexifinfo as p
 import argparse
 
@@ -28,18 +28,18 @@ def processMediaFile(mediaFile):
         return False
 
     # get information from exif tags, format dateTime, and Camera class objects
-    exifTagsDict = pyExifTool.JSONToDict(p.get_json(originalFilePath))
-    dateTimeStamp = pyExifTool.getMediaDateTimeStamp(exifTagsDict)
-    cameraInfo = pyExifTool.getCameraInformation(exifTagsDict)
+    exifTagsDict = pyExifTools.JSONToDict(p.get_json(originalFilePath))
+    dateTimeStamp = pyExifTools.getMediaDateTimeStamp(exifTagsDict)
+    cameraInfo = pyExifTools.getCameraInformation(exifTagsDict)
 
     # print information
-    # pyExifTool.bigSpacer()
-    pyExifTool.prettyPrintTags(exifTagsDict)
-    pyExifTool.spacer()
+    # pyExifTools.bigSpacer()
+    pyExifTools.prettyPrintTags(exifTagsDict)
+    pyExifTools.spacer()
     cameraInfo.printInfo()
-    pyExifTool.spacer()
+    pyExifTools.spacer()
     dateTimeStamp.printInfo()
-    pyExifTool.bigSpacer()
+    pyExifTools.bigSpacer()
 
 
 
@@ -59,20 +59,20 @@ def main():
                         required=False,
                         help='pass a single file to process',
                         metavar='MEDIA_FILE',
-                        type=lambda x: pyExifTool.openMediaFile(parser, x))
+                        type=lambda x: pyExifTools.openMediaFile(parser, x))
 
     # passing a directory (with or without sub directories) of files
     parser.add_argument('-d', '--mediaDirectory', dest='mediaDirectory',
                         required=False,
                         help='pass a directory of files to process, WARNING: RECURSIVE',
                         metavar='MEDIA_DIRECTORY',
-                        type=lambda x: pyExifTool.openMediaDirectory(parser, x))
+                        type=lambda x: pyExifTools.openMediaDirectory(parser, x))
 
     args = vars(parser.parse_args())
 
     print 'Arguments...'
-    pyExifTool.prettyPrintDict(args)
-    pyExifTool.bigSpacer()
+    pyExifTools.prettyPrintDict(args)
+    pyExifTools.bigSpacer()
 
     # attempt to process a passed file
     if args['mediaFile']:
@@ -85,7 +85,7 @@ def main():
     elif args['mediaDirectory']:
 
         # process a directory of files
-        filesToProcess = pyExifTool.getDirectoryContents(args['mediaDirectory'])
+        filesToProcess = pyExifTools.getDirectoryContents(args['mediaDirectory'])
 
         fileProcessCounter = 1
         for file in filesToProcess:
@@ -98,11 +98,11 @@ def main():
 
             fileProcessCounter += 1
 
-    pyExifTool.spacer()
+    pyExifTools.spacer()
 
     print 'ALL DONE!'
 
-    pyExifTool.bigSpacer()
+    pyExifTools.bigSpacer()
 
 
 
