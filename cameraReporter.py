@@ -56,6 +56,17 @@ def getUniqueCameras(mediaFile, cameraDict):
 
     return cameraDict
 
+def printCameraReport(cameraDict):
+    counter = 1
+    for key,value in cameraDict.iteritems():
+        pyExifTools.spacer()
+        # print 'Entry:\t%i' % (counter)
+        # print '%s\t(%i)' % (key, len(value))
+        print '(%i)\t%s' % (len(value), key)
+        for val in value:
+            print '\t%s' % (val[-1])
+        counter += 1
+
 #------------------------------------------------------------------------------
 #		main function
 #------------------------------------------------------------------------------
@@ -115,15 +126,7 @@ def main():
 
         pyExifTools.bigSpacer()
 
-    counter = 1
-    for key,value in cameraDict.iteritems():
-        pyExifTools.spacer()
-        # print 'Entry:\t%i' % (counter)
-        # print '%s\t(%i)' % (key, len(value))
-        print '(%i)\t%s' % (len(value), key)
-        for val in value:
-            print '\t%s' % (val[-1])
-        counter += 1
+    printCameraReport(cameraDict)
 
     pyExifTools.spacer()
     pyExifTools.bigSpacer()
