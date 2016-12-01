@@ -1,13 +1,11 @@
 #!/usr/bin/end python
 
-
 #------------------------------------------------------------------------------
 #		Sample Usage
 #------------------------------------------------------------------------------
 #
 #   > python cameraReport.py -d ~/Desktop/testPhotos
 #
-#------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
 
 import pyExifTools
@@ -45,18 +43,13 @@ def getUniqueCameras(mediaFile, cameraDict):
     # spacer()
     # cameraInfo = getCameraInformation(exifTagsDict, cameraMake, cameraModel)
     cameraInfo = pyExifTools.getCameraInformation(exifTagsDict)
-    cameraInfo.printInfo()
+    # cameraInfo.printInfo()
 
     camString = '%s_%s_%s_%s' % (cameraInfo.make, cameraInfo.model, cameraInfo.serial, cameraInfo.software)
 
-    print '****'
-    print camString
-    print cameraInfo
-    print mediaFile
-
     # if camera is not alrady in dictionary, add it
     if camString not in cameraDict:
-        cameraDict[camString] = [cameraInfo, mediaFile]
+        cameraDict[camString] = [[cameraInfo, mediaFile]]
     # else the camera already exists, so append file to its list
     else:
         cameraDict[camString].append([cameraInfo, mediaFile])
@@ -97,8 +90,8 @@ def main():
     # attempt to process a passed file
     if args['mediaFile']:
         try:
-            getUniqueCameras(args['mediaFile'], cameraDict)
-
+            cameraDict = getUniqueCameras(args['mediaFile'], cameraDict)
+            print cameraDict
         except:
             print '>>> Could not process file'
 
@@ -112,26 +105,30 @@ def main():
         pyExifTools.bigSpacer()
         for file in filesToProcess:
 
-            print '\n%s of %s' % (fileProcessCounter, len(filesToProcess))
-            getUniqueCameras(file, cameraDict)
+            print 'Processing %s of %s' % (fileProcessCounter, len(filesToProcess))
+            try:
+                cameraDict = getUniqueCameras(file, cameraDict)
+            except:
+                print '>>> Could not process file'
 
             fileProcessCounter += 1
 
         pyExifTools.bigSpacer()
 
-    # prettyPrintDict(cameraDict)
-    for item in cameraDict:
-        print '#----'
-        print item
-        # print '#----'
-        # item[0].printInfo()
+    counter = 1
+    for key,value in cameraDict.iteritems():
+        pyExifTools.spacer()
+        # print 'Entry:\t%i' % (counter)
+        # print '%s\t(%i)' % (key, len(value))
+        print '(%i)\t%s' % (len(value), key)
+        for val in value:
+            print '\t%s' % (val[-1])
+        counter += 1
 
-    print '#----'
+    pyExifTools.spacer()
     pyExifTools.bigSpacer()
 
-    print 'ALL DONE!'
 
-    pyExifTools.bigSpacer()
 
 if __name__ == '__main__':
     main()
