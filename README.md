@@ -9,28 +9,15 @@ Assumptions
 
 	> pip install -U pyexifinfo
 
-Current Sample Folder Structure
-
-	HardDrive
-		DateCorrected
-			Anchorage Square - San Francisco, CA, March 22, 2015
-				20151029_IMG_0168.JPG
-				20151029_IMG_0169.JPG
-				20151029_IMG_0167.JPG
-			April 13, 2013
-				20151030_IMG_0230.JPG
-			April 20, 2013
-				20151030_IMG_0254.JPG
-
 
 
 Goal Sample Folder Structure
 
 	photos
-		<extension>
-			<YYYY.MM.DD>
-				<cameraModel>.<artist>.<cameraSerial>
-					<YYYYMMDD>_<HHmmSS>.<sss>.<extension>
+		extension
+			YYYY.MM.DD
+				cameraModel.artist.cameraSerial
+					YYYYMMDD_HHmmSS.sss.extension
 
 
 
