@@ -29,7 +29,7 @@ def processMediaFile(mediaFile):
 
     # get information from exif tags, format dateTime, and Camera class objects
     exifTagsDict = pyExifTools.JSONToDict(p.get_json(originalFilePath))
-    dateTimeStamp = pyExifTools.getMediaDateTimeStamp(exifTagsDict)
+    # dateTimeStamp = pyExifTools.getMediaDateTimeStamp(exifTagsDict)
     cameraInfo = pyExifTools.getCameraInformation(exifTagsDict)
 
     # print information
@@ -76,10 +76,11 @@ def main():
 
     # attempt to process a passed file
     if args['mediaFile']:
-        try:
-            processMediaFile(args['mediaFile'])
-        except:
-            print '>>> Could not process file'
+        processMediaFile(args['mediaFile'])
+        # try:
+        #     processMediaFile(args['mediaFile'])
+        # except:
+        #     print '>>> Could not process file'
 
     # attempts to process a directory of files
     elif args['mediaDirectory']:
