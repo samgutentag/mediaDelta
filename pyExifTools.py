@@ -7,15 +7,9 @@
 #
 #   > python pyExifTool.py -a samgutentag -d /Volumes/GoProBackUps/DateCorrected/correctedFiles/02b_M-N/ -o /Volumes/MacPak500GB/photos > ~/Desktop/pyExifLog_corrected_02b_take2.txt
 #
-#
-#
-#
 #------------------------------------------------------------------------------
 #
 #------------------------------------------------------------------------------
-
-
-
 
 import pyexifinfo as p
 import argparse
@@ -165,12 +159,12 @@ def getFilePath(destinationDir, dateTimeStamp, cameraInfo, userName, extension):
         destinationDir = destinationDir[:-1]
 
     cleanCameraString = cameraLabelCleaner(cameraInfo, userName)
-    filePath = '%s/%s/fullRes/%s.%s.%s/%s/' % (destinationDir,
-                                                extension.upper(),
-                                                dateTimeStamp.year,
-                                                dateTimeStamp.month,
-                                                dateTimeStamp.day,
-                                                cleanCameraString)
+    filePath = '%s/%s/%s.%s.%s/%s/' % (destinationDir,
+                                        extension.upper(),
+                                        dateTimeStamp.year,
+                                        dateTimeStamp.month,
+                                        dateTimeStamp.day,
+                                        cleanCameraString)
 
     # camera model may not be known,
     if cameraInfo.model == 'NONE':
@@ -194,7 +188,6 @@ def getFilePath(destinationDir, dateTimeStamp, cameraInfo, userName, extension):
                                         extension)
 
     return filePath + fileName
-
 
 # copy files and preserve metadata
 def makeCopy(sourceFile, destinationFile):
@@ -245,7 +238,6 @@ def makeCopy(sourceFile, destinationFile):
         # print 'would have been copied'
         shutil.copy2(sourceFile, destinationFile)
         return destinationFile
-
 
 
 #------------------------------------------------------------------------------
@@ -686,8 +678,6 @@ def main():
     print 'ALL DONE!'
 
     bigSpacer()
-
-
 
 if __name__ == '__main__':
     main()

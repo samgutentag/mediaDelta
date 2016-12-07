@@ -1,5 +1,14 @@
 #!/usr/bin/end python
 
+#------------------------------------------------------------------------------
+#		Sample Usage
+#------------------------------------------------------------------------------
+#
+#   > python printExifTags.py -d ~/Desktop/testPhotos
+#   > python printExifTags.py -f ~/Desktop/testPhotos/samplePhoto.jpg
+#
+#------------------------------------------------------------------------------
+
 import pyExifTools
 import pyexifinfo as p
 import argparse
@@ -29,7 +38,7 @@ def processMediaFile(mediaFile):
 
     # get information from exif tags, format dateTime, and Camera class objects
     exifTagsDict = pyExifTools.JSONToDict(p.get_json(originalFilePath))
-    # dateTimeStamp = pyExifTools.getMediaDateTimeStamp(exifTagsDict)
+    dateTimeStamp = pyExifTools.getMediaDateTimeStamp(exifTagsDict)
     cameraInfo = pyExifTools.getCameraInformation(exifTagsDict)
 
     # print information
@@ -40,8 +49,6 @@ def processMediaFile(mediaFile):
     pyExifTools.spacer()
     dateTimeStamp.printInfo()
     pyExifTools.bigSpacer()
-
-
 
     return True
 
@@ -104,8 +111,6 @@ def main():
     print 'ALL DONE!'
 
     pyExifTools.bigSpacer()
-
-
 
 if __name__ == '__main__':
     main()
