@@ -20,8 +20,6 @@ Goal Sample Folder Structure
 					YYYYMMDD_HHmmSS.sss.extension
 
 
-
-
 printExifTags.py
 	prints all exif tags for a single file or a directory of files
 
