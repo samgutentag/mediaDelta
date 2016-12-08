@@ -671,13 +671,5 @@ def main():
 
         bigSpacer()
 
-
-
-    bigSpacer()
-
-    print 'ALL DONE!'
-
-    bigSpacer()
-
 if __name__ == '__main__':
     main()

@@ -43,7 +43,13 @@ def getUniqueCameras(mediaFile, cameraDict):
 
     cameraInfo = pyExifTools.getCameraInformation(exifTagsDict)
 
-    camString = '%s_%s_%s_%s' % (cameraInfo.make, cameraInfo.model, cameraInfo.serial, cameraInfo.software)
+    cameraInfo.printInfo()
+
+    # camString = '%s_%s_%s_%s' % (cameraInfo.make, cameraInfo.model, cameraInfo.serial, cameraInfo.software)
+    camString = '%s_%s' % (cameraInfo.make, cameraInfo.model)
+
+    if camString == 'NONE_NONE':
+        camString = '%s' % (cameraInfo.software)
 
     # if camera is not alrady in dictionary, add it
     if camString not in cameraDict:
@@ -58,8 +64,6 @@ def printCameraReport(cameraDict):
     counter = 1
     for key,value in sorted(cameraDict.iteritems()):
         pyExifTools.spacer()
-        # print 'Entry:\t%i' % (counter)
-        # print '%s\t(%i)' % (key, len(value))
         print '(%i)\t%s' % (len(value), key)
         for val in value:
             print '\t%s' % (val[-1])
@@ -126,7 +130,6 @@ def main():
 
     printCameraReport(cameraDict)
 
-    pyExifTools.spacer()
     pyExifTools.bigSpacer()
 
 
