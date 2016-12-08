@@ -135,7 +135,7 @@ def isValidMediaFileType(file):
 
     extensionToCheck = file.split('.')[-1].upper()
 
-    validImageFileExtensions = ['JPG', 'PNG', 'TIFF', 'CR2']
+    validImageFileExtensions = ['JPG', 'PNG', 'TIF', 'TIFF', 'CR2']
     validVideoFileExtensions = ['MOV', 'MP4', 'MPG', 'M4V', '3G2']
 
     if extensionToCheck in validVideoFileExtensions:
