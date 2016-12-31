@@ -43,7 +43,7 @@ def getUniqueCameras(mediaFile, cameraDict):
 
     cameraInfo = pyExifTools.getCameraInformation(exifTagsDict)
 
-    cameraInfo.printInfo()
+    # cameraInfo.printInfo()
 
     # camString = '%s_%s_%s_%s' % (cameraInfo.make, cameraInfo.model, cameraInfo.serial, cameraInfo.software)
     camString = '%s_%s' % (cameraInfo.make, cameraInfo.model)
@@ -61,13 +61,20 @@ def getUniqueCameras(mediaFile, cameraDict):
     return cameraDict
 
 def printCameraReport(cameraDict):
-    counter = 1
+
+    # print list of all unique cameras, and their count
+    for key,value in sorted(cameraDict.iteritems()):
+        pyExifTools.spacer()
+        print '(%i)\t%s' % (len(value), key)
+
+    pyExifTools.bigSpacer()
+
+    # print list of all unique cameras, their count, and all files that have the camera
     for key,value in sorted(cameraDict.iteritems()):
         pyExifTools.spacer()
         print '(%i)\t%s' % (len(value), key)
         for val in value:
             print '\t%s' % (val[-1])
-        counter += 1
 
 #------------------------------------------------------------------------------
 #		main function
@@ -124,9 +131,12 @@ def main():
             except:
                 print '>>> Could not process file'
 
+
             fileProcessCounter += 1
 
         pyExifTools.bigSpacer()
+
+
 
     printCameraReport(cameraDict)
 

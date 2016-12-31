@@ -30,7 +30,25 @@ class cameraObject:
         print 'Serial Number:\t%s' % self.serial
         print 'Software:\t\t%s' % self.software
 
-class mediaDateTimeObject:
+
+class mediaFileObject:
+
+    def __init__(self, type, extension, dateTime, camera, creator):
+        self.type = type
+        self.extension = extension
+        self.dateTime = dateTime
+        self.camera = camera
+        self.creator = creator
+
+    def printInfo(self):
+        print 'type:\t\t%s' % (self.type)
+        print 'extension:\t\t%s' % (self.extension)
+        print 'dateTime:\t\t%s' % (self.dateTime)
+        print 'camera:\t\t%s' % (self.camera)
+        print 'creator:\t\t%s' % (self.creator)
+
+
+class dateTimeObject:
 
     def __init__(self, tag, year, month, day, hour, minute, second, millisecond):
         self.tag = tag
@@ -79,6 +97,10 @@ def openMediaFile(parser, arg):
     else:
         return open(arg, 'rb')
 
+# closes passed file
+def closeMediaFile(file):
+    file.close()
+
 # checks that a given directory exists
 def openMediaDirectory(parser, arg):
     if not os.path.exists(arg):
@@ -100,7 +122,8 @@ def JSONToDict(data):
 #		file relocation functions
 #------------------------------------------------------------------------------
 
-# gets contents of a directory
+# gets contents of a directory, returns directory contents as a list
+# prunes only valid media file formats
 def getDirectoryContents(dir):
 
     directory_contents = []
@@ -108,123 +131,209 @@ def getDirectoryContents(dir):
     for root, directories, files in os.walk(dir):
         for filename in files:
             # only add files htat are a valid media file type
-            if isValidMediaFileType(filename):
+            if isValidMediaFileType(filename)[0]:
                 filePath = os.path.join(root, filename)
                 directory_contents.append(filePath)
     return directory_contents
 
-# check if file is a known imag or video format
+# check if file is a known image or video format, returns [bool, string] tuple
 def isValidMediaFileType(file):
 
     extensionToCheck = file.split('.')[-1].upper()
 
-    validImageFileExtensions = ['JPG', 'PNG', 'TIF', 'TIFF', 'CR2']
-    validVideoFileExtensions = ['MOV', 'MP4', 'MPG', 'M4V', '3G2']
+    validImageFileExtensions = ['JPG', 'PNG', 'TIF', 'TIFF', 'CR2', 'BMP', 'GIF']
+    validVideoFileExtensions = ['MOV', 'MP4', 'MPG', 'M4V', '3G2', 'ASF', 'AVI']
 
     if extensionToCheck in validVideoFileExtensions:
-        return True
+        return (True, 'image')
     elif extensionToCheck in validImageFileExtensions:
-        return True
+        return (True, 'video')
     else:
-        print '%s \t\tis not a valid file extension\n\t%s' % (extensionToCheck, file)
-        return False
+        return (False, 'ignore')
 
 # construct file path and name of 'correctly' named file
-def getFilePath(destinationDir, dateTimeStamp, cameraInfo, userName, extension):
+def getFilePath(destinationDir, mediaFile, event):
     fileName = ''
-    filePath = ''
+    dirName = ''
 
     # clean destinationDir to not include tail slashes
     while destinationDir.endswith('/'):
         destinationDir = destinationDir[:-1]
 
-    cleanCameraString = cameraLabelCleaner(cameraInfo, userName)
-    filePath = '%s/%s/%s.%s.%s/%s/' % (destinationDir,
-                                        extension.upper(),
-                                        dateTimeStamp.year,
-                                        dateTimeStamp.month,
-                                        dateTimeStamp.day,
-                                        cleanCameraString)
+    # cleanCameraString = cameraLabelCleaner(cameraInfo, userName)
+    # filePath = '%s/%s/%s.%s.%s/%s/' % (destinationDir,
+    #                                     extension.upper(),
+    #                                     dateTimeStamp.year,
+    #                                     dateTimeStamp.month,
+    #                                     dateTimeStamp.day,
+    #                                     cleanCameraString)
 
-    # camera model may not be known,
-    if cameraInfo.model == 'NONE':
-        # if it is not, try software,
-        if cameraInfo.software == 'NONE':
-            cameraName = ''
-        # if that is not known, leave blank
-        else:
-            cameraName = '_' + cameraInfo.software
-    else:
-        cameraName = '_' + cameraInfo.model
+
+    #  format:  'destination/type(plural)/YYYY/YYYY.MM/MM.<eventName>/'
+    #  example: 'photos/images/2016/2016.12/12.christmas/'
+    #  example: 'photos/videos/2016/2016.11/11.thanksgiving'
+    dirName = '%s/%ss/%s/%s.%s/%s.%s/' % (destinationDir,
+                                            mediaFile.type,
+                                            mediaFile.dateTime.year,
+                                            mediaFile.dateTime.year,
+                                            mediaFile.dateTime.month,
+                                            mediaFile.dateTime.month,
+                                            event)
+
+
+
+    # # camera model may not be known,
+    # if cameraInfo.model == 'NONE':
+    #     # if it is not, try software,
+    #     if cameraInfo.software == 'NONE':
+    #         cameraName = ''
+    #     # if that is not known, leave blank
+    #     else:
+    #         cameraName = '_' + cameraInfo.software
+    # else:
+    #     cameraName = '_' + cameraInfo.model
 
     # formatting : YYYYMMDD_HHmmSS.sss.<ext>
-    fileName = '%s%s%s_%s%s%s.%s.%s' % (dateTimeStamp.year,
-                                        dateTimeStamp.month,
-                                        dateTimeStamp.day,
-                                        dateTimeStamp.hour,
-                                        dateTimeStamp.minute,
-                                        dateTimeStamp.second,
-                                        dateTimeStamp.millisecond,
-                                        extension)
+    # fileName = '%s%s%s_%s%s%s.%s.%s' % (dateTimeStamp.year,
+    #                                     dateTimeStamp.month,
+    #                                     dateTimeStamp.day,
+    #                                     dateTimeStamp.hour,
+    #                                     dateTimeStamp.minute,
+    #                                     dateTimeStamp.second,
+    #                                     dateTimeStamp.millisecond,
+    #                                     extension)
 
-    return filePath + fileName
+    #  format:  'YYYYMMDD.HHMMSSsss.<eventName>.<creator>.<count(4 digits)>.<extension>'
+    #  example: '20161225.1200000.christmas.samgutentag.0001.CR2'
+    #  example: '20161127.1830500.thanksgiving.samgutentag.0003.CR2'
+    fileName '%s%s%s.%s%s%s%s.%s.%s.%s.%s' = (mediaFile.dateTime.year,
+                                                mediaFile.dateTime.month,
+                                                mediaFile.dateTime.day,
+
+                                                mediaFile.dateTime.hour,
+                                                mediaFile.dateTime.minute,
+                                                mediaFile.dateTime.second,
+                                                mediaFile.dateTime.millisecond,
+
+                                                event,
+
+                                                mediaFile.creator,
+
+                                                '0001',  # counter
+
+                                                mediaFile.extension)
+
+
+    # return dirName + fileName
+    return (dirName, fileName)
 
 # copy files and preserve metadata
-def makeCopy(sourceFile, destinationFile):
+# def makeCopy(sourceFile, destinationFile):
+def makeCopy(sourceFile, destinationDirectoryName, destinationFileName):
 
-    def make_str(counter):
+    # increment counter when file already exists, helps elliminate file overwrite
+    # fails out after 9999 copies are found, instead dumps all subsequent files to
+    # counter '0000', WILL OVERWRITE
+    def incrementCounter(sourceName):
+        # get current counter value
+        currentCounter = sourceName.split('.')[-2]
+
         # trim leading zeros
+        while currentCounter[:1] == '0':
+            currentCounter = currentCounter[1:]
 
-        try:
-            counter_temp = counter.split('0')[-1]
-            counterTemp = int(counter_temp) + 1
-        except:
-            counterTemp = int(counter) + 1
+        # format to integer and increment
+        if int(currentCounter) < 9999:
+            counter = int(currentCounter) + 1
+        else:
+            print '>>>>>>>\t9999 copies already exist!'
+            return '0000'
 
-        # format to 3 digits
-        while len(str(counterTemp)) < 3:
-            counterTemp = '0' + str(counterTemp)
-
-        return str(counterTemp)
-
-    destinationFileName = destinationFile.split('/')[-1]
-    destinationFileDirectory = destinationFile[:-len(destinationFileName)]
-
-    # check that destination directory exists, else create it:
-    if not os.path.exists(destinationFileDirectory):
-        os.makedirs(destinationFileDirectory)
-
-    # check if file exists, do not copy if it does
-    if os.path.isfile(destinationFile):
-        print 'file already exists... trying to make another copy...'
-
-        destinationFile_adjusted = destinationFile
-
-        counter = 0
-        destinationFile_adjusted = destinationFile_adjusted + '.copy' + make_str(counter)
-
-        while os.path.isfile(destinationFile_adjusted):
-            destinationFile_adjusted = destinationFile_adjusted[:-3] + make_str(counter)
-            # print destinationFile_adjusted
-            counter += 1
-
-        # copy file
-        shutil.copy2(sourceFile, destinationFile_adjusted)
-
-        return destinationFile_adjusted
+        # format to string and left side zero pad counter
+        newCounter = str(counter)
+        while len(newCounter) < 5:
+            newCounter = '0' + newCounter
 
 
-    else:
-        # print 'would have been copied'
-        shutil.copy2(sourceFile, destinationFile)
-        return destinationFile
+        incrementendFileName = sourceName.replace(currentCounter, newCounter)
+
+        return incrementendFileName
+
+    # check if destination directory exists, if not create it
+    if not os.path.exists(destinationDirectoryName):
+        os.makedirs(destinationDirectoryName)
+
+    # check if file exists
+    while os.path.isfile(destinationFileName):
+        # this file exists! increment the counter
+        destinationFileName = incrementCounter(destinationFileName)
+
+
+    # destination full file path
+    destinationFullPath = '%s%s' % (destinationDirectoryName, destinationFileName)
+
+    print 'copying %s to %s%s' % (sourceFile, destinationDirectoryName, destinationFileName)
+    print 'copying %s to %s' % (sourceFile, destinationFullPath)
+
+    # copy file
+    # shutil.copy2(sourceFile, destinationFullPath)
+
+    return (destinationDirectoryName, destinationFileName)
+
+
+    # def make_str(counter):
+    #     # trim leading zeros
+    #
+    #     try:
+    #         counter_temp = counter.split('0')[-1]
+    #         counterTemp = int(counter_temp) + 1
+    #     except:
+    #         counterTemp = int(counter) + 1
+    #
+    #     # format to 3 digits
+    #     while len(str(counterTemp)) < 3:
+    #         counterTemp = '0' + str(counterTemp)
+    #
+    #     return str(counterTemp)
+
+    # destinationFileName = destinationFile.split('/')[-1]
+    # destinationFileDirectory = destinationFile[:-len(destinationFileName)]
+    #
+    # # check that destination directory exists, else create it:
+    # if not os.path.exists(destinationFileDirectory):
+    #     os.makedirs(destinationFileDirectory)
+
+    # # check if file exists, do not copy if it does
+    # if os.path.isfile(destinationFile):
+    #     print 'file already exists... trying to make another copy...'
+    #
+    #     destinationFile_adjusted = destinationFile
+    #
+    #     counter = 0
+    #     destinationFile_adjusted = destinationFile_adjusted + '.copy' + make_str(counter)
+    #
+    #     while os.path.isfile(destinationFile_adjusted):
+    #         destinationFile_adjusted = destinationFile_adjusted[:-3] + make_str(counter)
+    #         # print destinationFile_adjusted
+    #         counter += 1
+    #
+    #     # copy file
+    #     shutil.copy2(sourceFile, destinationFile_adjusted)
+    #
+    #     return destinationFile_adjusted
+    #
+    #
+    # else:
+    #     # print 'would have been copied'
+    #     shutil.copy2(sourceFile, destinationFile)
+    #     return destinationFile
 
 
 #------------------------------------------------------------------------------
 #		main exif tag formatting functions
 #------------------------------------------------------------------------------
 
-# compare two mediaDateTimeObjects and return earlier one
+# compare two dateTimeObjects and return earlier one
 def getEarlierDateTime(tagA, tagB):
 
     # converts dateTime pieces into an integer for comparison
@@ -241,8 +350,8 @@ def getEarlierDateTime(tagA, tagB):
 # returns a list of (dateTimeTag, dateTimeValue)
 def getMediaDateTimeStamp(data):
 
-    # entryInfo = mediaDateTimeObject(tag, year, month, day, hour, minute, second, millisecond)
-    earlyDateTimeInfo = mediaDateTimeObject('NONE', '9999', '99', '99', '99', '99', '99', '999')
+    # entryInfo = dateTimeObject(tag, year, month, day, hour, minute, second, millisecond)
+    earlyDateTimeInfo = dateTimeObject('NONE', '9999', '99', '99', '99', '99', '99', '999')
 
     # collect all date related keys and values
     dateTimeTags = []
@@ -258,7 +367,7 @@ def getMediaDateTimeStamp(data):
     for entry in dateTimeTags:
 
         # default values
-        entryInfo = mediaDateTimeObject('NONE', '9999', '99', '99', '99', '99', '99', '999')
+        entryInfo = dateTimeObject('NONE', '9999', '99', '99', '99', '99', '99', '999')
 
         # set entry tag
         entryInfo.tag = str(entry[0])
@@ -365,6 +474,37 @@ def getCameraInformation(data, cameraMake = 'NONE', cameraModel = 'NONE'):
     cameraInfo = cameraObject(cameraMake, cameraModel, serialNumber, softwareName)
 
     return cameraInfo
+
+
+
+
+def getMediaFileObject(file):
+    print 'builds mediaFileObject'
+    print file
+
+    # determine type, image or video
+    mediaFileObject.type = isValidMediaFileType(file)[1]
+
+    # get file extension
+    mediaFileObject.extension = extension
+
+
+    mediaFileObject.dateTime = dateTime
+
+
+    mediaFileObject.camera = camera
+
+
+    mediaFileObject.creator = creator
+
+
+
+    return mediaFileObject
+
+
+
+
+
 
 # print "most" exif tags, skips encoding tags
 def prettyPrintTags(dataDictionary):
