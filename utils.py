@@ -160,15 +160,6 @@ def getFilePath(destinationDir, mediaFile, event):
     while destinationDir.endswith('/'):
         destinationDir = destinationDir[:-1]
 
-    # cleanCameraString = cameraLabelCleaner(cameraInfo, userName)
-    # filePath = '%s/%s/%s.%s.%s/%s/' % (destinationDir,
-    #                                     extension.upper(),
-    #                                     dateTimeStamp.year,
-    #                                     dateTimeStamp.month,
-    #                                     dateTimeStamp.day,
-    #                                     cleanCameraString)
-
-
     #  format:  'destination/type(plural)/YYYY/YYYY.MM/MM.<eventName>/'
     #  example: 'photos/images/2016/2016.12/12.christmas/'
     #  example: 'photos/videos/2016/2016.11/11.thanksgiving'
@@ -180,49 +171,17 @@ def getFilePath(destinationDir, mediaFile, event):
                                             mediaFile.dateTime.month,
                                             event)
 
-
-
-    # # camera model may not be known,
-    # if cameraInfo.model == 'NONE':
-    #     # if it is not, try software,
-    #     if cameraInfo.software == 'NONE':
-    #         cameraName = ''
-    #     # if that is not known, leave blank
-    #     else:
-    #         cameraName = '_' + cameraInfo.software
-    # else:
-    #     cameraName = '_' + cameraInfo.model
-
-    # formatting : YYYYMMDD_HHmmSS.sss.<ext>
-    # fileName = '%s%s%s_%s%s%s.%s.%s' % (dateTimeStamp.year,
-    #                                     dateTimeStamp.month,
-    #                                     dateTimeStamp.day,
-    #                                     dateTimeStamp.hour,
-    #                                     dateTimeStamp.minute,
-    #                                     dateTimeStamp.second,
-    #                                     dateTimeStamp.millisecond,
-    #                                     extension)
-
-    #  format:  'YYYYMMDD.HHMMSSsss.<eventName>.<creator>.<count(4 digits)>.<extension>'
-    #  example: '20161225.1200000.christmas.samgutentag.0001.CR2'
-    #  example: '20161127.1830500.thanksgiving.samgutentag.0003.CR2'
     fileName '%s%s%s.%s%s%s%s.%s.%s.%s.%s' = (mediaFile.dateTime.year,
                                                 mediaFile.dateTime.month,
                                                 mediaFile.dateTime.day,
-
                                                 mediaFile.dateTime.hour,
                                                 mediaFile.dateTime.minute,
                                                 mediaFile.dateTime.second,
                                                 mediaFile.dateTime.millisecond,
-
                                                 event,
-
                                                 mediaFile.creator,
-
                                                 '0001',  # counter
-
                                                 mediaFile.extension)
-
 
     # return dirName + fileName
     return (dirName, fileName)
@@ -254,7 +213,6 @@ def makeCopy(sourceFile, destinationDirectoryName, destinationFileName):
         while len(newCounter) < 5:
             newCounter = '0' + newCounter
 
-
         incrementendFileName = sourceName.replace(currentCounter, newCounter)
 
         return incrementendFileName
@@ -268,7 +226,6 @@ def makeCopy(sourceFile, destinationDirectoryName, destinationFileName):
         # this file exists! increment the counter
         destinationFileName = incrementCounter(destinationFileName)
 
-
     # destination full file path
     destinationFullPath = '%s%s' % (destinationDirectoryName, destinationFileName)
 
@@ -279,54 +236,6 @@ def makeCopy(sourceFile, destinationDirectoryName, destinationFileName):
     # shutil.copy2(sourceFile, destinationFullPath)
 
     return (destinationDirectoryName, destinationFileName)
-
-
-    # def make_str(counter):
-    #     # trim leading zeros
-    #
-    #     try:
-    #         counter_temp = counter.split('0')[-1]
-    #         counterTemp = int(counter_temp) + 1
-    #     except:
-    #         counterTemp = int(counter) + 1
-    #
-    #     # format to 3 digits
-    #     while len(str(counterTemp)) < 3:
-    #         counterTemp = '0' + str(counterTemp)
-    #
-    #     return str(counterTemp)
-
-    # destinationFileName = destinationFile.split('/')[-1]
-    # destinationFileDirectory = destinationFile[:-len(destinationFileName)]
-    #
-    # # check that destination directory exists, else create it:
-    # if not os.path.exists(destinationFileDirectory):
-    #     os.makedirs(destinationFileDirectory)
-
-    # # check if file exists, do not copy if it does
-    # if os.path.isfile(destinationFile):
-    #     print 'file already exists... trying to make another copy...'
-    #
-    #     destinationFile_adjusted = destinationFile
-    #
-    #     counter = 0
-    #     destinationFile_adjusted = destinationFile_adjusted + '.copy' + make_str(counter)
-    #
-    #     while os.path.isfile(destinationFile_adjusted):
-    #         destinationFile_adjusted = destinationFile_adjusted[:-3] + make_str(counter)
-    #         # print destinationFile_adjusted
-    #         counter += 1
-    #
-    #     # copy file
-    #     shutil.copy2(sourceFile, destinationFile_adjusted)
-    #
-    #     return destinationFile_adjusted
-    #
-    #
-    # else:
-    #     # print 'would have been copied'
-    #     shutil.copy2(sourceFile, destinationFile)
-    #     return destinationFile
 
 
 #------------------------------------------------------------------------------
@@ -365,9 +274,6 @@ def getDateTimeObject(exifData):
 
     # go through dateTime tags to determine the earliest one
     for entry in dateTimeTags:
-        #
-        # # default values
-        # entryInfo = dateTimeObject('NONE', '9999', '99', '99', '99', '99', '99', '999')
 
         entry_tag = str(entry[0])
         entry_dateTimeStamp = entry[1]
@@ -377,9 +283,6 @@ def getDateTimeObject(exifData):
             # defaults to writing out the date at the epoch
         if int(entry_dateTimeStamp.split(':')[0]) < 1975:
             break
-
-
-
 
         # remove negative timezone adjustment if it exists
         try:
@@ -457,7 +360,7 @@ def getDateTimeObject(exifData):
 
     return dateTime
 
-
+# sorts out camera information and returns a camera object
 def getCameraObject(exifData):
     # we want make, model, serial number, software
     cameraMake = 'NONE'
@@ -487,7 +390,7 @@ def getCameraObject(exifData):
 
     return camera
 
-
+# creates a mediaFileObject
 def getMediaFileObject(file, creatorName):
     print 'builds mediaFileObject'
     print file
@@ -496,7 +399,6 @@ def getMediaFileObject(file, creatorName):
 
         # process file
         exifTagsDict = JSONToDict(p.get_json(originalFilePath))
-
 
         # determine type, image or video
         fileType = isValidMediaFileType(file)[1]
@@ -513,19 +415,17 @@ def getMediaFileObject(file, creatorName):
         # get creatorName for file
         creator = creatorName.lower()
 
-
         # init mediaFileObject
         mediaFile = mediaFileObject(fileType, extension, dateTime, camera, creator)
         return mediaFile
 
     else:
         print 'not a valid media type'
-        return mediaFileObject
 
 
-
-
-
+#------------------------------------------------------------------------------
+#		pretty print tags and dictionary sources
+#------------------------------------------------------------------------------
 
 # print "most" exif tags, skips encoding tags
 def prettyPrintTags(dataDictionary):
@@ -603,67 +503,67 @@ def prettyPrintDict(dictionary):
 
     return True
 
-# clean up camera information for file naming
-def cameraLabelCleaner(camera, userName):
-
-    cleanCameraString = ''
-
-    # special cases for known cameras
-    # adjustments for Apple cameras, (iPhones, iPads, etc)
-    if camera.make.upper() == 'APPLE':
-        cleanCameraString = camera.make + '.' + camera.model + '.' + userName
-
-    # adjustments for Canon cameras
-    elif camera.make.upper() == 'CANON':
-            # left pad all canon serial numbers with zeros to be 12 digits long
-            if camera.serial == 'NONE':
-                tempSerialNumber = ''
-            else:
-                tempSerialNumber = camera.serial
-
-            while len(tempSerialNumber) < 13:
-                tempSerialNumber = '0' + tempSerialNumber
-
-            cleanCameraString = camera.model + '.' + userName + '.' + tempSerialNumber
-
-        # adjustments for Kodak cameras
-    elif camera.make.upper() == 'EASTMAN KODAK COMPANY':
-            cleanCameraString = camera.model
-
-        # adjustments for GoPro cameras
-    elif camera.make.upper() == 'GOPRO':
-            cleanCameraString = camera.make + '.' + camera.model + '.' + userName
-
-        # adjustments for Sony cameras
-    elif camera.make.upper() == 'SONY':
-            # sony camera models tend to have '-' in them, replace with '.'
-            tempModel = camera.model
-            tempModel = tempModel.replace('-', '.')
-
-            cleanCameraString = camera.make + '.' + tempModel + '.' + userName
-
-        # adjustments for Nikon cameras
-    elif camera.make.upper() == 'NIKON CORPORATION':
-            cleanCameraString = camera.model + '.' + userName
-
-    elif camera.make != 'NONE':
-        cleanCameraString = cleanCameraString + '.' + camera.make
-
-    elif camera.model != 'NONE':
-        cleanCameraString = cleanCameraString + '.' + camera.model
-
-    else:
-        # print 'camera make not was not an option...'
-        # camera.printInfo()
-        cleanCameraString = 'UNKNOWNCAMERA'
-
-
-    # remove anly leading '.'
-    while cleanCameraString[0] == '.':
-        cleanCameraString = cleanCameraString[1:]
-
-
-    return cleanCameraString
+# # clean up camera information for file naming
+# def cameraLabelCleaner(camera, userName):
+#
+#     cleanCameraString = ''
+#
+#     # special cases for known cameras
+#     # adjustments for Apple cameras, (iPhones, iPads, etc)
+#     if camera.make.upper() == 'APPLE':
+#         cleanCameraString = camera.make + '.' + camera.model + '.' + userName
+#
+#     # adjustments for Canon cameras
+#     elif camera.make.upper() == 'CANON':
+#             # left pad all canon serial numbers with zeros to be 12 digits long
+#             if camera.serial == 'NONE':
+#                 tempSerialNumber = ''
+#             else:
+#                 tempSerialNumber = camera.serial
+#
+#             while len(tempSerialNumber) < 13:
+#                 tempSerialNumber = '0' + tempSerialNumber
+#
+#             cleanCameraString = camera.model + '.' + userName + '.' + tempSerialNumber
+#
+#         # adjustments for Kodak cameras
+#     elif camera.make.upper() == 'EASTMAN KODAK COMPANY':
+#             cleanCameraString = camera.model
+#
+#         # adjustments for GoPro cameras
+#     elif camera.make.upper() == 'GOPRO':
+#             cleanCameraString = camera.make + '.' + camera.model + '.' + userName
+#
+#         # adjustments for Sony cameras
+#     elif camera.make.upper() == 'SONY':
+#             # sony camera models tend to have '-' in them, replace with '.'
+#             tempModel = camera.model
+#             tempModel = tempModel.replace('-', '.')
+#
+#             cleanCameraString = camera.make + '.' + tempModel + '.' + userName
+#
+#         # adjustments for Nikon cameras
+#     elif camera.make.upper() == 'NIKON CORPORATION':
+#             cleanCameraString = camera.model + '.' + userName
+#
+#     elif camera.make != 'NONE':
+#         cleanCameraString = cleanCameraString + '.' + camera.make
+#
+#     elif camera.model != 'NONE':
+#         cleanCameraString = cleanCameraString + '.' + camera.model
+#
+#     else:
+#         # print 'camera make not was not an option...'
+#         # camera.printInfo()
+#         cleanCameraString = 'UNKNOWNCAMERA'
+#
+#
+#     # remove anly leading '.'
+#     while cleanCameraString[0] == '.':
+#         cleanCameraString = cleanCameraString[1:]
+#
+#
+#     return cleanCameraString
 
 
 #------------------------------------------------------------------------------
