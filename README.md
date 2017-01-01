@@ -13,11 +13,17 @@ Assumptions
 
 Goal Sample Folder Structure
 
-	photos
-		extension
-			YYYY.MM.DD
-				cameraModel.artist.cameraSerial
-					YYYYMMDD_HHmmSS.sss.extension
+	photos/
+		images/
+			YYYY/
+				YYYY.MM/
+					MM.<eventNameInCamelCase>/
+						YYYYMMDD.HHMMSSsss.<eventName>.<creator>.<count(4 digit)>.<extention>
+		videos/
+			YYYY/
+				YYYY.MM/
+					MM.<eventNameInCamelCase>/
+						YYYYMMDD.HHMMSSsss.<eventName>.<creator>.<count(4 digit)>.<extention>
 
 
 printExifTags.py

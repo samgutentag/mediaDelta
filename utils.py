@@ -7,7 +7,7 @@ import json
 import os
 import shutil
 
-# special stuff to handle known non ascii cahracters, blame sony! (not really)
+# special stuff to handle known non ascii cahracters, blame Sony! (not really)
 import sys  # import sys package, if not already imported
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -30,7 +30,6 @@ class cameraObject:
         print 'Serial Number:\t%s' % self.serial
         print 'Software:\t\t%s' % self.software
 
-
 class mediaFileObject:
 
     def __init__(self, type, extension, dateTime, camera, creator):
@@ -46,7 +45,6 @@ class mediaFileObject:
         print 'dateTime:\t\t%s' % (self.dateTime)
         print 'camera:\t\t%s' % (self.camera)
         print 'creator:\t\t%s' % (self.creator)
-
 
 class dateTimeObject:
 
@@ -187,7 +185,6 @@ def getFilePath(destinationDir, mediaFile, event):
     return (dirName, fileName)
 
 # copy files and preserve metadata
-# def makeCopy(sourceFile, destinationFile):
 def makeCopy(sourceFile, destinationDirectoryName, destinationFileName):
 
     # increment counter when file already exists, helps elliminate file overwrite
@@ -424,72 +421,40 @@ def getMediaFileObject(file, creatorName):
 
 
 #------------------------------------------------------------------------------
-#		pretty print tags and dictionary sources
+#       pretty printer functions
 #------------------------------------------------------------------------------
 
 # print "most" exif tags, skips encoding tags
 def prettyPrintTags(dataDictionary):
-
-    counter = 0
-    longestTag = 0
-
-    # get string length of longest key
-    # assit in pretty printing
-    for key in dataDictionary.keys():
-        if len(key) > longestTag:
-            longestTag = len(key)
+    exifTagsToPrintDict = []
 
     # pretty print exif tags
-    for tag, entry in sorted(dataDictionary.iteritems()):
+    for key, value in sorted(dataDictionary.iteritems()):
         # excludes text encoded tags
         # these are just a ton of garbage data we dont need
-        if tag not in ('JPEGThumbnail', 'TIFFThumbnail'):
+        if key not in ('JPEGThumbnail', 'TIFFThumbnail'):
 
-            # calculate number of tab characters needed to pretty print
-            tabsNeeded = ((longestTag - len(tag))/4) + 1
+            exifTagsToPrint[key] = value
 
-            # print all in line and numbered
-            if counter < 100:
-                print '%s:\t\t%s:' % (counter, tag),
-            else:
-                print '%s:\t%s:' % (counter, tag),
-            print '\t' * tabsNeeded,
-            print entry
-            counter += 1
+    prettyPrintDict(exifTagsToPrintDict)
+
+    return True
 
 # print dateTime tags
 def prettyPrintDateTimeTags(dataDictionary):
+    dateTimeTagsDict = []
 
-    counter = 0
-    longestTag = 0
-
-    # get string length of longest key
-    # assit in pretty printing
-    for key in dataDictionary.keys():
-        if len(key) > longestTag:
-            longestTag = len(key)
-
-    # pretty print exif tags
+    # select only dateTime tags
     for tag, entry in sorted(dataDictionary.iteritems()):
-        # excludes text encoded tags
-        # these are just a ton of garbage data we dont need
         if 'date' in tag.lower():
+            dateTimeTagsDict[tag] = entry
 
-            # calculate number of tab characters needed to pretty print
-            tabsNeeded = ((longestTag - len(tag))/4) + 1
+    prettyPrintDict(dateTimeTagsDict)
 
-            # print all in line and numbered
-            if counter < 100:
-                print '%s:\t\t%s:' % (counter, tag),
-            else:
-                print '%s:\t%s:' % (counter, tag),
-            print '\t' * tabsNeeded,
-            print entry
-            counter += 1
+    return True
 
 # pretty print a dictionary in key value pairs, well spaced
 def prettyPrintDict(dictionary):
-
     longestKey = 0
 
     for key in dictionary:
@@ -503,107 +468,72 @@ def prettyPrintDict(dictionary):
 
     return True
 
-# # clean up camera information for file naming
-# def cameraLabelCleaner(camera, userName):
-#
-#     cleanCameraString = ''
-#
-#     # special cases for known cameras
-#     # adjustments for Apple cameras, (iPhones, iPads, etc)
-#     if camera.make.upper() == 'APPLE':
-#         cleanCameraString = camera.make + '.' + camera.model + '.' + userName
-#
-#     # adjustments for Canon cameras
-#     elif camera.make.upper() == 'CANON':
-#             # left pad all canon serial numbers with zeros to be 12 digits long
-#             if camera.serial == 'NONE':
-#                 tempSerialNumber = ''
-#             else:
-#                 tempSerialNumber = camera.serial
-#
-#             while len(tempSerialNumber) < 13:
-#                 tempSerialNumber = '0' + tempSerialNumber
-#
-#             cleanCameraString = camera.model + '.' + userName + '.' + tempSerialNumber
-#
-#         # adjustments for Kodak cameras
-#     elif camera.make.upper() == 'EASTMAN KODAK COMPANY':
-#             cleanCameraString = camera.model
-#
-#         # adjustments for GoPro cameras
-#     elif camera.make.upper() == 'GOPRO':
-#             cleanCameraString = camera.make + '.' + camera.model + '.' + userName
-#
-#         # adjustments for Sony cameras
-#     elif camera.make.upper() == 'SONY':
-#             # sony camera models tend to have '-' in them, replace with '.'
-#             tempModel = camera.model
-#             tempModel = tempModel.replace('-', '.')
-#
-#             cleanCameraString = camera.make + '.' + tempModel + '.' + userName
-#
-#         # adjustments for Nikon cameras
-#     elif camera.make.upper() == 'NIKON CORPORATION':
-#             cleanCameraString = camera.model + '.' + userName
-#
-#     elif camera.make != 'NONE':
-#         cleanCameraString = cleanCameraString + '.' + camera.make
-#
-#     elif camera.model != 'NONE':
-#         cleanCameraString = cleanCameraString + '.' + camera.model
-#
-#     else:
-#         # print 'camera make not was not an option...'
-#         # camera.printInfo()
-#         cleanCameraString = 'UNKNOWNCAMERA'
-#
-#
-#     # remove anly leading '.'
-#     while cleanCameraString[0] == '.':
-#         cleanCameraString = cleanCameraString[1:]
-#
-#
-#     return cleanCameraString
-
 
 #------------------------------------------------------------------------------
 #		file processing functions
 #------------------------------------------------------------------------------
 
-# main processing of media file, gets exif data, setups up destination directory and filename, copies file
-def processMediaFile(mediaFile, userName, destinationDir, cameraMake, cameraModel):
-    # originalFilePath = str(mediaFile).split("'")[1]
-    # when a single file is passed, the file name needs to be trimmed
-    try:
-        originalFilePath = str(mediaFile).split("'")[1]
-    # when a file is passed as part of a directory, it does not need to be trimmed
-    except:
-        originalFilePath = mediaFile
+# clean up camera information for file naming
+def cameraLabelCleaner(camera, userName):
 
-    # spacer()
-    print ">>> processing '%s'" % originalFilePath
-    extension = str(originalFilePath.split('.')[-1])
+    cleanCameraString = ''
 
-    # ignore dot files i.e. '.DS_Store'
-    if originalFilePath.split('.')[0].endswith('/'):
-        print 'ignoring %s' % originalFilePath
-        return False
+    # special cases for known cameras
+    # adjustments for Apple cameras, (iPhones, iPads, etc)
+    if camera.make.upper() == 'APPLE':
+        cleanCameraString = camera.make + '.' + camera.model + '.' + userName
 
-    # get information from exif tags, format dateTime, and Camera class objects
-    exifTagsDict = JSONToDict(p.get_json(originalFilePath))
-    dateTimeStamp = getMediaDateTimeStamp(exifTagsDict)
-    cameraInfo = getCameraInformation(exifTagsDict, cameraMake, cameraModel)
+    # adjustments for Canon cameras
+    elif camera.make.upper() == 'CANON':
+            # left pad all canon serial numbers with zeros to be 12 digits long
+            if camera.serial == 'NONE':
+                tempSerialNumber = ''
+            else:
+                tempSerialNumber = camera.serial
 
-    # build file path for media file to be copied to
-    correctedFilePath = getFilePath(destinationDir, dateTimeStamp, cameraInfo, userName.lower(), extension)
+            while len(tempSerialNumber) < 13:
+                tempSerialNumber = '0' + tempSerialNumber
 
-    # build file name for meida file to be copied as, appends '.copy' and a counter if it already exists
-    destFile = makeCopy(originalFilePath, correctedFilePath)
+            cleanCameraString = camera.model + '.' + userName + '.' + tempSerialNumber
 
-    print '\tmoved\t%s' % originalFilePath
-    print '\tto\t\t%s' % destFile
+        # adjustments for Kodak cameras
+    elif camera.make.upper() == 'EASTMAN KODAK COMPANY':
+            cleanCameraString = camera.model
 
-    return True
+        # adjustments for GoPro cameras
+    elif camera.make.upper() == 'GOPRO':
+            cleanCameraString = camera.make + '.' + camera.model + '.' + userName
+
+        # adjustments for Sony cameras
+    elif camera.make.upper() == 'SONY':
+            # sony camera models tend to have '-' in them, replace with '.'
+            tempModel = camera.model
+            tempModel = tempModel.replace('-', '.')
+
+            cleanCameraString = camera.make + '.' + tempModel + '.' + userName
+
+        # adjustments for Nikon cameras
+    elif camera.make.upper() == 'NIKON CORPORATION':
+            cleanCameraString = camera.model + '.' + userName
+
+    elif camera.make != 'NONE':
+        cleanCameraString = cleanCameraString + '.' + camera.make
+
+    elif camera.model != 'NONE':
+        cleanCameraString = cleanCameraString + '.' + camera.model
+
+    else:
+        # print 'camera make not was not an option...'
+        # camera.printInfo()
+        cleanCameraString = 'UNKNOWNCAMERA'
+
+
+    # remove anly leading '.'
+    while cleanCameraString[0] == '.':
+        cleanCameraString = cleanCameraString[1:]
+
+
+    return cleanCameraString
 
 # builds a dictionary of all unique camera objects found, and a file sample to match
 def getUniqueCameras(mediaFile):
@@ -632,3 +562,25 @@ def getUniqueCameras(mediaFile):
     # cameraInfo.printInfo()
 
     return cameraInfo
+
+# main processing of media file, gets exif data, setups up destination directory and filename, copies file
+def processMediaFile(originalFilePath, destinationDir, creator, event):
+
+    print ">>> processing '%s'" % originalFilePath
+
+    sourceFile = originalFilePath.split('/')[-1]
+    sourceFilePath = originalFilePath[:-len(sourceFile)]
+
+    # create a media file object for the input file
+    mediaFile = getMediaFileObject(sourceFile, creator)
+
+    # make Corrected File Path
+    correctedFilePath = getFilePath(destinationDir, mediaFile, event)
+
+    # copy file
+    destinationFile = makeCopy(sourceFile, correctedFilePath[0], correctedFilePath[1])
+
+    print '\tmoved\t%s' % originalFilePath
+    print '\tto\t\t%s%s' % (destinationFile[0], destinationFile[1])
+
+    return True
