@@ -145,11 +145,11 @@ def isValidMediaFileType(file):
     validVideoFileExtensions = ['MOV', 'MP4', 'MPG', 'M4V', '3G2', 'ASF', 'AVI']
 
     if extensionToCheck in validVideoFileExtensions:
-        return (True, 'image')
+        return (True, 'image', extensionToCheck)
     elif extensionToCheck in validImageFileExtensions:
-        return (True, 'video')
+        return (True, 'video', extensionToCheck)
     else:
-        return (False, 'ignore')
+        return (False, 'ignore', extensionToCheck)
 
 # construct file path and name of 'correctly' named file
 def getFilePath(destinationDir, mediaFile, event):
@@ -347,17 +347,17 @@ def getEarlierDateTime(tagA, tagB):
         return tagB
 
 # gets earlist date time tag, excludes dates in photoshop or camera profiles
-# returns a list of (dateTimeTag, dateTimeValue)
-def getMediaDateTimeStamp(data):
+# returns a list of dateTImeObject
+def getDateTimeObject(exifData):
 
     # entryInfo = dateTimeObject(tag, year, month, day, hour, minute, second, millisecond)
-    earlyDateTimeInfo = dateTimeObject('NONE', '9999', '99', '99', '99', '99', '99', '999')
+    earlistDateTimeObject = dateTimeObject('NONE', '9999', '99', '99', '99', '99', '99', '999')
 
     # collect all date related keys and values
     dateTimeTags = []
 
-    # select dateTime key, value pairs as a subset
-    for key, value in data.iteritems():
+    # select dateTime (key, value) pairs as a subset
+    for key, value in exifData.iteritems():
         if 'date' in key.lower():
             # exclude some odd tag keys
             if 'icc' not in key.lower():
@@ -365,141 +365,162 @@ def getMediaDateTimeStamp(data):
 
     # go through dateTime tags to determine the earliest one
     for entry in dateTimeTags:
+        #
+        # # default values
+        # entryInfo = dateTimeObject('NONE', '9999', '99', '99', '99', '99', '99', '999')
 
-        # default values
-        entryInfo = dateTimeObject('NONE', '9999', '99', '99', '99', '99', '99', '999')
+        entry_tag = str(entry[0])
+        entry_dateTimeStamp = entry[1]
 
-        # set entry tag
-        entryInfo.tag = str(entry[0])
-        dateTimeStamp = entry[1]
-
-        # if year is '0000', we dont want it, break out!
-        if dateTimeStamp.split(':')[0] == '0000':
+        # if year is before 1975, we dont want it, break out!
+            # this is to remove false low years that some software
+            # defaults to writing out the date at the epoch
+        if int(entry_dateTimeStamp.split(':')[0]) < 1975:
             break
+
+
+
 
         # remove negative timezone adjustment if it exists
         try:
-            dateTimeStamp = dateTimeStamp.split('-')[0]
+            entry_dateTimeStamp = entry_dateTimeStamp.split('-')[0]
         except:
             pass
 
         # remove positive timezone adjustment value if it exists
         try:
-            dateTimeStamp = dateTimeStamp.split('+')[0]
+            entry_dateTimeStamp = entry_dateTimeStamp.split('+')[0]
         except:
             pass
 
         # try to split into dateStamp and timeStamp, get dateStamp
         try:
-            dateStamp = dateTimeStamp.split(' ')[0]
+            entry_dateStamp = entry_dateTimeStamp.split(' ')[0]
         except:
-            dateStamp = '9999:99:99'
+            entry_dateStamp = '9999:99:99'
 
         # try to split into dateStamp and timeStamp, get timeStamp
         try:
-            timeStamp = dateTimeStamp.split(' ')[1]
+            entry_timeStamp = entry_dateTimeStamp.split(' ')[1]
 
             # sometimes time stamps have letters appened to the end of the second, lets remove those
-            while timeStamp[len(timeStamp)-1].isalpha():
-                timeStamp = timeStamp[:-1]
+            while entry_timeStamp[len(timeStamp)-1].isalpha():
+                entry_timeStamp = entry_timeStamp[:-1]
         except:
-            timeStamp = '23:59:99.999'
+            entry_timeStamp = '23:59:99.999'
 
         # set values for each
-        entryInfo.year = dateStamp.split(':')[0]
-        entryInfo.month = dateStamp.split(':')[1]
-        entryInfo.day = dateStamp.split(':')[2]
-        entryInfo.hour = timeStamp.split(':')[0]
-        entryInfo.minute = timeStamp.split(':')[1]
-        try:
-            entryInfo.second = timeStamp.split(':')[2]
-        except:
-            entryInfo.second = '99.999'
+        yearTag = entry_dateStamp.split(':')[0]
+        monthTag = entry_dateStamp.split(':')[1]
+        dayTag = entry_dateStamp.split(':')[2]
+        hourTag = entry_timeStamp.split(':')[0]
+        minuteTag = entry_timeStamp.split(':')[1]
 
-        # try splitting secondStamp into secondStamp and millisecondStamp
+        # split out secondTag, else default to '99'
         try:
-            entryInfo.millisecond = entryInfo.second.split('.')[1]
-            entryInfo.second = entryInfo.second.split('.')[0]
+            secondTag = entry_timeStamp.split(':')[2]
+        except:
+            secondTag = '99.999'
+
+        # try splitting second into secondStamp and millisecondStamp
+        try:
+            millisecondTag = secondTag.split('.')[1]
+            secondTag = secondTag.split('.')[0]
 
             # some time stamps come through with an alpha character(s) suffix
             # lets remove those if they exist
-            while entryInfo.millisecond[len(entryInfo.millisecond)-1].isalpha():
-                entryInfo.millisecond = entryInfo.millisecond[:-1]
+            while millisecondTag[len(millisecondTag)-1].isalpha():
+                millisecondTag = millisecondTag[:-1]
+
+            # format millisecondStamp to be a fixed length of 3 digits
+            if len(millisecondTag) > 3:
+                millisecondTag = millisecondTag[:4]
+
+            while len(millisecondTag) < 3:
+                millisecondTag = '0' + millisecondTag
 
         except:
-            entryInfo.millisecond = '999'
+            millisecondTag = '999'
 
-        # format millisecondStamp to be a fixed length of 3 digits
-        if len(entryInfo.millisecond) > 3:
-            entryInfo.millisecond = entryInfo.millisecond[:4]
 
-        while len(entryInfo.millisecond) < 3:
-            entryInfo.millisecond = '0' + entryInfo.millisecond
+        entry_dateTimeObject = dateTimeObject(entry_tag,
+                                                yearTag,
+                                                monthTag,
+                                                dayTag,
+                                                hourTag,
+                                                minuteTag,
+                                                secondTag,
+                                                millisecondTag)
 
-        earlyDateTimeInfo = getEarlierDateTime(earlyDateTimeInfo, entryInfo)
 
-    return earlyDateTimeInfo
+        dateTime = getEarlierDateTime(earlistDateTimeObject, entry_dateTimeObject)
 
-# gets camera and or software device information
-# returns a list of (cameraMake, cameraModel, serialNumber, softwareName)
-# defaults to 'NONE' if a piece of information can not be found
-def getCameraInformation(data, cameraMake = 'NONE', cameraModel = 'NONE'):
+    return dateTime
+
+
+def getCameraObject(exifData):
     # we want make, model, serial number, software
-    if not cameraMake:
-        cameraMake = 'NONE'
-    if not cameraModel:
-        cameraModel  = 'NONE'
-
+    cameraMake = 'NONE'
+    cameraModel  = 'NONE'
     serialNumber = 'NONE'
     softwareName = 'NONE'
 
-    for key,value in data.iteritems():
+    for key,value in exifData.iteritems():
         # get serial number string i.e. '192029004068'
         if 'exif:serialnumber' in key.lower():
-            serialNumber = str(data[key])
+            serialNumber = str(exifData[key])
         # get make string i.e. 'Canon'
         if 'exif:make' in key.lower():
-            cameraMake = str(data[key])
+            cameraMake = str(exifData[key])
         # get model string i.e. 'Canon EOS 5D Mark III'
         if 'exif:model' in key.lower():
-            cameraModel = str(data[key])
+            cameraModel = str(exifData[key])
         # get software string i.e. 'Adobe Photoshop Lightroom 6.3 (Macintosh)''
         if 'exif:software' in key.lower():
-            softwareName = str(data[key])
+            softwareName = str(exifData[key])
 
     # special case for iOS devices reporting software version
     if cameraMake.lower() == 'apple':
         softwareName = 'iOS %s' % softwareName
 
-    cameraInfo = cameraObject(cameraMake, cameraModel, serialNumber, softwareName)
+    camera = cameraObject(cameraMake, cameraModel, serialNumber, softwareName)
 
-    return cameraInfo
-
-
+    return camera
 
 
-def getMediaFileObject(file):
+def getMediaFileObject(file, creatorName):
     print 'builds mediaFileObject'
     print file
 
-    # determine type, image or video
-    mediaFileObject.type = isValidMediaFileType(file)[1]
+    if isValidMediaFileType(file)[0]:
 
-    # get file extension
-    mediaFileObject.extension = extension
-
-
-    mediaFileObject.dateTime = dateTime
+        # process file
+        exifTagsDict = JSONToDict(p.get_json(originalFilePath))
 
 
-    mediaFileObject.camera = camera
+        # determine type, image or video
+        fileType = isValidMediaFileType(file)[1]
+
+        # get file extension
+        extension = isValidMediaFileType(file)[2]
+
+        # get dateTimeObject for file
+        dateTime = getDateTimeObject(exifTagsDict)
+
+        # get cameraObject for file
+        camera = getCameraObject(exifTagsDact)
+
+        # get creatorName for file
+        creator = creatorName.lower()
 
 
-    mediaFileObject.creator = creator
+        # init mediaFileObject
+        mediaFile = mediaFileObject(fileType, extension, dateTime, camera, creator)
+        return mediaFile
 
-
-
-    return mediaFileObject
+    else:
+        print 'not a valid media type'
+        return mediaFileObject
 
 
 
