@@ -1,0 +1,128 @@
+Arguments...
+mediaDirectory    None
+mediaFile         <open file '/Users/samgutentag/Google Drive/gutenShare/BlakeToast.MOV', mode 'rb' at 0x103586e40>
+
+
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+>>> processing '/Users/samgutentag/Google Drive/gutenShare/BlakeToast.MOV'
+0:		Composite:AvgBitrate: 					15.5 Mbps
+1:		Composite:GPSAltitude: 					66.606 m
+2:		Composite:GPSAltitudeRef: 				Above Sea Level
+3:		Composite:GPSLatitude: 					36 deg 7' 48.36" N
+4:		Composite:GPSLongitude: 					121 deg 38' 40.20" W
+5:		Composite:GPSPosition: 					36 deg 7' 48.36" N, 121 deg 38' 40.20" W
+6:		Composite:ImageSize: 					1920x1080
+7:		Composite:Megapixels: 					2.1
+8:		Composite:Rotation: 						90
+9:		ExifTool:ExifToolVersion: 				10.33
+10:		File:Directory: 							/Users/samgutentag/Google Drive/gutenShare
+11:		File:FileAccessDate: 					2017:01:09 07:40:08-08:00
+12:		File:FileInodeChangeDate: 				2016:11:24 12:11:12-08:00
+13:		File:FileModifyDate: 					2016:10:06 12:43:32-07:00
+14:		File:FileName: 							BlakeToast.MOV
+15:		File:FilePermissions: 					rw-------
+16:		File:FileSize: 							675 MB
+17:		File:FileType: 							MOV
+18:		File:FileTypeExtension: 					mov
+19:		File:MIMEType: 							video/quicktime
+20:		QuickTime:AudioBitsPerSample: 			16
+21:		QuickTime:AudioChannels: 				1
+22:		QuickTime:AudioFormat: 					mp4a
+23:		QuickTime:AudioSampleRate: 				44100
+24:		QuickTime:Balance: 						0
+25:		QuickTime:BitDepth: 						24
+26:		QuickTime:CleanApertureDimensions: 		1920x1080
+27:		QuickTime:CompatibleBrands: 				[u'qt  ']
+28:		QuickTime:CompressorID: 					avc1
+29:		QuickTime:CompressorName: 				H.264
+30:		QuickTime:CreateDate: 					2016:09:25 01:27:58
+31:		QuickTime:CreationDate: 					2016:09:24 18:27:58-07:00
+32:		QuickTime:CurrentTime: 					0 s
+33:		QuickTime:Duration: 						0:06:04
+34:		QuickTime:EncodedPixelsDimensions: 		1920x1080
+35:		QuickTime:GPSCoordinates: 				36 deg 7' 48.36" N, 121 deg 38' 40.20" W, 66.606 m Above Sea Level
+36:		QuickTime:GenBalance: 					0
+37:		QuickTime:GenFlags: 						0 0 0
+38:		QuickTime:GenGraphicsMode: 				ditherCopy
+39:		QuickTime:GenMediaVersion: 				0
+40:		QuickTime:GenOpColor: 					32768 32768 32768
+41:		QuickTime:GraphicsMode: 					ditherCopy
+42:		QuickTime:HandlerClass: 					Data Handler
+43:		QuickTime:HandlerDescription: 			Core Media Data Handler
+44:		QuickTime:HandlerType: 					Metadata Tags
+45:		QuickTime:HandlerVendorID: 				Apple
+46:		QuickTime:ImageHeight: 					1080
+47:		QuickTime:ImageWidth: 					1920
+48:		QuickTime:MajorBrand: 					Apple QuickTime (.MOV/QT)
+49:		QuickTime:Make: 							Apple
+50:		QuickTime:MatrixStructure: 				1 0 0 0 1 0 0 0 1
+51:		QuickTime:MediaCreateDate: 				2016:09:25 01:27:58
+52:		QuickTime:MediaDuration: 				0:06:04
+53:		QuickTime:MediaHeaderVersion: 			0
+54:		QuickTime:MediaLanguageCode: 			und
+55:		QuickTime:MediaModifyDate: 				2016:09:25 01:34:03
+56:		QuickTime:MediaTimeScale: 				600
+57:		QuickTime:MinorVersion: 					0.0.0
+58:		QuickTime:Model: 						iPhone 6s
+59:		QuickTime:ModifyDate: 					2016:09:25 01:34:03
+60:		QuickTime:MovieDataOffset: 				36
+61:		QuickTime:MovieDataSize: 				707905959
+62:		QuickTime:MovieHeaderVersion: 			0
+63:		QuickTime:NextTrackID: 					5
+64:		QuickTime:OpColor: 						32768 32768 32768
+65:		QuickTime:OtherFormat: 					mebx
+66:		QuickTime:PosterTime: 					0 s
+67:		QuickTime:PreferredRate: 				1
+68:		QuickTime:PreferredVolume: 				100.00%
+69:		QuickTime:PreviewDuration: 				0 s
+70:		QuickTime:PreviewTime: 					0 s
+71:		QuickTime:ProductionApertureDimensions: 	1920x1080
+72:		QuickTime:PurchaseFileFormat: 			mp4a
+73:		QuickTime:SelectionDuration: 			0 s
+74:		QuickTime:SelectionTime: 				0 s
+75:		QuickTime:Software: 						10.0.1
+76:		QuickTime:SourceImageHeight: 			1080
+77:		QuickTime:SourceImageWidth: 				1920
+78:		QuickTime:TimeScale: 					600
+79:		QuickTime:TrackCreateDate: 				2016:09:25 01:27:58
+80:		QuickTime:TrackDuration: 				0:06:04
+81:		QuickTime:TrackHeaderVersion: 			0
+82:		QuickTime:TrackID: 						1
+83:		QuickTime:TrackLayer: 					0
+84:		QuickTime:TrackModifyDate: 				2016:09:25 01:34:03
+85:		QuickTime:TrackVolume: 					100.00%
+86:		QuickTime:VideoFrameRate: 				29.978
+87:		QuickTime:XResolution: 					72
+88:		QuickTime:YResolution: 					72
+89:		SourceFile: 								/Users/samgutentag/Google Drive/gutenShare/BlakeToast.MOV
+
+
+#-------------------------------------------------------------------------------
+Camera Make:	NONE
+Camera Model:	NONE
+Serial Number:	NONE
+Software:		NONE
+
+
+#-------------------------------------------------------------------------------
+tag:			QuickTime:CreationDate
+year:			2016
+month:			09
+day:			24
+hour:			18
+minute:			27
+second:			58
+millisecond:	999
+
+
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+#-------------------------------------------------------------------------------
+ALL DONE!
+
+
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
