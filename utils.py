@@ -29,22 +29,6 @@ class CameraObject:
         print 'Serial Number:\t%s' % self.serial
         print 'Software:\t\t%s' % self.software
 
-class MediaFileObject:
-
-    def __init__(self, type, extension, dateTime, camera, creator):
-        self.type = type
-        self.extension = extension
-        self.dateTime = dateTime
-        self.camera = camera
-        self.creator = creator
-
-    def printInfo(self):
-        print 'type:\t\t%s' % (self.type)
-        print 'extension:\t\t%s' % (self.extension)
-        print 'dateTime:\t\t%s' % (self.dateTime)
-        print 'camera:\t\t%s' % (self.camera)
-        print 'creator:\t\t%s' % (self.creator)
-
 class DateTimeObject:
 
     def __init__(self, tag, year, month, day, hour, minute, second, millisecond):
@@ -74,6 +58,21 @@ class DateTimeObject:
         print 'second:\t\t\t%s' % self.second
         print 'millisecond:\t%s' % self.millisecond
 
+class MediaFileObject:
+
+    def __init__(self, type, extension, dateTimeObject, cameraObject, creator):
+        self.type = type
+        self.extension = extension
+        self.dateTime = dateTimeObject
+        self.camera = cameraObject
+        self.creator = creator
+
+    def printInfo(self):
+        print 'type:\t\t%s' % (self.type)
+        print 'extension:\t\t%s' % (self.extension)
+        print 'dateTime:\t\t%s' % (self.dateTime.printInfo())
+        print 'camera:\t\t%s' % (self.camera.printInfo())
+        print 'creator:\t\t%s' % (self.creator)
 
 #------------------------------------------------------------------------------
 #		functions
@@ -83,17 +82,20 @@ class DateTimeObject:
 def spacer():
     print '\n'
     print '#' + '-'*79
+    print '\n'
 def bigSpacer():
     print '\n'
     print '#' + '!'*79
     print '#' + '!'*79
+    print '\n'
 
 # checks that a given file exists, and opens it
 def openMediaFile(parser, arg):
     if not os.path.exists(arg):
         parser.error('The file %s does not exist' % arg)
     else:
-        return open(arg, 'rb')
+        file = str(open(arg, 'rb')).split("'")[1]
+        return file
 
 # checks that a given directory exists
 def openMediaDirectory(parser, arg):
@@ -170,6 +172,7 @@ def getMediaFileType(exifData):
 def getCorrectedFilePath(destinationDir, mediaFileObject, event):
     fileName = ''
     dirName = ''
+    counter = '0001'
 
     # clean destinationDir to not include tail slashes, if they exist
     while destinationDir.endswith('/'):
@@ -185,7 +188,8 @@ def getCorrectedFilePath(destinationDir, mediaFileObject, event):
                                             mediaFileObject.dateTime.month,
                                             mediaFileObject.dateTime.month,
                                             event)
-    fileName '%s%s%s.%s%s%s%s.%s.%s.%s.%s' = (mediaFileObject.dateTime.year,
+
+    fileName = '%s%s%s.%s%s%s%s.%s.%s.%s.%s' % (mediaFileObject.dateTime.year,
                                                 mediaFileObject.dateTime.month,
                                                 mediaFileObject.dateTime.day,
                                                 mediaFileObject.dateTime.hour,
@@ -194,7 +198,7 @@ def getCorrectedFilePath(destinationDir, mediaFileObject, event):
                                                 mediaFileObject.dateTime.millisecond,
                                                 event,
                                                 mediaFileObject.creator,
-                                                '0001',  # counter
+                                                counter,
                                                 mediaFileObject.extension)
 
     # return dirName + fileName
@@ -244,7 +248,7 @@ def makeCopy(sourceFile, destinationDirectoryName, destinationFileName):
         destinationFileName = incrementCounter(destinationFileName)
 
         # when the counter reaches 9999, break out of while loop!
-        if destinationFileName.split('.')[-2] = '9999':
+        if destinationFileName.split('.')[-2] == '9999':
             break
 
     # destination full file path
@@ -603,7 +607,8 @@ def prettyPrintDict(dictionary):
 #		file processing functions
 #------------------------------------------------------------------------------
 
-# main processing of media file, gets exif data, setups up destination directory and filename, copies file
+# main processing of media file, gets exif data,
+# sets up destination directory and filename, copies file
 def processMediaFile(inputFile, destinationDir, creator, event):
 
     print ">>> processing '%s'" % inputFile

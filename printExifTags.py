@@ -9,48 +9,9 @@
 #
 #------------------------------------------------------------------------------
 
-import pyExifTools
-import pyexifinfo as p
+import utils
+import pyexifinfo
 import argparse
-
-import sys  # import sys package, if not already imported
-reload(sys)
-sys.setdefaultencoding('utf-8')
-
-# main processing of media file, gets exif data, setups up destination directory and filename, copies file
-# def processMediaFile(mediaFile, userName, destinationDir):
-def processMediaFile(mediaFile):
-    # when a single file is passed, the file name needs to be trimmed
-    try:
-        originalFilePath = str(mediaFile).split("'")[1]
-    # when a file is passed as part of a directory, it does not need to be trimmed
-    except:
-        originalFilePath = mediaFile
-
-    # spacer()
-    print ">>> processing '%s'" % originalFilePath
-    extension = str(originalFilePath.split('.')[-1])
-
-    # ignore dot files i.e. '.DS_Store'
-    if originalFilePath.split('.')[0].endswith('/'):
-        print 'ignoring %s' % originalFilePath
-        return False
-
-    # get information from exif tags, format dateTime, and Camera class objects
-    exifTagsDict = pyExifTools.JSONToDict(p.get_json(originalFilePath))
-    dateTimeStamp = pyExifTools.getMediaDateTimeStamp(exifTagsDict)
-    cameraInfo = pyExifTools.getCameraInformation(exifTagsDict)
-
-    # print information
-    # pyExifTools.bigSpacer()
-    pyExifTools.prettyPrintTags(exifTagsDict)
-    pyExifTools.spacer()
-    cameraInfo.printInfo()
-    pyExifTools.spacer()
-    dateTimeStamp.printInfo()
-    pyExifTools.bigSpacer()
-
-    return True
 
 
 #------------------------------------------------------------------------------
@@ -66,51 +27,56 @@ def main():
                         required=False,
                         help='pass a single file to process',
                         metavar='MEDIA_FILE',
-                        type=lambda x: pyExifTools.openMediaFile(parser, x))
+                        type=lambda x: utils.openMediaFile(parser, x))
 
     # passing a directory (with or without sub directories) of files
     parser.add_argument('-d', '--mediaDirectory', dest='mediaDirectory',
                         required=False,
                         help='pass a directory of files to process, WARNING: RECURSIVE',
                         metavar='MEDIA_DIRECTORY',
-                        type=lambda x: pyExifTools.openMediaDirectory(parser, x))
+                        type=lambda x: utils.openMediaDirectory(parser, x))
 
     args = vars(parser.parse_args())
 
+    utils.bigSpacer()
     print 'Arguments...'
-    pyExifTools.prettyPrintDict(args)
-    pyExifTools.bigSpacer()
+    utils.prettyPrintDict(args)
+    utils.bigSpacer()
 
     # attempt to process a passed file
     if args['mediaFile']:
-        processMediaFile(args['mediaFile'])
-        # try:
-        #     processMediaFile(args['mediaFile'])
-        # except:
-        #     print '>>> Could not process file'
+
+        # get absolute filepath in a string
+        exifTagsDict = utils.JSONToDict(pyexifinfo.get_json(args['mediaFile']))
+
+        # pretty print dictionary of exif tags
+        utils.prettyPrintDict(exifTagsDict)
+
+
 
     # attempts to process a directory of files
     elif args['mediaDirectory']:
 
         # process a directory of files
-        filesToProcess = pyExifTools.getDirectoryContents(args['mediaDirectory'])
+        filesToProcess = utils.getDirectoryContents(args['mediaDirectory'])
 
         fileProcessCounter = 1
         for file in filesToProcess:
+            utils.spacer()
+            print '\n%s of %s' % (fileProcessCounter, len(filesToProcess)),
             try:
-                print '\n%s of %s' % (fileProcessCounter, len(filesToProcess))
-                processMediaFile(file)
+                # pretty print dictionary of exif tags
+                exifTagsDict = utis.JSONToDict(pyexifinfo.get_json(file))
+                utils.prettyPrintDict(exifTagsDict)
 
             except:
-                print 'skipping %s' % file
+                print '\tskipping %s' % file
 
             fileProcessCounter += 1
 
-    pyExifTools.spacer()
-
+    utils.spacer()
     print 'ALL DONE!'
-
-    pyExifTools.bigSpacer()
+    utils.bigSpacer()
 
 if __name__ == '__main__':
     main()
