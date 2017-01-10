@@ -261,7 +261,7 @@ def makeCopy(sourceFile, destinationDirectoryName, destinationFileName):
     print '>>> copying %s to %s' % (sourceFile, destinationFullPath)
 
     # copy file
-    shutil.copy2(sourceFile, destinationFullPath)
+    # shutil.copy2(sourceFile, destinationFullPath)
 
     return (destinationDirectoryName, destinationFileName)
 
