@@ -46,11 +46,14 @@ def main():
     # attempt to process a passed file
     if args['mediaFile']:
 
-        # get absolute filepath in a string
-        exifTagsDict = utils.JSONToDict(pyexifinfo.get_json(args['mediaFile']))
+        try:
 
-        # pretty print dictionary of exif tags
-        utils.prettyPrintDict(exifTagsDict)
+            # get absolute filepath in a string
+            exifTagsDict = utils.JSONToDict(pyexifinfo.get_json(args['mediaFile']))
+            # pretty print dictionary of exif tags
+            utils.prettyPrintDict(exifTagsDict)
+        except:
+            print '>>> unabel to process %s' % args['mediaFile']
 
 
 
@@ -68,7 +71,6 @@ def main():
                 # pretty print dictionary of exif tags
                 exifTagsDict = utis.JSONToDict(pyexifinfo.get_json(file))
                 utils.prettyPrintDict(exifTagsDict)
-
             except:
                 print '\tskipping %s' % file
 

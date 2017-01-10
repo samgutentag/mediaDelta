@@ -24,9 +24,9 @@ class CameraObject:
         self.software = str(software).split('(')[0].replace(' ', '.')
 
     def printInfo(self):
-        print 'Camera Make:\t%s' % self.make
-        print 'Camera Model:\t%s' % self.model
-        print 'Serial Number:\t%s' % self.serial
+        print 'Camera Make:\t\t%s' % self.make
+        print 'Camera Model:\t\t%s' % self.model
+        print 'Serial Number:\t\t%s' % self.serial
         print 'Software:\t\t%s' % self.software
 
 class DateTimeObject:
@@ -49,14 +49,14 @@ class DateTimeObject:
         return dateTimeString
 
     def printInfo(self):
-        print 'tag:\t\t\t%s' % self.tag
-        print 'year:\t\t\t%s' % self.year
-        print 'month:\t\t\t%s' % self.month
-        print 'day:\t\t\t%s' % self.day
-        print 'hour:\t\t\t%s' % self.hour
-        print 'minute:\t\t\t%s' % self.minute
-        print 'second:\t\t\t%s' % self.second
-        print 'millisecond:\t%s' % self.millisecond
+        print 'Tag:\t\t\t%s' % self.tag
+        print 'Year:\t\t\t%s' % self.year
+        print 'Month:\t\t\t%s' % self.month
+        print 'Day:\t\t\t%s' % self.day
+        print 'Hour:\t\t\t%s' % self.hour
+        print 'Minute:\t\t\t%s' % self.minute
+        print 'Second:\t\t\t%s' % self.second
+        print 'Millisecond:\t\t%s' % self.millisecond
 
 class MediaFileObject:
 
@@ -68,11 +68,12 @@ class MediaFileObject:
         self.creator = creator
 
     def printInfo(self):
-        print 'type:\t\t%s' % (self.type)
-        print 'extension:\t\t%s' % (self.extension)
-        print 'dateTime:\t\t%s' % (self.dateTime.printInfo())
-        print 'camera:\t\t%s' % (self.camera.printInfo())
-        print 'creator:\t\t%s' % (self.creator)
+        print 'Type:\t\t\t%s' % (self.type)
+        print 'Extension:\t\t%s' % (self.extension)
+        print 'Creator:\t\t%s' % (self.creator)
+        self.camera.printInfo()
+        self.dateTime.printInfo()
+
 
 #------------------------------------------------------------------------------
 #		functions
@@ -157,7 +158,7 @@ def isValidMediaFileType(file):
 def getMediaFileType(exifData):
 
     # get media type from 'File:MIMEType' value, (video or image)
-    mediaType = exifData['File:MIMEType:'].split('/')[0].lower()
+    mediaType = exifData['File:MIMEType'].split('/')[0].lower()
 
     # get file type from 'File:FileType' value
     fileType = exifData['File:FileType'].upper()
@@ -244,8 +245,10 @@ def makeCopy(sourceFile, destinationDirectoryName, destinationFileName):
 
     # check if file exists
     while os.path.isfile(destinationFileName):
+        print 'file exists, atempting to increment counter...'
         # this file exists! increment the counter
         destinationFileName = incrementCounter(destinationFileName)
+        print '>destinationFileName now %s' % destinationFileName
 
         # when the counter reaches 9999, break out of while loop!
         if destinationFileName.split('.')[-2] == '9999':
@@ -258,7 +261,7 @@ def makeCopy(sourceFile, destinationDirectoryName, destinationFileName):
     print '>>> copying %s to %s' % (sourceFile, destinationFullPath)
 
     # copy file
-    # shutil.copy2(sourceFile, destinationFullPath)
+    shutil.copy2(sourceFile, destinationFullPath)
 
     return (destinationDirectoryName, destinationFileName)
 
@@ -519,13 +522,13 @@ def getCameraObject(exifData):
 
 # uses information from exifData to create a MediaFileObject if possible
 def getMediaFileObject(file, creatorName):
-    print 'builds MediaFileObject from %s' % file
+    # print 'building MediaFileObject from %s' % file
 
     # if the file is a valid media file type, else skip all this
     if isValidMediaFileType(file):
 
         # get exifTags into a dictionary
-        exifTagsDict = JSONToDict(pyexifinfo.get_json(originalFilePath))
+        exifTagsDict = JSONToDict(pyexifinfo.get_json(file))
         # prettyPrintDict(exifTagsDict)
 
         # Get file type information
@@ -537,7 +540,7 @@ def getMediaFileObject(file, creatorName):
         dateTimeObject = getDateTimeObject(exifTagsDict)
 
         # get CameraObject for file
-        cameraObject = getCameraObject(exifTagsDact)
+        cameraObject = getCameraObject(exifTagsDict)
 
         # get creatorName for file
         creator = creatorName.lower()
@@ -552,7 +555,7 @@ def getMediaFileObject(file, creatorName):
         return mediaFileObject
 
     else:
-        print '>>> could not create MediaFileObject from %s' % file
+        print '>>> could not create MediaFileObject from %s, not a valid media file type' % file
         return False
 
 
@@ -613,19 +616,15 @@ def processMediaFile(inputFile, destinationDir, creator, event):
 
     print ">>> processing '%s'" % inputFile
 
-    # devide input file into file and directory
-    sourceFile = inputFile.split('/')[-1]
-    sourceFilePath = inputFile[:-len(sourceFile)]
-
     # create a media file object for the input file
     try:
-        mediaFileObject = getMediaFileObject(sourceFile, creator)
+        mediaFileObject = getMediaFileObject(inputFile, creator)
 
         # make Corrected File Path
-        correctedFilePath = getCorrectedFilePath(destinationDir, mediaFile, event)
+        correctedFilePath = getCorrectedFilePath(destinationDir, mediaFileObject, event)
 
         # copy file, returns destinationDirectory and destinationFile
-        destinationFile = makeCopy(sourceFile, correctedFilePath[0], correctedFilePath[1])
+        destinationFile = makeCopy(inputFile, correctedFilePath[0], correctedFilePath[1])
 
         print '\tmoved\t%s' % inputFile
         print '\tto\t\t%s%s' % (destinationFile[0], destinationFile[1])

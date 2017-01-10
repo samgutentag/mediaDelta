@@ -29,5 +29,7 @@ Goal Sample Folder Structure
 printExifTags.py
 	prints all exif tags for a single file or a directory of files
 
+TO DO:
+
 cameraReporter.py
 	generates a camera report of all files in a directory, or in a single file, and collects them in a dictionary that is easy to get counts for
