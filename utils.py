@@ -624,7 +624,7 @@ def processMediaFile(inputFile, destinationDir, creator, event):
         # make Corrected File Path
         correctedFilePath = getCorrectedFilePath(destinationDir, mediaFile, event)
 
-        # copy file
+        # copy file, returns destinationDirectory and destinationFile
         destinationFile = makeCopy(sourceFile, correctedFilePath[0], correctedFilePath[1])
 
         print '\tmoved\t%s' % inputFile
