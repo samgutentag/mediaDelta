@@ -75,25 +75,14 @@ def archiveMediaFile(inputFile, destinationDir, creator):
     print ">>> processing '%s'" % inputFile
     archivedMediaFilePath = ''
 
-    # mediaFileObject = utils.getMediaFileObject(inputFile, creator)
-    # mediaFileObject.printInfo()
-
+    # get mediaFileObject
     mediaFileObject = utils.getMediaFileObject(inputFile, creator)
-    # utils.spacer()
-    # mediaFileObject.printInfo()
-    # utils.spacer()
-    # mediaFileObject.dateTime.printInfo()
-    # utils.spacer()
 
     # make Corrected File Path
     correctedFilePath = getCorrectedArchiveFilePath(destinationDir, mediaFileObject)
 
     # copy file, returns destinationDirectory and destinationFile
     archivedMediaFilePath = utils.makeCopy(inputFile, correctedFilePath[0], correctedFilePath[1])
-
-
-
-    print archivedMediaFilePath
 
     return archivedMediaFilePath
 
@@ -132,12 +121,6 @@ def main():
                         help = 'user provided creator name, used for tagging with multiple artists or photographers into a single collection',
                         metavar='CREATOR_NAME')
 
-    # # creator name helps with identification when multiple photographers or artists are contributing to a single collection
-    # parser.add_argument('-e', '--eventName', dest='eventName',
-    #                 required = True,
-    #                 help = 'event name used to aide identification of directories contents',
-    #                 metavar='EVENT_NAME')
-
     args = vars(parser.parse_args())
 
     utils.bigSpacer()
@@ -147,10 +130,8 @@ def main():
 
     # attempt to process a passed file
     if args['mediaFile']:
-        # processMediaFile(args['mediaFile'], args['artistName'], args['outputDirectory'], args['cameraMake'], args['cameraModel'])
         archivedFilePath = archiveMediaFile(args['mediaFile'], args['outputDirectory'], args['creatorName'])
         print 'Archived\t%s\nto\t\t%s' % (args['mediaFile'], archivedFilePath)
-
 
     # attempts to process a directory of files
     elif args['mediaDirectory']:
@@ -159,7 +140,6 @@ def main():
         filesToProcess = utils.getDirectoryContents(args['mediaDirectory'])
 
         fileProcessCounter = 1
-        utils.bigSpacer()
         for file in filesToProcess:
 
             print '\n%s of %s' % (fileProcessCounter, len(filesToProcess))
@@ -171,6 +151,9 @@ def main():
             fileProcessCounter += 1
 
         utils.bigSpacer()
+
+    print 'Done!'
+    utils.bigSpacer()
 
 if __name__ == '__main__':
     main()
