@@ -211,10 +211,14 @@ def getCorrectedFilePath(destinationDir, mediaFileObject, event):
 # returns (destinationDirectoryName, destinationFileName) list
 def makeCopy(sourceFile, destinationDirectoryName, destinationFileName):
 
+    destinationAbsoluteFilePath = destinationDirectoryName + destinationFileName
+
     # increment counter when file already exists, helps elliminate file overwrite
     # fails out after 9999 copies are found, instead dumps all subsequent files to
     # counter '9999', WILL OVERWRITE
     def incrementCounter(sourceName):
+
+        origCounter = sourceName.split('.')[-2]
 
         # get current counter value
         currentCounter = sourceName.split('.')[-2]
@@ -227,15 +231,15 @@ def makeCopy(sourceFile, destinationDirectoryName, destinationFileName):
         if int(currentCounter) < 9999:
             counter = int(currentCounter) + 1
         else:
-            print '>>>>>>>\t9999 copies already exist!'
-            return '9999'
+            counter = 9999
 
         # format to string and left side zero pad counter
-        newCounter = str(counter)
-        while len(newCounter) < 5:
-            newCounter = '0' + newCounter
+        counterString = str(counter)
+        while len(counterString) < 4:
+            counterString = '0' + counterString
 
-        incrementendFileName = sourceName.replace(currentCounter, newCounter)
+        incrementendFileName = sourceName.replace(origCounter, counterString)
+
 
         return incrementendFileName
 
@@ -244,26 +248,18 @@ def makeCopy(sourceFile, destinationDirectoryName, destinationFileName):
         os.makedirs(destinationDirectoryName)
 
     # check if file exists
-    while os.path.isfile(destinationFileName):
-        print 'file exists, atempting to increment counter...'
+    while os.path.isfile(destinationAbsoluteFilePath):
+        # print 'file exists, attempting to increment counter...'
         # this file exists! increment the counter
-        destinationFileName = incrementCounter(destinationFileName)
-        print '>destinationFileName now %s' % destinationFileName
+        destinationAbsoluteFilePath = incrementCounter(destinationAbsoluteFilePath)
 
         # when the counter reaches 9999, break out of while loop!
-        if destinationFileName.split('.')[-2] == '9999':
+        if destinationAbsoluteFilePath.split('.')[-2] == '9999':
             break
 
-    # destination full file path
-    destinationFullPath = '%s%s' % (destinationDirectoryName, destinationFileName)
+    shutil.copy2(sourceFile, str(destinationAbsoluteFilePath))
 
-    print '>>> copying %s to %s%s' % (sourceFile, destinationDirectoryName, destinationFileName)
-    print '>>> copying %s to %s' % (sourceFile, destinationFullPath)
-
-    # copy file
-    # shutil.copy2(sourceFile, destinationFullPath)
-
-    return (destinationDirectoryName, destinationFileName)
+    return str(destinationAbsoluteFilePath)
 
 
 #------------------------------------------------------------------------------
@@ -307,8 +303,8 @@ def getDateTimeObject(exifData):
         entry_dateTimeStamp = entry[1]
 
         # if year is before 1975, we dont want it, break out!
-            # this is to remove false low years that some software
-            # defaults to writing out the date at the epoch
+        # this is to remove false low years that some software
+        # defaults to writing out the date at the epoch
         if int(entry_dateTimeStamp.split(':')[0]) < 1975:
             break
 
@@ -324,64 +320,59 @@ def getDateTimeObject(exifData):
         except:
             pass
 
-        # try to split into dateStamp and timeStamp, get dateStamp
+        # split apart dateStamp, defaults to '9999:99:99'
         try:
             entry_dateStamp = entry_dateTimeStamp.split(' ')[0]
         except:
-            entry_dateStamp = '9999:99:99'
+            entry_dateStamp = entry_dateTimeStamp
 
-        # try to split into dateStamp and timeStamp, get timeStamp
+        # break dateStamp into pieces
+        dateStamp_year = entry_dateStamp.split(':')[0]
+        dateStamp_month = entry_dateStamp.split(':')[1]
+        dateStamp_day = entry_dateStamp.split(':')[2]
+
+
+
+        # split apart timeStamp, defaults to '23:59:59.999'
         try:
             entry_timeStamp = entry_dateTimeStamp.split(' ')[1]
 
             # sometimes time stamps have letters appened to the end of the second, lets remove those
-            while entry_timeStamp[len(timeStamp)-1].isalpha():
+            while entry_timeStamp[len(entry_timeStamp)-1].isalpha():
                 entry_timeStamp = entry_timeStamp[:-1]
         except:
-            entry_timeStamp = '23:59:99.999'
+            entry_timeStamp = '23:59:59.999'
 
-        # set values for each
-        yearTag = entry_dateStamp.split(':')[0]
-        monthTag = entry_dateStamp.split(':')[1]
-        dayTag = entry_dateStamp.split(':')[2]
-        hourTag = entry_timeStamp.split(':')[0]
-        minuteTag = entry_timeStamp.split(':')[1]
+        # break timeStamp into pieces
+        timeStamp_hour = entry_timeStamp.split(':')[0]
+        timeStamp_minute = entry_timeStamp.split(':')[1]
+        timeStamp_second = entry_timeStamp.split(':')[2]
 
-        # split out secondTag, else default to '99'
+        # try splitting second into seconds and milliseconds
         try:
-            secondTag = entry_timeStamp.split(':')[2]
-        except:
-            secondTag = '99.999'
 
-        # try splitting second into secondStamp and millisecondStamp
-        try:
-            millisecondTag = secondTag.split('.')[1]
-            secondTag = secondTag.split('.')[0]
-
-            # some time stamps come through with an alpha character(s) suffix
-            # lets remove those if they exist
-            while millisecondTag[len(millisecondTag)-1].isalpha():
-                millisecondTag = millisecondTag[:-1]
+            timeStamp_second = timeStamp_second.split('.')[0]
+            timeStamp_millisecond = timeStamp_second.split('.')[1]
 
             # format millisecondStamp to be a fixed length of 3 digits
-            if len(millisecondTag) > 3:
-                millisecondTag = millisecondTag[:4]
-
-            while len(millisecondTag) < 3:
-                millisecondTag = '0' + millisecondTag
+            if len(timeStamp_millisecond) > 3:
+                timeStamp_millisecond = timeStamp_millisecond[:4]
+            # zero padded from the left if needed
+            while len(timeStamp_millisecond) < 3:
+                timeStamp_millisecond = '0' + timeStamp_millisecond
 
         except:
-            millisecondTag = '999'
+            timeStamp_millisecond = '999'
 
         # create DateTimeObject
         entry_DateTimeObject = DateTimeObject(entry_tag,
-                                                yearTag,
-                                                monthTag,
-                                                dayTag,
-                                                hourTag,
-                                                minuteTag,
-                                                secondTag,
-                                                millisecondTag)
+                                                dateStamp_year,
+                                                dateStamp_month,
+                                                dateStamp_day,
+                                                timeStamp_hour,
+                                                timeStamp_minute,
+                                                timeStamp_second,
+                                                timeStamp_millisecond)
 
         # compare DateTimeObjects
         earliestDateTimeObject = getEarlierDateTime(earliestDateTimeObject, entry_DateTimeObject)
@@ -626,8 +617,8 @@ def processMediaFile(inputFile, destinationDir, creator, event):
         # copy file, returns destinationDirectory and destinationFile
         destinationFile = makeCopy(inputFile, correctedFilePath[0], correctedFilePath[1])
 
-        print '\tmoved\t%s' % inputFile
-        print '\tto\t\t%s%s' % (destinationFile[0], destinationFile[1])
+        # print '\tmoved\t%s' % inputFile
+        # print '\tto\t\t%s%s' % (destinationFile[0], destinationFile[1])
 
     except:
         print '\t>>> could not create a MediaFileObject, skipping %s' % inputFile
