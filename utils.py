@@ -346,7 +346,11 @@ def getDateTimeObject(exifData):
         # break timeStamp into pieces
         timeStamp_hour = entry_timeStamp.split(':')[0]
         timeStamp_minute = entry_timeStamp.split(':')[1]
-        timeStamp_second = entry_timeStamp.split(':')[2]
+
+        try:
+            timeStamp_second = entry_timeStamp.split(':')[2]
+        except:
+            timeStamp_second = '99'
 
         # try splitting second into seconds and milliseconds
         try:
