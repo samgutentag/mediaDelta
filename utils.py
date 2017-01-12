@@ -257,7 +257,7 @@ def makeCopy(sourceFile, destinationDirectoryName, destinationFileName):
         if destinationAbsoluteFilePath.split('.')[-2] == '9999':
             break
 
-    # shutil.copy2(sourceFile, str(destinationAbsoluteFilePath))
+    shutil.copy2(sourceFile, str(destinationAbsoluteFilePath))
 
     return str(destinationAbsoluteFilePath)
 

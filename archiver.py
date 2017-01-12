@@ -76,13 +76,19 @@ def archiveMediaFile(inputFile, destinationDir, creator):
     archivedMediaFilePath = ''
 
     # get mediaFileObject
-    mediaFileObject = utils.getMediaFileObject(inputFile, creator)
+    try:
+        mediaFileObject = utils.getMediaFileObject(inputFile, creator)
+    except:
+        print 'ERROR:\tcould not create mediaFileObject from \'%s\', skipping...' % inputFile
+        return inputFile
+
 
     # make Corrected File Path
     correctedFilePath = getCorrectedArchiveFilePath(destinationDir, mediaFileObject)
 
     # copy file, returns destinationDirectory and destinationFile
     archivedMediaFilePath = utils.makeCopy(inputFile, correctedFilePath[0], correctedFilePath[1])
+    print 'Archived\t%s\nto\t\t%s' % (inputFile, archivedMediaFilePath)
 
     return archivedMediaFilePath
 
@@ -131,7 +137,7 @@ def main():
     # attempt to process a passed file
     if args['mediaFile']:
         archivedFilePath = archiveMediaFile(args['mediaFile'], args['outputDirectory'], args['creatorName'])
-        print 'Archived\t%s\nto\t\t%s' % (args['mediaFile'], archivedFilePath)
+
 
     # attempts to process a directory of files
     elif args['mediaDirectory']:
@@ -143,15 +149,12 @@ def main():
         for file in filesToProcess:
 
             print '\n%s of %s' % (fileProcessCounter, len(filesToProcess))
-            # processMediaFile(file, args['artistName'], args['outputDirectory'], args['cameraMake'], args['cameraModel'])
 
             archivedFilePath = archiveMediaFile(file, args['outputDirectory'], args['creatorName'])
-            print 'Archived\t%s\nto\t\t%s' % (file, archivedFilePath)
 
             fileProcessCounter += 1
 
-        utils.bigSpacer()
-
+    utils.bigSpacer()
     print 'Done!'
     utils.bigSpacer()
 
