@@ -257,7 +257,7 @@ def makeCopy(sourceFile, destinationDirectoryName, destinationFileName):
         if destinationAbsoluteFilePath.split('.')[-2] == '9999':
             break
 
-    shutil.copy2(sourceFile, str(destinationAbsoluteFilePath))
+    # shutil.copy2(sourceFile, str(destinationAbsoluteFilePath))
 
     return str(destinationAbsoluteFilePath)
 
@@ -293,7 +293,9 @@ def getDateTimeObject(exifData):
     for key, value in exifData.iteritems():
         if 'date' in key.lower():
             # exclude some odd tag keys
-            if 'icc' not in key.lower():
+                # excludes ICC* keys
+                # excludes values that dont have ':' character
+            if 'icc' not in key.lower() and ":" in value:
                 dateTimeTags.append([key, value])
 
     # go through dateTime tags to determine the earliest one
@@ -301,6 +303,12 @@ def getDateTimeObject(exifData):
 
         entry_tag = str(entry[0])
         entry_dateTimeStamp = entry[1]
+
+        # some date tags are not formateted dates... super annoying
+        try:
+            entry_dateTimeStamp.split(':')[0]
+        except:
+            break
 
         # if year is before 1975, we dont want it, break out!
         # this is to remove false low years that some software
