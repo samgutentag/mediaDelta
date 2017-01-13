@@ -132,6 +132,11 @@ def getDirectoryContents(dir):
             if isValidMediaFileType(filename):
                 filePath = os.path.join(root, filename)
                 directory_contents.append(filePath)
+            elif not isIgnorableSystemFile(filename):
+                print '>>> POSSIBLE MEDIA FILE:\t%s/%s' % (root, filename)
+            else:
+                break
+
     return directory_contents
 
 # check if file is a known image or video format, returns [bool, string] tuple
@@ -150,6 +155,19 @@ def isValidMediaFileType(file):
         return True
     else:
         return False
+
+def isIgnorableSystemFile(file):
+    # get extension of file
+    extensionToCheck = file.split('.')[-1].upper()
+
+    # 'Valid' media file type extensions
+    ingnorableSystemFiles = ['INI', 'DS_STORE', 'DB', 'TEMP', 'INFO', 'PLIST', 'CTG', 'ATTR', 'TMP', 'WTC']
+
+    if extensionToCheck in ingnorableSystemFiles:
+        return True
+    else:
+        return False
+
 
 # read exifTags for media file type info
 # returns a list of mediaType, fileType, fileExtensions
