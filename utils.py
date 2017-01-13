@@ -134,7 +134,7 @@ def getDirectoryContents(dir):
                 directory_contents.append(filePath)
             elif not isIgnorableSystemFile(filename):
                 print '>>> POSSIBLE MEDIA FILE:\t%s/%s' % (root, filename)
-            
+
     return directory_contents
 
 # check if file is a known image or video format, returns [bool, string] tuple
@@ -310,8 +310,9 @@ def getDateTimeObject(exifData):
         if 'date' in key.lower():
             # exclude some odd tag keys
                 # excludes ICC* keys
+                # excludes FlashPix* keys
                 # excludes values that dont have ':' character
-            if 'icc' not in key.lower() and ":" in value:
+            if 'icc' not in key.lower() and not 'flashpix' in key.lower() and ":" in value:
                 dateTimeTags.append([key, value])
 
     # go through dateTime tags to determine the earliest one
