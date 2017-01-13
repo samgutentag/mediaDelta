@@ -134,9 +134,7 @@ def getDirectoryContents(dir):
                 directory_contents.append(filePath)
             elif not isIgnorableSystemFile(filename):
                 print '>>> POSSIBLE MEDIA FILE:\t%s/%s' % (root, filename)
-            else:
-                break
-
+            
     return directory_contents
 
 # check if file is a known image or video format, returns [bool, string] tuple
