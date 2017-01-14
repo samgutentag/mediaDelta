@@ -22,22 +22,12 @@ def main():
     # setup parser
     parser = argparse.ArgumentParser(description='Output EXIF data of a given media file or files in a directory')
 
-    # passing a single file
-
-    parser.add_argument('-i', '--inputSource', dest='inputMedia',
-                        required=False,
-                        help='pass an inpute file or directory to be processed',
-                        metavar='INPUT_SOURCE',
-                        type=lambda x: utils.openInput(parser, x))
-
-    # passing a directory (with or without sub directories) of files
+    # forces an attemp tto read exif data
     parser.add_argument('-x', '--force', dest='doForce',
                         required=False,
-                        help='Force evaluation of files',
-                        metavar='DO_FORCE')
+                        action='store_true')
 
-
-
+    # passing a single file
     parser.add_argument('-f', '--mediaFile', dest='mediaFile',
                         required=False,
                         help='pass a single file to process',
@@ -61,17 +51,19 @@ def main():
     # attempt to process a passed file
     if args['mediaFile']:
 
-        exifTagsDict = utils.JSONToDict(pyexifinfo.get_json(args['mediaFile']))
-        # pretty print dictionary of exif tags
-        utils.prettyPrintDict(exifTagsDict)
-
-        try:
-            # get absolute filepath in a string
+        if args['doForce']:
             exifTagsDict = utils.JSONToDict(pyexifinfo.get_json(args['mediaFile']))
             # pretty print dictionary of exif tags
             utils.prettyPrintDict(exifTagsDict)
-        except:
-            print '>>> unabel to process %s' % args['mediaFile']
+
+        else:
+            try:
+                # get absolute filepath in a string
+                exifTagsDict = utils.JSONToDict(pyexifinfo.get_json(args['mediaFile']))
+                # pretty print dictionary of exif tags
+                utils.prettyPrintDict(exifTagsDict)
+            except:
+                print '>>> unabel to process %s' % args['mediaFile']
 
 
 
@@ -84,13 +76,20 @@ def main():
         fileProcessCounter = 1
         for file in filesToProcess:
             utils.spacer()
-            print '\n%s of %s' % (fileProcessCounter, len(filesToProcess)),
-            try:
+
+            if args['doForce']:
+                print '\n%s of %s' % (fileProcessCounter, len(filesToProcess)),
                 # pretty print dictionary of exif tags
-                exifTagsDict = utis.JSONToDict(pyexifinfo.get_json(file))
+                exifTagsDict = utils.JSONToDict(pyexifinfo.get_json(file))
                 utils.prettyPrintDict(exifTagsDict)
-            except:
-                print '\tskipping %s' % file
+
+            else:
+                try:
+                    # pretty print dictionary of exif tags
+                    exifTagsDict = utils.JSONToDict(pyexifinfo.get_json(file))
+                    utils.prettyPrintDict(exifTagsDict)
+                except:
+                    print '\tskipping %s' % file
 
             fileProcessCounter += 1
 

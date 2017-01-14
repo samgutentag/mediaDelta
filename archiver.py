@@ -127,6 +127,7 @@ def main():
                         help = 'user provided creator name, used for tagging with multiple artists or photographers into a single collection',
                         metavar='CREATOR_NAME')
 
+
     args = vars(parser.parse_args())
 
     utils.bigSpacer()
@@ -136,8 +137,8 @@ def main():
 
     # attempt to process a passed file
     if args['mediaFile']:
-        archivedFilePath = archiveMediaFile(args['mediaFile'], args['outputDirectory'], args['creatorName'])
 
+        archivedFilePath = archiveMediaFile(args['mediaFile'], args['outputDirectory'], args['creatorName'])
 
     # attempts to process a directory of files
     elif args['mediaDirectory']:
