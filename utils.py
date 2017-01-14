@@ -105,6 +105,16 @@ def openMediaDirectory(parser, arg):
     else:
         return arg
 
+
+
+def openInput(parser, arg):
+    if os.path.isfile(arg):
+        openMediaFile(parser, arg)
+    elif os.path.isdir(arg):
+        openMediaDirectory(parser, arg)
+    else:
+        print 'something went wrong, input was not a file or a directory...'
+
 # convert json information gathered by exif tools into a dictionary
 def JSONToDict(data):
     if len(data) < 1:

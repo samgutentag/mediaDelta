@@ -23,6 +23,21 @@ def main():
     parser = argparse.ArgumentParser(description='Output EXIF data of a given media file or files in a directory')
 
     # passing a single file
+
+    parser.add_argument('-i', '--inputSource', dest='inputMedia',
+                        required=False,
+                        help='pass an inpute file or directory to be processed',
+                        metavar='INPUT_SOURCE',
+                        type=lambda x: utils.openInput(parser, x))
+
+    # passing a directory (with or without sub directories) of files
+    parser.add_argument('-x', '--force', dest='doForce',
+                        required=False,
+                        help='Force evaluation of files',
+                        metavar='DO_FORCE')
+
+
+
     parser.add_argument('-f', '--mediaFile', dest='mediaFile',
                         required=False,
                         help='pass a single file to process',
@@ -46,8 +61,11 @@ def main():
     # attempt to process a passed file
     if args['mediaFile']:
 
-        try:
+        exifTagsDict = utils.JSONToDict(pyexifinfo.get_json(args['mediaFile']))
+        # pretty print dictionary of exif tags
+        utils.prettyPrintDict(exifTagsDict)
 
+        try:
             # get absolute filepath in a string
             exifTagsDict = utils.JSONToDict(pyexifinfo.get_json(args['mediaFile']))
             # pretty print dictionary of exif tags
