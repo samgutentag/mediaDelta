@@ -684,3 +684,96 @@ def processMediaFile(inputFile, destinationDir, creator, event):
 
     except:
         print '\t>>> could not create a MediaFileObject, skipping %s' % inputFile
+
+
+
+
+
+
+
+
+
+#------------------------------------------------------------------------------
+#		file archiving functions
+#------------------------------------------------------------------------------
+
+
+def getCorrectedArchiveFilePath(destinationDir, mediaFileObject):
+    fileName = ''
+    dirName = ''
+    counter = '0001'
+
+    # clean destinationDir to not include tail slashes, if they exist
+    while destinationDir.endswith('/'):
+        destinationDir = destinationDir[:-1]
+
+    #  format:  'destination/mediaType(plural)/YYYY/YYYY.MM/MM.<eventName>/'
+    #  example: 'photos/images/2016/2016.12/12.christmas/'
+    #  example: 'photos/videos/2016/2016.11/11.thanksgiving'
+    dirName = '%s/%ss/%s/%s.%s/' % (destinationDir,
+                                            mediaFileObject.type,
+                                            mediaFileObject.dateTime.year,
+                                            mediaFileObject.dateTime.year,
+                                            mediaFileObject.dateTime.month)
+    # format:  'YYYYMMDD.HHMMSSsss.<creator>.<counter>.<extension>'
+    fileName = '%s%s%s.%s%s%s%s.%s.%s.%s' % (mediaFileObject.dateTime.year,
+                                                mediaFileObject.dateTime.month,
+                                                mediaFileObject.dateTime.day,
+                                                mediaFileObject.dateTime.hour,
+                                                mediaFileObject.dateTime.minute,
+                                                mediaFileObject.dateTime.second,
+                                                mediaFileObject.dateTime.millisecond,
+                                                mediaFileObject.creator,
+                                                counter,
+                                                mediaFileObject.extension)
+
+    # return dirName + fileName
+    return (dirName, fileName)
+
+
+
+def archiveMediaFile(inputFile, destinationDir, creator):
+
+    startTime = datetime.now()
+
+    print ">>> processing '%s'" % inputFile
+    archivedMediaFilePath = ''
+
+    try:
+        mediaFileObject = getMediaFileObject(inputFile, creator)
+    except:
+        print 'ERROR:\tcould not create mediaFileObject from \'%s\', skipping...' % inputFile
+        return inputFile
+
+
+    # make Corrected File Path
+    correctedFilePath = getCorrectedArchiveFilePath(destinationDir, mediaFileObject)
+
+    # copy file, returns destinationDirectory and destinationFile
+    archivedMediaFilePath = makeCopy(inputFile, correctedFilePath[0], correctedFilePath[1])
+
+
+    print 'Archived\t%s\nto\t\t\t%s' % (inputFile, archivedMediaFilePath)
+    print '\t[%s]' % str(datetime.now() - startTime)
+
+    return archivedMediaFilePath
+
+
+
+
+
+
+
+
+
+def printTimeSheet(startTime, endTime, fileCount):
+    print 'REPORT >>>'
+    duration = endTime - startTime
+    print 'Processed %s files in %s' % (fileCount, duration)
+    print '\tStarted at:\t\t%s' % startTime.time()
+    print '\tFinished at:\t%s' % endTime.time()
+    print
+    filesPerMinute = float(fileCount)/duration.seconds/60
+    print 'Average Files Per Minute:\t%s' % str(filesPerMinute)
+    secondsPerFile = duration.seconds/float(fileCount)
+    print 'Average Seconds Per File:\t%s' % secondsPerFile
