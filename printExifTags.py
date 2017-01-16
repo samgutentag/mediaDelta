@@ -123,6 +123,9 @@ def main():
     logFileDestination = logFile_destinationDir + logFileName
     print logFileDestination
     shutil.move(logFileName, logFileDestination)
+    
+    print 'Logfile located at \'%s\'' % logFileDestination
+
 
 if __name__ == '__main__':
     main()

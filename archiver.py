@@ -122,5 +122,7 @@ def main():
     logFileDestination = logFile_destinationDir + logFileName
     shutil.move(logFileName, logFileDestination)
 
+    print 'Logfile located at \'%s\'' % logFileDestination
+
 if __name__ == '__main__':
     main()
