@@ -55,12 +55,16 @@ def main():
     utils.bigSpacer()
     print 'Arguments...'
     utils.prettyPrintDict(args)
-    utils.bigSpacer()
+    utils.spacer()
+
+    startTime = datetime.now()
+    fileCount = 0
 
     # attempt to process a passed file
     if args['mediaFile']:
 
         try:
+            fileCount = 1
             utils.prettyPrintTags(args['mediaFile'])
         except:
             print '>>> unable to process %s' % args['mediaFile']
@@ -77,6 +81,7 @@ def main():
         filesToProcess = utils.getDirectoryContents(args['mediaDirectory'])
 
         fileProcessCounter = 1
+        fileCount = len(filesToProcess)
         for file in filesToProcess:
             utils.spacer()
 
@@ -95,6 +100,9 @@ def main():
 
         logFile_destinationDir = args['mediaDirectory'][:args['mediaDirectory'].rfind('/')+1]
 
+    utils.spacer()
+    utils.printTimeSheet(startTime, datetime.now(), fileCount)
+
 
     utils.spacer()
     print 'ALL DONE!'
@@ -106,16 +114,14 @@ def main():
     #---------------------------------------------------------------------------
 
     # clean destinationDir to not include tail slashes, if they exist
-    # logFile_destinationDir = args['outputDirectory']
-    while logFile_destinationDir.endswith('/'):
-        logFile_destinationDir = logFile_destinationDir[:-1]
-    logFile_destinationDir = logFile_destinationDir[:logFile_destinationDir.rfind('/')+1] + '/logs/'
+    logFile_destinationDir = logFile_destinationDir + 'logs/'
 
     # check if destination directory exists, if not create it
     if not os.path.exists(logFile_destinationDir):
         os.makedirs(logFile_destinationDir)
 
     logFileDestination = logFile_destinationDir + logFileName
+    print logFileDestination
     shutil.move(logFileName, logFileDestination)
 
 if __name__ == '__main__':
