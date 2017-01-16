@@ -240,15 +240,13 @@ def getCorrectedFilePath(destinationDir, mediaFileObject, event):
 # will overwrite when copies exceed 9,999
 # returns (destinationDirectoryName, destinationFileName) list
 def makeCopy(sourceFile, destinationDirectoryName, destinationFileName):
-    
+
     destinationAbsoluteFilePath = destinationDirectoryName + destinationFileName
 
     # increment counter when file already exists, helps elliminate file overwrite
     # fails out after 9999 copies are found, instead dumps all subsequent files to
     # counter '9999', WILL OVERWRITE
     def incrementCounter(sourceName):
-
-        print sourceName.split('.')
 
         origCounter = sourceName.split('.')[-2]
 
@@ -756,7 +754,6 @@ def archiveMediaFile(inputFile, destinationDir, creator):
 
     # make Corrected File Path
     correctedFilePath = getCorrectedArchiveFilePath(destinationDir, mediaFileObject)
-    print correctedFilePath
 
     # copy file, returns destinationDirectory and destinationFile
     archivedMediaFilePath = makeCopy(inputFile, correctedFilePath[0], correctedFilePath[1])
