@@ -11,8 +11,8 @@ Item
 001)    Some files include date format by MM.DD.YYYY, lets figur eout how to handle those
     Issue:  possibly be converting all '.' to ':' first, then IF that happened, reorganize which pieces are where?
     Opened: 20170113
-    Closed:
-    Result:
+    Closed: 20170115
+    Result: date formats accounted for!
 
 002)    Formatting with events named into folder structure
     Issue:  want to pass chunks of files with an event name in them for better organizing
@@ -23,5 +23,5 @@ Item
 003)    Archive/backup alternatives
         Issue:  auto sort into different hard drives, ensure multple copies exist, might be more manual than scripted
         Opened: 20170113
-        Closed:
+        Closed: archive functions moved to utils, format transferable
         Result:
