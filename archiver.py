@@ -11,12 +11,9 @@
 #
 #------------------------------------------------------------------------------
 
-import pyexifinfo as p
 import argparse
-import json
-import os
-import shutil
 import utils
+from datetime import datetime
 
 # special stuff to handle known non ascii cahracters, blame sony! (not really)
 import sys  # import sys package, if not already imported
@@ -72,10 +69,11 @@ def getCorrectedArchiveFilePath(destinationDir, mediaFileObject):
 
 def archiveMediaFile(inputFile, destinationDir, creator):
 
+    startTime = datetime.now()
+
     print ">>> processing '%s'" % inputFile
     archivedMediaFilePath = ''
 
-    # get mediaFileObject
     try:
         mediaFileObject = utils.getMediaFileObject(inputFile, creator)
     except:
@@ -88,7 +86,10 @@ def archiveMediaFile(inputFile, destinationDir, creator):
 
     # copy file, returns destinationDirectory and destinationFile
     archivedMediaFilePath = utils.makeCopy(inputFile, correctedFilePath[0], correctedFilePath[1])
-    print 'Archived\t%s\nto\t\t%s' % (inputFile, archivedMediaFilePath)
+
+
+    print 'Archived\t%s\nto\t\t\t%s' % (inputFile, archivedMediaFilePath)
+    print '\t[%s]' % str(datetime.now() - startTime)
 
     return archivedMediaFilePath
 
@@ -135,10 +136,18 @@ def main():
     utils.prettyPrintDict(args)
     utils.bigSpacer()
 
+    startTime = datetime.now()
+    fileCount = 0
+
     # attempt to process a passed file
     if args['mediaFile']:
 
+        print '\tStarted: %s' % datetime.now().time()
+
         archivedFilePath = archiveMediaFile(args['mediaFile'], args['outputDirectory'], args['creatorName'])
+        fileCount = 1
+
+        print '\tFinished: %s' % datetime.now().time()
 
     # attempts to process a directory of files
     elif args['mediaDirectory']:
@@ -146,14 +155,43 @@ def main():
         # process a directory of files
         filesToProcess = utils.getDirectoryContents(args['mediaDirectory'])
 
+
         fileProcessCounter = 1
+        fileCount = len(filesToProcess)
         for file in filesToProcess:
 
-            print '\n%s of %s' % (fileProcessCounter, len(filesToProcess))
+            print '\n%s of %s ' % (fileProcessCounter, fileCount)
 
             archivedFilePath = archiveMediaFile(file, args['outputDirectory'], args['creatorName'])
 
+
             fileProcessCounter += 1
+
+    endTime = datetime.now()
+    duration = endTime - startTime
+
+
+    utils.spacer()
+
+    print 'REPORT >>>'
+
+    print 'Processed %s files in %s' % (fileCount, duration)
+
+    print '\tStarted at:\t\t%s' % startTime.time()
+    print '\tFinished at:\t%s' % endTime.time()
+
+    print
+
+    filesPerMinute = float(fileCount)/duration.seconds/60
+    print 'Average Files Per Minute:\t%s' % str(filesPerMinute)
+
+    secondsPerFile = duration.seconds/float(fileCount)
+    print 'Average Seconds Per File:\t%s' % secondsPerFile
+
+
+
+
+
 
     utils.bigSpacer()
     print 'Done!'

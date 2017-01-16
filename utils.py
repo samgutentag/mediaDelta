@@ -5,6 +5,7 @@ import pyexifinfo
 import json
 import os
 import shutil
+from datetime import datetime
 
 # special stuff to handle known non ascii cahracters, blame Sony! (not really)
 import sys  # import sys package, if not already imported
@@ -95,8 +96,9 @@ def openMediaFile(parser, arg):
     if not os.path.exists(arg):
         parser.error('The file %s does not exist' % arg)
     else:
-        file = str(open(arg, 'rb')).split("'")[1]
-        return file
+        # file = str(open(arg, 'rb')).split("'")[1]
+        # return file
+        return arg
 
 # checks that a given directory exists
 def openMediaDirectory(parser, arg):
@@ -104,16 +106,6 @@ def openMediaDirectory(parser, arg):
         parser.error('The directory %s does not exist' % arg)
     else:
         return arg
-
-
-
-def openInput(parser, arg):
-    if os.path.isfile(arg):
-        openMediaFile(parser, arg)
-    elif os.path.isdir(arg):
-        openMediaDirectory(parser, arg)
-    else:
-        print 'something went wrong, input was not a file or a directory...'
 
 # convert json information gathered by exif tools into a dictionary
 def JSONToDict(data):
@@ -331,16 +323,14 @@ def getDateTimeObject(exifData):
         entry_tag = str(entry[0])
         entry_dateTimeStamp = entry[1]
 
-        # some date tags are not formateted dates... super annoying
+        #-----------------------------------------------------------------------
+        #   Clean up
+        #-----------------------------------------------------------------------
+
+        # some date tags are not formatted dates... super annoying
         try:
             entry_dateTimeStamp.split(':')[0]
         except:
-            break
-
-        # if year is before 1975, we dont want it, break out!
-        # this is to remove false low years that some software
-        # defaults to writing out the date at the epoch
-        if int(entry_dateTimeStamp.split(':')[0]) < 1975:
             break
 
         # remove negative timezone adjustment if it exists
@@ -355,18 +345,41 @@ def getDateTimeObject(exifData):
         except:
             pass
 
+        #-----------------------------------------------------------------------
+        #   get dateStamp
+        #   [dateStamp_year, dateStamp_month, dateStamp_day]
+        #-----------------------------------------------------------------------
+
         # split apart dateStamp, defaults to '9999:99:99'
         try:
             entry_dateStamp = entry_dateTimeStamp.split(' ')[0]
         except:
             entry_dateStamp = entry_dateTimeStamp
 
-        # break dateStamp into pieces
-        dateStamp_year = entry_dateStamp.split(':')[0]
-        dateStamp_month = entry_dateStamp.split(':')[1]
-        dateStamp_day = entry_dateStamp.split(':')[2]
+        # note that dates are either formatted 'YYYY:MM:DD' or 'MM.DD.YYYY'
+        entry_dateStamp = entry_dateStamp.replace('.', ':')
 
+        # if formatted 'YYYY:MM:DD'
+        if len(entry_dateStamp.split(':')[0]) == 2:
+            dateStamp_year = entry_dateStamp.split(':')[2]
+            dateStamp_month = entry_dateStamp.split(':')[0]
+            dateStamp_day = entry_dateStamp.split(':')[1]
+        # if formatted 'YYYY:MM:DD'
+        else:
+            dateStamp_year = entry_dateStamp.split(':')[0]
+            dateStamp_month = entry_dateStamp.split(':')[1]
+            dateStamp_day = entry_dateStamp.split(':')[2]
 
+        # if year is before 1975, we dont want it, break out!
+        # this is to remove false low years that some software
+        # defaults to writing out the date at the epoch
+        if int(dateStamp_year) < 1975:
+            break
+
+        #-----------------------------------------------------------------------
+        #   get timeStamp
+        #   [timeStamp_hour, timeStamp_minute, timeStamp_second, timeStamp_millisecond]
+        #-----------------------------------------------------------------------
 
         # split apart timeStamp, defaults to '23:59:59.999'
         try:
@@ -403,6 +416,11 @@ def getDateTimeObject(exifData):
         except:
             timeStamp_millisecond = '999'
 
+
+        #-----------------------------------------------------------------------
+        #   buildDateTimeObject
+        #-----------------------------------------------------------------------
+
         # create DateTimeObject
         entry_DateTimeObject = DateTimeObject(entry_tag,
                                                 dateStamp_year,
@@ -415,6 +433,7 @@ def getDateTimeObject(exifData):
 
         # compare DateTimeObjects
         earliestDateTimeObject = getEarlierDateTime(earliestDateTimeObject, entry_DateTimeObject)
+
 
     return earliestDateTimeObject
 
@@ -596,9 +615,10 @@ def getMediaFileObject(file, creatorName):
 # print exif tags, skips encoding tags
 def prettyPrintTags(exifDict):
     exifTagsToPrintDict = []
+    sortedDict = sorted(exifDict.iteritems())
 
     # pretty print exif tags
-    for key, value in sorted(exifDict):
+    for key, value in sortedDict:
         # excludes text encoded tags
         if key not in ('JPEGThumbnail', 'TIFFThumbnail'):
             exifTagsToPrint[key] = value
@@ -612,7 +632,8 @@ def prettyPrintDateTimeTags(exifDict):
     dateTimeTagsDict = []
 
     # select only dateTime tags
-    for tag, entry in sorted(exifDict.iteritems()):
+    sortedDict = sorted(exifDict.iteritems())
+    for tag, entry in sortedDict:
         if 'date' in tag.lower():
             dateTimeTagsDict[tag] = entry
 
@@ -628,7 +649,8 @@ def prettyPrintDict(dictionary):
         if len(key) > longestKey:
             longestKey = len(key)
 
-    for key, value in sorted(dictionary.iteritems()):
+    sortedDict = sorted(dictionary.iteritems())
+    for key, value in sortedDict:
         spacesNeeded = longestKey - len(key) + 4
         spaces = ' ' * spacesNeeded
         print '%s%s%s' % (key, spaces, value)
@@ -644,6 +666,8 @@ def prettyPrintDict(dictionary):
 # sets up destination directory and filename, copies file
 def processMediaFile(inputFile, destinationDir, creator, event):
 
+    startTime = datetime.now()
+
     print ">>> processing '%s'" % inputFile
 
     # create a media file object for the input file
@@ -656,8 +680,7 @@ def processMediaFile(inputFile, destinationDir, creator, event):
         # copy file, returns destinationDirectory and destinationFile
         destinationFile = makeCopy(inputFile, correctedFilePath[0], correctedFilePath[1])
 
-        # print '\tmoved\t%s' % inputFile
-        # print '\tto\t\t%s%s' % (destinationFile[0], destinationFile[1])
+        print 'Processed file in %s' % str(datetime.now() - startTime)
 
     except:
         print '\t>>> could not create a MediaFileObject, skipping %s' % inputFile

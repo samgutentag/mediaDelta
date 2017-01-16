@@ -12,7 +12,7 @@
 import utils
 import pyexifinfo
 import argparse
-
+from datetime import datetime
 
 #------------------------------------------------------------------------------
 #		main function
@@ -51,6 +51,10 @@ def main():
     # attempt to process a passed file
     if args['mediaFile']:
 
+        currentTime = datetime.now().time()
+
+        print '\n[%s]' % (currentTime)
+
         if args['doForce']:
             exifTagsDict = utils.JSONToDict(pyexifinfo.get_json(args['mediaFile']))
             # pretty print dictionary of exif tags
@@ -77,8 +81,11 @@ def main():
         for file in filesToProcess:
             utils.spacer()
 
+            currentTime = datetime.now().time()
+
+            print '\n%s of %s [%s]' % (fileProcessCounter, len(filesToProcess), currentTime)
+
             if args['doForce']:
-                print '\n%s of %s' % (fileProcessCounter, len(filesToProcess)),
                 # pretty print dictionary of exif tags
                 exifTagsDict = utils.JSONToDict(pyexifinfo.get_json(file))
                 utils.prettyPrintDict(exifTagsDict)
