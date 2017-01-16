@@ -9,10 +9,15 @@
 #
 #------------------------------------------------------------------------------
 
-import utils
+
 import pyexifinfo
 import argparse
+import utils
 from datetime import datetime
+import logging
+import shutil
+import os
+
 
 #------------------------------------------------------------------------------
 #		main function
@@ -21,11 +26,6 @@ from datetime import datetime
 def main():
     # setup parser
     parser = argparse.ArgumentParser(description='Output EXIF data of a given media file or files in a directory')
-
-    # forces an attemp tto read exif data
-    parser.add_argument('-x', '--force', dest='doForce',
-                        required=False,
-                        action='store_true')
 
     # passing a single file
     parser.add_argument('-f', '--mediaFile', dest='mediaFile',
@@ -43,6 +43,15 @@ def main():
 
     args = vars(parser.parse_args())
 
+
+    #---------------------------------------------------------------------------
+    #   Setup logging file
+    #---------------------------------------------------------------------------
+    logDateTime = datetime.now().strftime('%Y%m%d%H%M%S')
+    logFileName = 'printExifTags_%s.log' % logDateTime
+    logging.basicConfig(filename=logFileName, level=logging.DEBUG)
+
+
     utils.bigSpacer()
     print 'Arguments...'
     utils.prettyPrintDict(args)
@@ -51,24 +60,14 @@ def main():
     # attempt to process a passed file
     if args['mediaFile']:
 
-        currentTime = datetime.now().time()
+        try:
+            utils.prettyPrintTags(args['mediaFile'])
+        except:
+            print '>>> unable to process %s' % args['mediaFile']
+            logging.info('>>> unable to process %s', args['mediaFile'])
 
-        print '\n[%s]' % (currentTime)
 
-        if args['doForce']:
-            exifTagsDict = utils.JSONToDict(pyexifinfo.get_json(args['mediaFile']))
-            # pretty print dictionary of exif tags
-            utils.prettyPrintDict(exifTagsDict)
-
-        else:
-            try:
-                # get absolute filepath in a string
-                exifTagsDict = utils.JSONToDict(pyexifinfo.get_json(args['mediaFile']))
-                # pretty print dictionary of exif tags
-                utils.prettyPrintDict(exifTagsDict)
-            except:
-                print '>>> unabel to process %s' % args['mediaFile']
-
+        logFile_destinationDir = args['mediaFile'][:args['mediaFile'].rfind('/')+1]
 
 
     # attempts to process a directory of files
@@ -81,28 +80,43 @@ def main():
         for file in filesToProcess:
             utils.spacer()
 
-            currentTime = datetime.now().time()
+            currentTime = datetime.now()
 
             print '\n%s of %s [%s]' % (fileProcessCounter, len(filesToProcess), currentTime)
+            logging.info('\n%s of %s [%s]', fileProcessCounter, len(filesToProcess), currentTime)
 
-            if args['doForce']:
-                # pretty print dictionary of exif tags
-                exifTagsDict = utils.JSONToDict(pyexifinfo.get_json(file))
-                utils.prettyPrintDict(exifTagsDict)
-
-            else:
-                try:
-                    # pretty print dictionary of exif tags
-                    exifTagsDict = utils.JSONToDict(pyexifinfo.get_json(file))
-                    utils.prettyPrintDict(exifTagsDict)
-                except:
-                    print '\tskipping %s' % file
+            try:
+                utils.prettyPrintTags(file)
+            except:
+                print '\tskipping %s' % file
+                logging.info('\tskipping %s', file)
 
             fileProcessCounter += 1
+
+        logFile_destinationDir = args['mediaDirectory'][:args['mediaDirectory'].rfind('/')+1]
+
 
     utils.spacer()
     print 'ALL DONE!'
     utils.bigSpacer()
+
+
+    #---------------------------------------------------------------------------
+    #   Move logging file
+    #---------------------------------------------------------------------------
+
+    # clean destinationDir to not include tail slashes, if they exist
+    # logFile_destinationDir = args['outputDirectory']
+    while logFile_destinationDir.endswith('/'):
+        logFile_destinationDir = logFile_destinationDir[:-1]
+    logFile_destinationDir = logFile_destinationDir[:logFile_destinationDir.rfind('/')+1] + '/logs/'
+
+    # check if destination directory exists, if not create it
+    if not os.path.exists(logFile_destinationDir):
+        os.makedirs(logFile_destinationDir)
+
+    logFileDestination = logFile_destinationDir + logFileName
+    shutil.move(logFileName, logFileDestination)
 
 if __name__ == '__main__':
     main()

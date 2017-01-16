@@ -14,6 +14,10 @@
 import argparse
 import utils
 from datetime import datetime
+import logging
+import shutil
+import os
+
 
 # special stuff to handle known non ascii cahracters, blame sony! (not really)
 import sys  # import sys package, if not already imported
@@ -25,6 +29,7 @@ sys.setdefaultencoding('utf-8')
 #------------------------------------------------------------------------------
 
 def main():
+
     # setup parser
     parser = argparse.ArgumentParser(description='Read EXIF data of a given media file, update filename and sort into structured directory')
 
@@ -56,6 +61,14 @@ def main():
 
 
     args = vars(parser.parse_args())
+
+
+    #---------------------------------------------------------------------------
+    #   Setup logging file
+    #---------------------------------------------------------------------------
+    logDateTime = datetime.now().strftime('%Y%m%d%H%M%S')
+    logFileName = 'archiver_%s.log' % logDateTime
+    logging.basicConfig(filename=logFileName, level=logging.DEBUG)
 
     utils.bigSpacer()
     print 'Arguments...'
@@ -90,6 +103,24 @@ def main():
     utils.spacer()
     print 'Done!'
     utils.bigSpacer()
+
+    #---------------------------------------------------------------------------
+    #   Move logging file
+    #---------------------------------------------------------------------------
+
+    # clean outputDirectory to not include tail slashes, if they exist
+    outDir = args['outputDirectory']
+    while outDir.endswith('/'):
+        outDir = outDir[:-1]
+
+    logFile_destinationDir = args['outputDirectory'][:args['outputDirectory'].rfind('/')+1] + 'logs/'
+
+    # check if destination directory exists, if not create it
+    if not os.path.exists(logFile_destinationDir):
+        os.makedirs(logFile_destinationDir)
+
+    logFileDestination = logFile_destinationDir + logFileName
+    shutil.move(logFileName, logFileDestination)
 
 if __name__ == '__main__':
     main()

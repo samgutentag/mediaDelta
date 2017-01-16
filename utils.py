@@ -6,6 +6,7 @@ import json
 import os
 import shutil
 from datetime import datetime
+import logging
 
 # special stuff to handle known non ascii cahracters, blame Sony! (not really)
 import sys  # import sys package, if not already imported
@@ -85,11 +86,21 @@ def spacer():
     print '\n'
     print '#' + '-'*79
     print '\n'
+
+    logging.info('\n')
+    logging.info('#' + '-'*79)
+    logging.info('\n')
+
 def bigSpacer():
     print '\n'
     print '#' + '!'*79
     print '#' + '!'*79
     print '\n'
+
+    logging.info('\n')
+    logging.info('#' + '!'*79)
+    logging.info('#' + '!'*79)
+    logging.info('\n')
 
 # checks that a given file exists, and opens it
 def openMediaFile(parser, arg):
@@ -111,6 +122,7 @@ def openMediaDirectory(parser, arg):
 def JSONToDict(data):
     if len(data) < 1:
         print '>>> this file has no exif data'
+        logging.warning('>>> this file has no exif data')
         return
     else:
         # return a sorted dictionary of all exif tag, value pairs
@@ -136,6 +148,7 @@ def getDirectoryContents(dir):
                 directory_contents.append(filePath)
             elif not isIgnorableSystemFile(filename):
                 print '>>> POSSIBLE MEDIA FILE:\t%s/%s' % (root, filename)
+                logging.info('>>> POSSIBLE MEDIA FILE:\t%s/%s', root, filename)
 
     return directory_contents
 
@@ -605,6 +618,7 @@ def getMediaFileObject(file, creatorName):
 
     else:
         print '>>> could not create MediaFileObject from %s, not a valid media file type' % file
+        logging.warning('>>> could not create MediaFileObject from %s, not a valid media file type', file)
         return False
 
 
@@ -613,17 +627,10 @@ def getMediaFileObject(file, creatorName):
 #------------------------------------------------------------------------------
 
 # print exif tags, skips encoding tags
-def prettyPrintTags(exifDict):
-    exifTagsToPrintDict = []
-    sortedDict = sorted(exifDict.iteritems())
+def prettyPrintTags(exifInfo):
 
-    # pretty print exif tags
-    for key, value in sortedDict:
-        # excludes text encoded tags
-        if key not in ('JPEGThumbnail', 'TIFFThumbnail'):
-            exifTagsToPrint[key] = value
-
-    prettyPrintDict(exifTagsToPrintDict)
+    exifDict = JSONToDict(pyexifinfo.get_json(exifInfo))
+    prettyPrintDict(exifDict)
 
     return True
 
@@ -654,6 +661,7 @@ def prettyPrintDict(dictionary):
         spacesNeeded = longestKey - len(key) + 4
         spaces = ' ' * spacesNeeded
         print '%s%s%s' % (key, spaces, value)
+        logging.info('%s%s%s', key, spaces, value)
 
     return True
 
@@ -669,6 +677,7 @@ def processMediaFile(inputFile, destinationDir, creator, event):
     startTime = datetime.now()
 
     print ">>> processing '%s'" % inputFile
+    logging.info(">>> processing '%s'", inputFile)
 
     # create a media file object for the input file
     try:
@@ -681,9 +690,11 @@ def processMediaFile(inputFile, destinationDir, creator, event):
         destinationFile = makeCopy(inputFile, correctedFilePath[0], correctedFilePath[1])
 
         print 'Processed file in %s' % str(datetime.now() - startTime)
+        logging.info('Processed file in %s', str(datetime.now() - startTime))
 
     except:
         print '\t>>> could not create a MediaFileObject, skipping %s' % inputFile
+        logging.warning('\t>>> could not create a MediaFileObject, skipping %s', inputFile)
 
 
 
@@ -737,12 +748,14 @@ def archiveMediaFile(inputFile, destinationDir, creator):
     startTime = datetime.now()
 
     print ">>> processing '%s'" % inputFile
+    logging.info(">>> processing '%s'",inputFile)
     archivedMediaFilePath = ''
 
     try:
         mediaFileObject = getMediaFileObject(inputFile, creator)
     except:
         print 'ERROR:\tcould not create mediaFileObject from \'%s\', skipping...' % inputFile
+        logging.warning('ERROR:\tcould not create mediaFileObject from \'%s\', skipping...', inputFile)
         return inputFile
 
 
@@ -755,6 +768,9 @@ def archiveMediaFile(inputFile, destinationDir, creator):
 
     print 'Archived\t%s\nto\t\t\t%s' % (inputFile, archivedMediaFilePath)
     print '\t[%s]' % str(datetime.now() - startTime)
+
+    logging.info('Archived\t%s\nto\t\t\t%s', inputFile, archivedMediaFilePath)
+    logging.info('\t[%s]', str(datetime.now() - startTime))
 
     return archivedMediaFilePath
 
@@ -773,7 +789,26 @@ def printTimeSheet(startTime, endTime, fileCount):
     print '\tStarted at:\t\t%s' % startTime.time()
     print '\tFinished at:\t%s' % endTime.time()
     print
-    filesPerMinute = float(fileCount)/duration.seconds/60
+    try:
+        filesPerMinute = float(fileCount)/duration.seconds/60
+    except:
+        filesPerMinute = 1.0;
     print 'Average Files Per Minute:\t%s' % str(filesPerMinute)
-    secondsPerFile = duration.seconds/float(fileCount)
+    try:
+        secondsPerFile = duration.seconds/float(fileCount)
+    except:
+        secondsPerFile = 1.0
     print 'Average Seconds Per File:\t%s' % secondsPerFile
+
+
+
+    logging.info('REPORT >>>')
+    duration = endTime - startTime
+    logging.info('Processed %s files in %s', fileCount, duration)
+    logging.info('\tStarted at:\t\t%s', startTime.time())
+    logging.info('\tFinished at:\t%s', endTime.time())
+    print
+    # filesPerMinute = float(fileCount)/duration.seconds/60
+    logging.info('Average Files Per Minute:\t%s', str(filesPerMinute))
+    # secondsPerFile = duration.seconds/float(fileCount)
+    logging.info('Average Seconds Per File:\t%s', secondsPerFile)
