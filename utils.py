@@ -181,7 +181,6 @@ def isIgnorableSystemFile(file):
     else:
         return False
 
-
 # read exifTags for media file type info
 # returns a list of mediaType, fileType, fileExtensions
 # example (video, MOV, MOV) -> movie file
@@ -241,13 +240,15 @@ def getCorrectedFilePath(destinationDir, mediaFileObject, event):
 # will overwrite when copies exceed 9,999
 # returns (destinationDirectoryName, destinationFileName) list
 def makeCopy(sourceFile, destinationDirectoryName, destinationFileName):
-
+    
     destinationAbsoluteFilePath = destinationDirectoryName + destinationFileName
 
     # increment counter when file already exists, helps elliminate file overwrite
     # fails out after 9999 copies are found, instead dumps all subsequent files to
     # counter '9999', WILL OVERWRITE
     def incrementCounter(sourceName):
+
+        print sourceName.split('.')
 
         origCounter = sourceName.split('.')[-2]
 
@@ -265,11 +266,15 @@ def makeCopy(sourceFile, destinationDirectoryName, destinationFileName):
             counter = 9999
 
         # format to string and left side zero pad counter
-        counterString = str(counter)
-        while len(counterString) < 4:
-            counterString = '0' + counterString
+        newCounterString = str(counter)
+        while len(newCounterString) < 4:
+            newCounterString = '0' + newCounterString
 
-        incrementendFileName = sourceName.replace(origCounter, counterString)
+        origCounterString = '.' + origCounter + '.'
+        newCounterString = '.' + newCounterString + '.'
+
+        incrementendFileName = sourceName.replace(origCounterString, newCounterString)
+
 
 
         return incrementendFileName
@@ -697,17 +702,9 @@ def processMediaFile(inputFile, destinationDir, creator, event):
         logging.warning('\t>>> could not create a MediaFileObject, skipping %s', inputFile)
 
 
-
-
-
-
-
-
-
 #------------------------------------------------------------------------------
 #		file archiving functions
 #------------------------------------------------------------------------------
-
 
 def getCorrectedArchiveFilePath(destinationDir, mediaFileObject):
     fileName = ''
@@ -741,8 +738,6 @@ def getCorrectedArchiveFilePath(destinationDir, mediaFileObject):
     # return dirName + fileName
     return (dirName, fileName)
 
-
-
 def archiveMediaFile(inputFile, destinationDir, creator):
 
     startTime = datetime.now()
@@ -761,6 +756,7 @@ def archiveMediaFile(inputFile, destinationDir, creator):
 
     # make Corrected File Path
     correctedFilePath = getCorrectedArchiveFilePath(destinationDir, mediaFileObject)
+    print correctedFilePath
 
     # copy file, returns destinationDirectory and destinationFile
     archivedMediaFilePath = makeCopy(inputFile, correctedFilePath[0], correctedFilePath[1])
@@ -775,12 +771,9 @@ def archiveMediaFile(inputFile, destinationDir, creator):
     return archivedMediaFilePath
 
 
-
-
-
-
-
-
+#------------------------------------------------------------------------------
+#		reporting
+#------------------------------------------------------------------------------
 
 def printTimeSheet(startTime, endTime, fileCount):
     print 'REPORT >>>'
