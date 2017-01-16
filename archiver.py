@@ -113,7 +113,7 @@ def main():
     while outDir.endswith('/'):
         outDir = outDir[:-1]
 
-    logFile_destinationDir = args['outputDirectory'][:args['outputDirectory'].rfind('/')+1] + 'logs/'
+    logFile_destinationDir = outDir[:outDir.rfind('/')+1] + 'logs/'
 
     # check if destination directory exists, if not create it
     if not os.path.exists(logFile_destinationDir):
