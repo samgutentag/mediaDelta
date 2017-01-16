@@ -49,7 +49,7 @@ def main():
     #---------------------------------------------------------------------------
     logDateTime = datetime.now().strftime('%Y%m%d%H%M%S')
     logFileName = 'printExifTags_%s.log' % logDateTime
-    logging.basicConfig(filename=logFileName, level=logging.DEBUG)
+    logging.basicConfig(format='%(levelname)s:%(message)s', filename=logFileName, level=logging.DEBUG)
 
 
     utils.bigSpacer()
@@ -123,7 +123,7 @@ def main():
     logFileDestination = logFile_destinationDir + logFileName
     print logFileDestination
     shutil.move(logFileName, logFileDestination)
-    
+
     print 'Logfile located at \'%s\'' % logFileDestination
 
 

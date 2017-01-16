@@ -68,7 +68,7 @@ def main():
     #---------------------------------------------------------------------------
     logDateTime = datetime.now().strftime('%Y%m%d%H%M%S')
     logFileName = 'archiver_%s.log' % logDateTime
-    logging.basicConfig(filename=logFileName, level=logging.DEBUG)
+    logging.basicConfig(format='%(levelname)s:%(message)s', filename=logFileName, level=logging.DEBUG)
 
     utils.bigSpacer()
     print 'Arguments...'
@@ -110,8 +110,9 @@ def main():
 
     # clean outputDirectory to not include tail slashes, if they exist
     outDir = args['outputDirectory']
-    while outDir.endswith('/'):
-        outDir = outDir[:-1]
+
+    if outDir[-1:] != '/':
+        outDir = outDir + '/'
 
     logFile_destinationDir = outDir[:outDir.rfind('/')+1] + 'logs/'
 
