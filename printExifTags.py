@@ -9,11 +9,10 @@
 #
 #------------------------------------------------------------------------------
 
-
-import pyexifinfo
 import argparse
 import utils
 from datetime import datetime
+from datetime import timedelta
 import logging
 import shutil
 import os
@@ -49,7 +48,7 @@ def main():
     #---------------------------------------------------------------------------
     logDateTime = datetime.now().strftime('%Y%m%d%H%M%S')
     logFileName = 'printExifTags_%s.log' % logDateTime
-    logging.basicConfig(format='%(levelname)s:%(message)s', filename=logFileName, level=logging.DEBUG)
+    logging.basicConfig(format='%(message)s', filename=logFileName, level=logging.DEBUG)
 
 
     utils.bigSpacer()
@@ -79,35 +78,65 @@ def main():
 
         # process a directory of files
         filesToProcess = utils.getDirectoryContents(args['mediaDirectory'])
-
         fileProcessCounter = 1
         fileCount = len(filesToProcess)
+
+        elapsedTimeList = []
+
         for file in filesToProcess:
-            utils.spacer()
+            print '\n%s of %s' % (fileProcessCounter, len(filesToProcess))
+            logging.info('\n%s of %s', fileProcessCounter, len(filesToProcess))
 
-            currentTime = datetime.now()
-
-            print '\n%s of %s [%s]' % (fileProcessCounter, len(filesToProcess), currentTime)
-            logging.info('\n%s of %s [%s]', fileProcessCounter, len(filesToProcess), currentTime)
+            startTime = datetime.now()
 
             try:
                 utils.prettyPrintTags(file)
+
             except:
                 print '\tskipping %s' % file
                 logging.info('\tskipping %s', file)
+
+            endTime = datetime.now()
+
+            elapsedTime = endTime - startTime
+
+            elapsedTimeList.append(elapsedTime)
+
+            # use time of first file for average of first
+            if fileProcessCounter == 1:
+
+                # calculate average file process time
+                totalTime = 0
+                for item in elapsedTimeList:
+                    timeInSeconds = item.total_seconds()
+                    totalTime = totalTime + timeInSeconds
+
+                averageTime = totalTime / float(fileProcessCounter)
+
+            # every 10 files, get the average elapsed time per file
+            elif fileProcessCounter % 10 == 0:
+
+                # calculate average file process time
+                totalTime = 0
+                for item in elapsedTimeList:
+                    timeInSeconds = item.total_seconds()
+                    totalTime = totalTime + timeInSeconds
+
+                averageTime = totalTime / float(fileProcessCounter)
+
+            logging.info('Averaging %s per file', str(timedelta(seconds=averageTime)))
+
+            filesRemaining = fileCount - fileProcessCounter
+            estimatedTimeRemaining = float(filesRemaining) * averageTime
+
+            print 'Estimated Time Remaining:\t %s' % str(timedelta(seconds=estimatedTimeRemaining))
+            logging.info('Estimated Time Remaining:\t %s', str(timedelta(seconds=estimatedTimeRemaining)))
 
             fileProcessCounter += 1
 
         logFile_destinationDir = args['mediaDirectory'][:args['mediaDirectory'].rfind('/')+1]
 
     utils.spacer()
-    utils.printTimeSheet(startTime, datetime.now(), fileCount)
-
-
-    utils.spacer()
-    print 'ALL DONE!'
-    utils.bigSpacer()
-
 
     #---------------------------------------------------------------------------
     #   Move logging file
@@ -125,6 +154,11 @@ def main():
     shutil.move(logFileName, logFileDestination)
 
     print 'Logfile located at \'%s\'' % logFileDestination
+
+    utils.spacer()
+    print 'ALL DONE!'
+    utils.bigSpacer()
+
 
 
 if __name__ == '__main__':

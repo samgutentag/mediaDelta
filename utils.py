@@ -105,16 +105,16 @@ def bigSpacer():
 # checks that a given file exists, and opens it
 def openMediaFile(parser, arg):
     if not os.path.exists(arg):
-        parser.error('The file %s does not exist' % arg)
+        parser.error('The file \'%s\' does not exist' % arg)
+        logging.warning('The file \'%s\' does not exist', arg)
     else:
-        # file = str(open(arg, 'rb')).split("'")[1]
-        # return file
         return arg
 
 # checks that a given directory exists
 def openMediaDirectory(parser, arg):
     if not os.path.exists(arg):
-        parser.error('The directory %s does not exist' % arg)
+        parser.error('The directory \'%s\' does not exist' % arg)
+        logging.warning('The directory \'%s\' does not exist', arg)
     else:
         return arg
 
@@ -232,7 +232,6 @@ def getCorrectedFilePath(destinationDir, mediaFileObject, event):
                                                 counter,
                                                 mediaFileObject.extension)
 
-    # return dirName + fileName
     return (dirName, fileName)
 
 # copy files and preserve metadata
@@ -268,12 +267,12 @@ def makeCopy(sourceFile, destinationDirectoryName, destinationFileName):
         while len(newCounterString) < 4:
             newCounterString = '0' + newCounterString
 
+        # add prefix and suffix '.', to help replace function better find only
+        # counter portion of the file name string
         origCounterString = '.' + origCounter + '.'
         newCounterString = '.' + newCounterString + '.'
 
         incrementendFileName = sourceName.replace(origCounterString, newCounterString)
-
-
 
         return incrementendFileName
 
@@ -449,7 +448,6 @@ def getDateTimeObject(exifData):
 
         # compare DateTimeObjects
         earliestDateTimeObject = getEarlierDateTime(earliestDateTimeObject, entry_DateTimeObject)
-
 
     return earliestDateTimeObject
 
@@ -721,6 +719,7 @@ def getCorrectedArchiveFilePath(destinationDir, mediaFileObject):
                                             mediaFileObject.dateTime.year,
                                             mediaFileObject.dateTime.year,
                                             mediaFileObject.dateTime.month)
+
     # format:  'YYYYMMDD.HHMMSSsss.<creator>.<counter>.<extension>'
     fileName = '%s%s%s.%s%s%s%s.%s.%s.%s' % (mediaFileObject.dateTime.year,
                                                 mediaFileObject.dateTime.month,
@@ -758,47 +757,13 @@ def archiveMediaFile(inputFile, destinationDir, creator):
     # copy file, returns destinationDirectory and destinationFile
     archivedMediaFilePath = makeCopy(inputFile, correctedFilePath[0], correctedFilePath[1])
 
+    endTime = datetime.now()
+    elapsedTime = endTime - startTime
 
-    print 'Archived\t%s\nto\t\t\t%s' % (inputFile, archivedMediaFilePath)
-    print '\t[%s]' % str(datetime.now() - startTime)
+    # print 'Archived\t%s\nto\t\t\t%s' % (inputFile, archivedMediaFilePath)
+    # print '\t[%s]' % elapsedTime
 
     logging.info('Archived\t%s\nto\t\t\t%s', inputFile, archivedMediaFilePath)
-    logging.info('\t[%s]', str(datetime.now() - startTime))
+    logging.info('\t[%s]', elapsedTime)
 
-    return archivedMediaFilePath
-
-
-#------------------------------------------------------------------------------
-#		reporting
-#------------------------------------------------------------------------------
-
-def printTimeSheet(startTime, endTime, fileCount):
-    print 'REPORT >>>'
-    duration = endTime - startTime
-    print 'Processed %s files in %s' % (fileCount, duration)
-    print '\tStarted at:\t\t%s' % startTime.time()
-    print '\tFinished at:\t%s' % endTime.time()
-    print
-    try:
-        filesPerMinute = float(fileCount)/duration.seconds/60
-    except:
-        filesPerMinute = 1.0;
-    print 'Average Files Per Minute:\t%s' % str(filesPerMinute)
-    try:
-        secondsPerFile = duration.seconds/float(fileCount)
-    except:
-        secondsPerFile = 1.0
-    print 'Average Seconds Per File:\t%s' % secondsPerFile
-
-
-
-    logging.info('REPORT >>>')
-    duration = endTime - startTime
-    logging.info('Processed %s files in %s', fileCount, duration)
-    logging.info('\tStarted at:\t\t%s', startTime.time())
-    logging.info('\tFinished at:\t%s', endTime.time())
-    print
-    # filesPerMinute = float(fileCount)/duration.seconds/60
-    logging.info('Average Files Per Minute:\t%s', str(filesPerMinute))
-    # secondsPerFile = duration.seconds/float(fileCount)
-    logging.info('Average Seconds Per File:\t%s', secondsPerFile)
+    return (archivedMediaFilePath, elapsedTime)
