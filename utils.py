@@ -160,7 +160,7 @@ def isValidMediaFileType(file):
 
     # 'Valid' media file type extensions
     validVideoFileExtensions = ['MOV', 'MP4', 'MPG', 'M4V', '3G2', 'ASF', 'AVI']
-    validImageFileExtensions = ['JPG', 'PNG', 'TIF', 'TIFF', 'CR2', 'BMP', 'GIF']
+    validImageFileExtensions = ['JPG', 'PNG', 'TIF', 'TIFF', 'CR2', 'BMP', 'GIF', 'DNG']
 
     if extensionToCheck in validVideoFileExtensions:
         return True
@@ -767,3 +767,50 @@ def archiveMediaFile(inputFile, destinationDir, creator):
     logging.info('\t[%s]', elapsedTime)
 
     return (archivedMediaFilePath, elapsedTime)
+
+
+
+# creates a backup of files if and only if they do not already exist in the destinationDir structure
+
+def backupMediaFile(sourceDir, inputFile, destinationDir):
+    startTime = datetime.now()
+
+    print ">>> processing '%s'" % inputFile
+    logging.info(">>> processing '%s'",inputFile)
+
+
+    #   sourceDir           /Volumes/GreenTree2000/photoArchive/
+    #   inputFile          /Volumes/GreenTree2000/photoArchive/images/2017/2017.02/20170210.034208999.samgutentag.0001.CR2
+    #   destinationDir      /Volumes/destinationDir/photoArchive/
+
+    # destinationFileFullPath
+    #   /Volumes/destinationDir/photoArchive/images/2017/2017.02/20170210.034208999.samgutentag.0001.CR2
+
+    backupFileAbsolutePath = inputFile.replace(sourceDir, destinationDir, 1)
+
+    fullDestinationDir = backupFileAbsolutePath[0:backupFileAbsolutePath.rfind('/')]
+
+    print backupFileAbsolutePath
+
+    # check if destination directory exists, if not create it
+    if not os.path.exists(fullDestinationDir):
+        os.makedirs(fullDestinationDir)
+
+    # check if file exists
+    if os.path.isfile(backupFileAbsolutePath):
+        logging.info('file has already been backed up, skipping')
+        print 'file has already been backed up, skipping'
+
+    else:
+        logging.info('backing up %s to %s', inputFile, backupFileAbsolutePath)
+        print 'backing up %s to %s' % (inputFile, backupFileAbsolutePath)
+        shutil.copy2(inputFile, backupFileAbsolutePath)
+
+
+    endTime = datetime.now()
+    elapsedTime = endTime - startTime
+
+    logging.info('Backed Up\t%s\nto\t\t\t%s', inputFile, backupFileAbsolutePath)
+    logging.info('\t[%s]', elapsedTime)
+
+    return (backupFileAbsolutePath, elapsedTime)
