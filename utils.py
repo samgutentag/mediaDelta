@@ -385,11 +385,12 @@ def getDateTimeObject(exifData):
             dateStamp_month = entry_dateStamp.split(':')[1]
             dateStamp_day = entry_dateStamp.split(':')[2]
 
-        # if year is before 1975, we dont want it, break out!
+        # if year is before 1975, we dont want it, set year to 9999 to make sure
+        # it is not the lowest year
         # this is to remove false low years that some software
         # defaults to writing out the date at the epoch
         if int(dateStamp_year) < 1975:
-            break
+            dateStamp_year = '9999'
 
         #-----------------------------------------------------------------------
         #   get timeStamp
@@ -446,8 +447,11 @@ def getDateTimeObject(exifData):
                                                 timeStamp_second,
                                                 timeStamp_millisecond)
 
+        # entry_DateTimeObject.printInfo()
+
         # compare DateTimeObjects
         earliestDateTimeObject = getEarlierDateTime(earliestDateTimeObject, entry_DateTimeObject)
+        # earliestDateTimeObject.printInfo()
 
     return earliestDateTimeObject
 
