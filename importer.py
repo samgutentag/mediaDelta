@@ -1,5 +1,28 @@
 #!/usr/bin/end python
 
+#------------------------------------------------------------------------------
+#		Description
+#       Script imports media files from a user passed directory to a user
+#       specified destination.  For example, a user imports from an SD card to
+#       a portable hard drive.  Does very little to check if duplicates exists
+#       or are being made.
+#
+#       Output destination is formatted by getting username from the user and
+#       exif data from the media files being processed.
+#
+#       The output path is formatted as such:
+#       <destinationDir>/<camera>/<mediaType>/<YYYY><MM><DD>/
+#
+#       The output filename is formatted as such:
+#       <user>.<camera>.<YYYY><MM><DD>.<HH><mm><SS><sss>.<counter>.<extention>
+#
+#------------------------------------------------------------------------------
+#		Sample Usage
+#   >   python importer.py -u $USER -s /Volumes/EOS_DIGITAL/ -d /Volumes/IMAGE_500/STAGING/
+#
+#------------------------------------------------------------------------------
+#
+#------------------------------------------------------------------------------
 
 import argparse
 import utils
@@ -16,10 +39,55 @@ import sys  # import sys package, if not already imported
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
+#------------------------------------------------------------------------------
+#   Formatting Functions
+#------------------------------------------------------------------------------
 
+#   formats file name and destination directory for easy sorting
+def getImportMediaFileLocation(inputFile, destinationDir, user, counter):
+
+    print ">>> import processing '%s'" % inputFile
+    logging.info(">>> import processing '%s'", inputFile)
+
+    try:
+        #   generate a mediaFileObject from the given input file
+        mediaFileObject = utils.getMediaFileObject(inputFile, user)
+    except:
+        print 'ERROR:\tcould not create mediaFileObject from \'%s\', skipping...' % inputFile
+        logging.warning('ERROR:\tcould not create mediaFileObject from \'%s\', skipping...', inputFile)
+        return 'NULL'
+
+    #   set file name and path
+    #   format: <user>.<camera>.<YYYY><MM><DD>.<HH><mm><SS><sss>.<counter>.<extention>
+    importFileName = '%s.%s.%s%s%s.%s%s%s%s.%s.%s' %   (user,
+                                                    mediaFileObject.camera.model,
+                                                    mediaFileObject.dateTime.year,
+                                                    mediaFileObject.dateTime.month,
+                                                    mediaFileObject.dateTime.day,
+                                                    mediaFileObject.dateTime.hour,
+                                                    mediaFileObject.dateTime.minute,
+                                                    mediaFileObject.dateTime.second,
+                                                    mediaFileObject.dateTime.millisecond,
+                                                    str(counter),
+                                                    mediaFileObject.extension.lower())
+
+    #   format: <destinationDir>/<camera>/<mediaType>/<YYYY><MM><DD>/
+    importFilePath = '%s/%s/%s/%s%s%s/' % (destinationDir,
+                                        mediaFileObject.camera.model,
+                                        mediaFileObject.type,
+                                        mediaFileObject.dateTime.year,
+                                        mediaFileObject.dateTime.month,
+                                        mediaFileObject.dateTime.day)
+
+    return (importFilePath, importFileName)
+
+
+#------------------------------------------------------------------------------
+#   Main Function
+#------------------------------------------------------------------------------
 def main():
 
-    #define parser
+    #   Setup parser
     parser = argparse.ArgumentParser(description="Import Data from a memory card to a staging drive")
 
     parser.add_argument('-u', '--username', dest='username',
@@ -41,7 +109,7 @@ def main():
 
     #   setup logging
     logDateTime = datetime.now().strftime('%Y%m%d%H%M%S')
-    logFileName = 'import_%s.log' % logDateTime
+    logFileName = 'importer_%s.log' % logDateTime
     logging.basicConfig(format='%(message)s', filename=logFileName, level=logging.DEBUG)
 
     #   print arguments
@@ -49,8 +117,6 @@ def main():
     print 'Arguments...'
     utils.prettyPrintDict(args)
     utils.spacer()
-
-    fileCount = 0
 
     #   Get source directory contents
     filesToProcess = utils.getDirectoryContents(args['sourceDirectory'])
@@ -62,17 +128,15 @@ def main():
     while destDir[-1] == '/':
         destDir = destDir[:-1]
 
-    #   process files and import if not already imported
+    #   Process files and import if not already imported
     for file in filesToProcess:
-        startTime = datetime.now()
 
         print '\n%s of %s' % (fileProcessCounter, fileCount)
         logging.info('\n%s of %s', fileProcessCounter, fileCount)
 
-        importFileLocation = utils.getImportMediaFileLocation(file, destDir, args['username'], fileProcessCounter)
+        importFileLocation = getImportMediaFileLocation(file, destDir, args['username'], fileProcessCounter)
 
         importPath = importFileLocation[0] + importFileLocation[1]
-        # print importPath
 
         # check if destination directory exists, if not create it
         if not os.path.exists(importFileLocation[0]):
@@ -90,45 +154,27 @@ def main():
 
         fileProcessCounter += 1
 
-
-
-
-    #   move log file to destination directory
-
+    #   Move log file to destination directory
     currentDirectory = os.getcwd() + '/'
     logFilePath = currentDirectory + logFileName
     logFileDestinationDir = destDir + '/logs/'
 
-
-    # check if destination directory exists, if not create it
+    #   Check if destination directory exists, if not create it
     if not os.path.exists(logFileDestinationDir):
         os.makedirs(logFileDestinationDir)
 
     logFileDestination = logFileDestinationDir  + logFileName
-
     shutil.move(logFilePath, logFileDestination)
 
-
-
-
-    #   print arguments
+    #   Say Goodbye!
     utils.spacer()
     print 'ALL DONE!'
     logging.info('ALL DONE!')
     utils.bigSpacer()
 
 
-
 if __name__ == '__main__':
     main()
-
-
-
-
-
-
-
-
 
 
 

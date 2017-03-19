@@ -238,7 +238,7 @@ def getCorrectedFilePath(destinationDir, mediaFileObject, event):
 # handles copies by incrementing a copy counter
 # will overwrite when copies exceed 9,999
 # returns (destinationDirectoryName, destinationFileName) list
-def makeCopy(sourceFile, destinationDirectoryName, destinationFileName):
+def safeCopy(sourceFile, destinationDirectoryName, destinationFileName):
 
     destinationAbsoluteFilePath = destinationDirectoryName + destinationFileName
 
@@ -675,174 +675,36 @@ def prettyPrintDict(dictionary):
 #		file processing functions
 #------------------------------------------------------------------------------
 
-# main processing of media file, gets exif data,
-# sets up destination directory and filename, copies file
-def processMediaFile(inputFile, destinationDir, creator, event):
-
-    startTime = datetime.now()
-
-    print ">>> processing '%s'" % inputFile
-    logging.info(">>> processing '%s'", inputFile)
-
-    # create a media file object for the input file
-    try:
-        mediaFileObject = getMediaFileObject(inputFile, creator)
-
-        # make Corrected File Path
-        correctedFilePath = getCorrectedFilePath(destinationDir, mediaFileObject, event)
-
-        # copy file, returns destinationDirectory and destinationFile
-        destinationFile = makeCopy(inputFile, correctedFilePath[0], correctedFilePath[1])
-
-        print 'Processed file in %s' % str(datetime.now() - startTime)
-        logging.info('Processed file in %s', str(datetime.now() - startTime))
-
-    except:
-        print '\t>>> could not create a MediaFileObject, skipping %s' % inputFile
-        logging.warning('\t>>> could not create a MediaFileObject, skipping %s', inputFile)
+# # main processing of media file, gets exif data,
+# # sets up destination directory and filename, copies file
+# def processMediaFile(inputFile, destinationDir, creator, event):
+#
+#     startTime = datetime.now()
+#
+#     print ">>> processing '%s'" % inputFile
+#     logging.info(">>> processing '%s'", inputFile)
+#
+#     # create a media file object for the input file
+#     try:
+#         mediaFileObject = getMediaFileObject(inputFile, creator)
+#
+#         # make Corrected File Path
+#         correctedFilePath = getCorrectedFilePath(destinationDir, mediaFileObject, event)
+#
+#         # copy file, returns destinationDirectory and destinationFile
+#         destinationFile = makeCopy(inputFile, correctedFilePath[0], correctedFilePath[1])
+#
+#         print 'Processed file in %s' % str(datetime.now() - startTime)
+#         logging.info('Processed file in %s', str(datetime.now() - startTime))
+#
+#     except:
+#         print '\t>>> could not create a MediaFileObject, skipping %s' % inputFile
+#         logging.warning('\t>>> could not create a MediaFileObject, skipping %s', inputFile)
 
 
 #------------------------------------------------------------------------------
-#		file archiving functions
+#		file backup functions
 #------------------------------------------------------------------------------
-
-def getCorrectedArchiveFilePath(destinationDir, mediaFileObject):
-    fileName = ''
-    dirName = ''
-    counter = '0001'
-
-    # clean destinationDir to not include tail slashes, if they exist
-    while destinationDir.endswith('/'):
-        destinationDir = destinationDir[:-1]
-
-    #  format:  'destination/mediaType(plural)/YYYY/YYYY.MM/MM.<eventName>/'
-    #  example: 'photos/images/2016/2016.12/12.christmas/'
-    #  example: 'photos/videos/2016/2016.11/11.thanksgiving'
-    dirName = '%s/%ss/%s/%s.%s/' % (destinationDir,
-                                            mediaFileObject.type,
-                                            mediaFileObject.dateTime.year,
-                                            mediaFileObject.dateTime.year,
-                                            mediaFileObject.dateTime.month)
-
-    # format:  'YYYYMMDD.HHMMSSsss.<creator>.<counter>.<extension>'
-    fileName = '%s%s%s.%s%s%s%s.%s.%s.%s' % (mediaFileObject.dateTime.year,
-                                                mediaFileObject.dateTime.month,
-                                                mediaFileObject.dateTime.day,
-                                                mediaFileObject.dateTime.hour,
-                                                mediaFileObject.dateTime.minute,
-                                                mediaFileObject.dateTime.second,
-                                                mediaFileObject.dateTime.millisecond,
-                                                mediaFileObject.creator,
-                                                counter,
-                                                mediaFileObject.extension)
-
-    # return dirName + fileName
-    return (dirName, fileName)
-
-def archiveMediaFile(inputFile, destinationDir, creator):
-
-    startTime = datetime.now()
-
-    print ">>> processing '%s'" % inputFile
-    logging.info(">>> processing '%s'",inputFile)
-    archivedMediaFilePath = ''
-
-    try:
-        mediaFileObject = getMediaFileObject(inputFile, creator)
-    except:
-        print 'ERROR:\tcould not create mediaFileObject from \'%s\', skipping...' % inputFile
-        logging.warning('ERROR:\tcould not create mediaFileObject from \'%s\', skipping...', inputFile)
-        return inputFile
-
-
-    # make Corrected File Path
-    correctedFilePath = getCorrectedArchiveFilePath(destinationDir, mediaFileObject)
-
-    # copy file, returns destinationDirectory and destinationFile
-    archivedMediaFilePath = makeCopy(inputFile, correctedFilePath[0], correctedFilePath[1])
-
-    endTime = datetime.now()
-    elapsedTime = endTime - startTime
-
-    # print 'Archived\t%s\nto\t\t\t%s' % (inputFile, archivedMediaFilePath)
-    # print '\t[%s]' % elapsedTime
-
-    logging.info('Archived\t%s\nto\t\t\t%s', inputFile, archivedMediaFilePath)
-    logging.info('\t[%s]', elapsedTime)
-
-    return (archivedMediaFilePath, elapsedTime)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-def getImportMediaFileLocation(inputFile, destinationDir, user, counter):
-
-    print ">>> processing '%s'" % inputFile
-    logging.info(">>> processing '%s'", inputFile)
-
-    try:
-        #   generate a mediaFileObject from the given input file
-        mediaFileObject = getMediaFileObject(inputFile, user)
-    except:
-        print 'ERROR:\tcould not create mediaFileObject from \'%s\', skipping...' % inputFile
-        logging.warning('ERROR:\tcould not create mediaFileObject from \'%s\', skipping...', inputFile)
-        return 'NULL'
-
-
-    #   set file name and path
-    #importFileName = 'user.camera.YYYYMMDD.HHmmSSsss.couter.extention'
-    importFileName = '%s.%s.%s%s%s.%s%s%s%s.%s.%s' %   (user,
-                                                    mediaFileObject.camera.model,
-                                                    mediaFileObject.dateTime.year,
-                                                    mediaFileObject.dateTime.month,
-                                                    mediaFileObject.dateTime.day,
-                                                    mediaFileObject.dateTime.hour,
-                                                    mediaFileObject.dateTime.minute,
-                                                    mediaFileObject.dateTime.second,
-                                                    mediaFileObject.dateTime.millisecond,
-                                                    str(counter),
-                                                    mediaFileObject.extension.lower())
-
-    # make correct file path
-    # importFilePath = '/destinationDir/camera/YYYYMMDD/'
-    importFilePath = '%s/%s/%s/%s%s%s/' % (destinationDir,
-                                        mediaFileObject.camera.model,
-                                        mediaFileObject.type,
-                                        mediaFileObject.dateTime.year,
-                                        mediaFileObject.dateTime.month,
-                                        mediaFileObject.dateTime.day)
-
-    return (importFilePath, importFileName)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -850,7 +712,6 @@ def getImportMediaFileLocation(inputFile, destinationDir, user, counter):
 
 
 # creates a backup of files if and only if they do not already exist in the destinationDir structure
-
 def backupMediaFile(sourceDir, inputFile, destinationDir):
     startTime = datetime.now()
 

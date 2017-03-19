@@ -1,11 +1,24 @@
 #!/usr/bin/end python
 
-
+#------------------------------------------------------------------------------
+#		Description
+#       Script is ideal for archiving large photo or video libraries, uses exif
+#       tags to sort media files into a structured folder system.  If duplicates
+#       are found, they are given an incremented counter in the file name, up to
+#       9999, after that, the counter loops back over itself, overwriting 0001, etc.
+#
+#       Output destination is formatted by getting username from the user and
+#       exif data from the media files being processed.
+#
+#       The output path is formatted as such:
+#       <destinationDir>/<mediaType>/<YYYY>/<YYYY><MM>/
+#
+#       The output filename is formatted as such:
+#       <YYYY><MM><DD>.<HH><MM><SS><sss.<creator>.<counter>.<extension>
+#
 #------------------------------------------------------------------------------
 #		Sample Usage
-#------------------------------------------------------------------------------
-#
-#   > python archiver.py -a samgutentag -d /Volumes/GoProBackUps/DateCorrected/correctedFiles/02b_M-N/ -o /Volumes/MacPak500GB/photos > ~/Desktop/pyExifLog_corrected_02b_take2.txt
+#   >   python archiver.py -u $USER -s /Volumes/EOS_DIGITAL/ -d /Volumes/IMAGE_500/STAGING/
 #
 #------------------------------------------------------------------------------
 #
@@ -26,142 +39,162 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 #------------------------------------------------------------------------------
-#		main function
+#   Formatting Functions
+#------------------------------------------------------------------------------
+
+#   formats file name and destination directory for easy sorting
+def getArchiveMediaFileLocation(inputFile, destinationDir, user):
+
+    startTime = datetime.now()
+
+    print ">>> archive processing '%s'" % inputFile
+    logging.info(">>> archive processing '%s'",inputFile)
+
+    try:
+        #   generate a mediaFileObject from the given input file
+        mediaFileObject = utils.getMediaFileObject(inputFile, user)
+    except:
+        print 'ERROR:\tcould not create mediaFileObject from \'%s\', skipping...' % inputFile
+        logging.warning('ERROR:\tcould not create mediaFileObject from \'%s\', skipping...', inputFile)
+        return 'NULL'
+
+
+    #   Set file name and path
+    archiveFileName = ''
+    archiveFilePath = ''
+    counter = '0001'
+
+    #   format:  <YYYY><MM><DD>.<HH><MM><SS><sss.<creator>.<counter>.<extension>
+    archiveFileName = '%s%s%s.%s%s%s%s.%s.%s.%s' % (mediaFileObject.dateTime.year,
+                                                    mediaFileObject.dateTime.month,
+                                                    mediaFileObject.dateTime.day,
+                                                    mediaFileObject.dateTime.hour,
+                                                    mediaFileObject.dateTime.minute,
+                                                    mediaFileObject.dateTime.second,
+                                                    mediaFileObject.dateTime.millisecond,
+                                                    mediaFileObject.creator,
+                                                    counter,
+                                                    mediaFileObject.extension)
+
+    #   format: <destinationDir>/<mediaType>/<YYYY>/<YYYY><MM>/
+    archiveFilePath = '%s/%s/%s/%s.%s/' % (destinationDir,
+                                            mediaFileObject.type,
+                                            mediaFileObject.dateTime.year,
+                                            mediaFileObject.dateTime.year,
+                                            mediaFileObject.dateTime.month)
+
+    return (archiveFilePath, archiveFileName)
+
+
+#------------------------------------------------------------------------------
+#		Main Function
 #------------------------------------------------------------------------------
 
 def main():
 
-    # setup parser
+    #   Setup parser
     parser = argparse.ArgumentParser(description='Read EXIF data of a given media file, update filename and sort into structured directory')
 
-    # passing a single file
-    parser.add_argument('-f', '--mediaFile', dest='mediaFile',
-                        required=False,
-                        help='pass a single file to process',
-                        metavar='MEDIA_FILE',
-                        type=lambda x: utils.openMediaFile(parser, x))
-
-    # passing a directory (with or without sub directories) of files
-    parser.add_argument('-d', '--mediaDirectory', dest='mediaDirectory',
-                        required=False,
-                        help='pass a directory of files to process, WARNING: RECURSIVE',
-                        metavar='MEDIA_DIRECTORY',
-                        type=lambda x: utils.openMediaDirectory(parser, x))
-
-    # output directory destination
-    parser.add_argument('-o', '--outputDirectory', dest='outputDirectory',
-                        required = True,
-                        help = 'this is the root destination directory that photos will be copied to',
-                        metavar='OUTPUT_DIRECTORY')
-
-    # creator name helps with identification when multiple photographers or artists are contributing to a single collection
-    parser.add_argument('-c', '--creatorName', dest='creatorName',
+    parser.add_argument('-u', '--username', dest='username',
                         required = True,
                         help = 'user provided creator name, used for tagging with multiple artists or photographers into a single collection',
-                        metavar='CREATOR_NAME')
+                        metavar='USER_NAME')
 
+    parser.add_argument('-s', '--source', dest='sourceDirectory',
+                        required = True,
+                        help = 'the source directory of the files we want to import, typically a memory card',
+                        metavar='SOURCE_DIRECTORY')
+
+    parser.add_argument('-d', '--destination', dest='destinationDirectory',
+                        required = True,
+                        help='the destination directory of the files we want to import, typically on an external hard drive',
+                        metavar='DESTINATION_DIRECTORY')
 
     args = vars(parser.parse_args())
 
-
-    #---------------------------------------------------------------------------
-    #   Setup logging file
-    #---------------------------------------------------------------------------
+    #   setup logging
     logDateTime = datetime.now().strftime('%Y%m%d%H%M%S')
     logFileName = 'archiver_%s.log' % logDateTime
     logging.basicConfig(format='%(message)s', filename=logFileName, level=logging.DEBUG)
 
+    #   print arguments
     utils.bigSpacer()
     print 'Arguments...'
     utils.prettyPrintDict(args)
     utils.spacer()
 
-    startTime = datetime.now()
-    fileCount = 0
+    # Get source directory countents
+    filesToProcess = utils.getDirectoryContents(args['sourceDirectory'])
+    fileProcessCounter = 1
+    fileCount = len(filesToProcess)
 
-    # attempt to process a passed file
-    if args['mediaFile']:
-        archivedFilePath = utils.archiveMediaFile(args['mediaFile'], args['outputDirectory'], args['creatorName'])
-        fileCount = 1
+    #   Clean destination directory name
+    destDir = args['destinationDirectory']
+    while destDir[-1] == '/':
+        destDir = destDir[:-1]
 
-    # attempts to process a directory of files
-    elif args['mediaDirectory']:
+    #   Process files and archive them to their final destination, handles duplicates
+    for file in filesToProcess:
 
-        # process a directory of files
-        filesToProcess = utils.getDirectoryContents(args['mediaDirectory'])
-        fileProcessCounter = 1
-        fileCount = len(filesToProcess)
+        print '\n%s of %s ' % (fileProcessCounter, fileCount)
+        logging.info('\n%s of %s ', fileProcessCounter, fileCount)
 
-        elapsedTimeList = []
+        # archivedFilePath = utils.archiveMediaFile(file, args['outputDirectory'], args['creatorName'])
+        archiveFileLocation = getArchiveMediaFileLocation(file, destDir, args['username'])
 
-        for file in filesToProcess:
-            print '\n%s of %s ' % (fileProcessCounter, fileCount)
-            logging.info('\n%s of %s ', fileProcessCounter, fileCount)
-            archivedFilePath = utils.archiveMediaFile(file, args['outputDirectory'], args['creatorName'])
+        archivePath = archiveFileLocation[0] + archiveFileLocation[1]
 
-            # append elapsed time to list
-            elapsedTimeList.append(archivedFilePath[1])
+        utils.safeCopy(file, archiveFileLocation[0], archiveFileLocation[1])
 
-            # use time of first file for average of first
-            if fileProcessCounter == 1:
+        fileProcessCounter += 1
 
-                # calculate average file process time
-                totalTime = 0
-                for item in elapsedTimeList:
-                    timeInSeconds = item.total_seconds()
-                    totalTime = totalTime + timeInSeconds
+    #   Move log file to destination directory
+    currentDirectory = os.getcwd() + '/'
+    logFilePath = currentDirectory + logFileName
+    logFileDestinationDir = destDir + '/logs/'
 
-                averageTime = totalTime / float(fileProcessCounter)
+    #   Check if destination directory exists, if not create it
+    if not os.path.exists(logFileDestinationDir):
+        os.makedirs(logFileDestinationDir)
 
-            # every 10 files, get the average elapsed time per file
-            elif fileProcessCounter % 10 == 0:
+    logFileDestination = logFileDestinationDir  + logFileName
+    shutil.move(logFilePath, logFileDestination)
 
-                # calculate average file process time
-                totalTime = 0
-                for item in elapsedTimeList:
-                    timeInSeconds = item.total_seconds()
-                    totalTime = totalTime + timeInSeconds
-
-                averageTime = totalTime / float(fileProcessCounter)
-
-            logging.info('Averaging %s per file', str(timedelta(seconds=averageTime)))
-
-            filesRemaining = fileCount - fileProcessCounter
-            estimatedTimeRemaining = float(filesRemaining) * averageTime
-
-            print 'Estimated Time Remaining:\t %s' % str(timedelta(seconds=estimatedTimeRemaining))
-            logging.info('Estimated Time Remaining:\t %s', str(timedelta(seconds=estimatedTimeRemaining)))
-
-
-            fileProcessCounter += 1
-
+    #   Say Goodbye!
     utils.spacer()
-
-    #---------------------------------------------------------------------------
-    #   Move logging file
-    #---------------------------------------------------------------------------
-
-    # clean outputDirectory to not include tail slashes, if they exist
-    outDir = args['outputDirectory']
-
-    if outDir[-1:] != '/':
-        outDir = outDir + '/'
-
-    logFile_destinationDir = outDir[:outDir.rfind('/')+1] + 'logs/'
-
-    # check if destination directory exists, if not create it
-    if not os.path.exists(logFile_destinationDir):
-        os.makedirs(logFile_destinationDir)
-
-    logFileDestination = logFile_destinationDir + logFileName
-    shutil.move(logFileName, logFileDestination)
-
-    print 'Logfile located at \'%s\'' % logFileDestination
-
-    utils.spacer()
-    print 'Done!'
+    print 'ALL DONE!'
+    logging.info('ALL DONE!')
     utils.bigSpacer()
 
 
 if __name__ == '__main__':
     main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#EOF
