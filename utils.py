@@ -188,7 +188,7 @@ def isIgnorableSystemFile(file):
 def getMediaFileType(exifData):
 
     # get media type from 'File:MIMEType' value, (video or image)
-    mediaType = exifData['File:MIMEType'].split('/')[0].lower()
+    mediaType = exifData['File:MIMEType'].split('/')[0].upper()
 
     # get file type from 'File:FileType' value
     fileType = exifData['File:FileType'].upper()
@@ -771,6 +771,81 @@ def archiveMediaFile(inputFile, destinationDir, creator):
     logging.info('\t[%s]', elapsedTime)
 
     return (archivedMediaFilePath, elapsedTime)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def getImportMediaFileLocation(inputFile, destinationDir, user, counter):
+
+    print ">>> processing '%s'" % inputFile
+    logging.info(">>> processing '%s'", inputFile)
+
+    try:
+        #   generate a mediaFileObject from the given input file
+        mediaFileObject = getMediaFileObject(inputFile, user)
+    except:
+        print 'ERROR:\tcould not create mediaFileObject from \'%s\', skipping...' % inputFile
+        logging.warning('ERROR:\tcould not create mediaFileObject from \'%s\', skipping...', inputFile)
+        return 'NULL'
+
+
+    #   set file name and path
+    #importFileName = 'user.camera.YYYYMMDD.HHmmSSsss.couter.extention'
+    importFileName = '%s.%s.%s%s%s.%s%s%s%s.%s.%s' %   (user,
+                                                    mediaFileObject.camera.model,
+                                                    mediaFileObject.dateTime.year,
+                                                    mediaFileObject.dateTime.month,
+                                                    mediaFileObject.dateTime.day,
+                                                    mediaFileObject.dateTime.hour,
+                                                    mediaFileObject.dateTime.minute,
+                                                    mediaFileObject.dateTime.second,
+                                                    mediaFileObject.dateTime.millisecond,
+                                                    str(counter),
+                                                    mediaFileObject.extension.lower())
+
+    # make correct file path
+    # importFilePath = '/destinationDir/camera/YYYYMMDD/'
+    importFilePath = '%s/%s/%s/%s%s%s/' % (destinationDir,
+                                        mediaFileObject.camera.model,
+                                        mediaFileObject.type,
+                                        mediaFileObject.dateTime.year,
+                                        mediaFileObject.dateTime.month,
+                                        mediaFileObject.dateTime.day)
+
+    return (importFilePath, importFileName)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -102,7 +102,6 @@ def main():
             # append elapsed time to list
             elapsedTimeList.append(archivedFilePath[1])
 
-
             # use time of first file for average of first
             if fileProcessCounter == 1:
 
