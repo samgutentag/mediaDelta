@@ -10,10 +10,10 @@
 
 
 import argparse
-import PIL
 from PIL import Image
 from PIL import ImageStat
 import sys
+import utils
 
 
 
@@ -21,28 +21,27 @@ import sys
 #		comparisons
 #------------------------------------------------------------------------------
 
-def diffHistograms(hist1, hist2):
+def imageMatch(image1, image2):
+    isSame = True
+    # img1 = Image.open(image1)
+    # img2 = Image.open(image2)
 
-    if hist1 == hist2:
-        print 'this images match!'
-    else:
+    deviation01 = image1.stddev[0] - image2.stddev[0]
+    deviation02 = image1.stddev[1] - image2.stddev[1]
+    deviation03 = image1.stddev[2] - image2.stddev[2]
 
-        histogramCompare = []
+    print 'Deviation01:\t%s' % deviation01
+    print 'Deviation02:\t%s' % deviation02
+    print 'Deviation03:\t%s' % deviation03
 
-        if len(hist1) == len(hist2):
-            index = 0
-            for item in hist1:
-                histogramPair = (hist1[index], hist2[index])
-                histogramCompare.append(histogramPair)
-                index += 1
+    if deviation01 > 1.0:
+        isSame = False
+    if deviation02 > 1.0:
+        isSame = False
+    if deviation03 > 1.0:
+        isSame = False
 
-
-        for item in histogramCompare:
-            if item[0] == item[1]:
-                print '\t%s\t%s' % (item[0], item[1])
-            else:
-                print '\t%s\t%s\tDIFF!' % (item[0], item[1])
-
+    return isSame
 
 def compareImages(image1, image2):
     print 'image1:\t%s' % image1
@@ -59,60 +58,40 @@ def compareImages(image1, image2):
     img1_stat = ImageStat.Stat(img1)
     img2_stat = ImageStat.Stat(img2)
 
-    print 'img1_stat.extrema\t%s' % img1_stat.extrema
-    print 'img2_stat.extrema\t%s' % img2_stat.extrema
+    # print 'img1_stat.extrema\t%s' % img1_stat.extrema
+    # print 'img2_stat.extrema\t%s' % img2_stat.extrema
+    #
+    # print 'img1_stat.count\t\t%s' % img1_stat.count
+    # print 'img2_stat.count\t\t%s' % img2_stat.count
+    #
+    # print 'img1_stat.sum\t\t%s' % img1_stat.sum
+    # print 'img2_stat.sum\t\t%s' % img2_stat.sum
+    #
+    # print 'img1_stat.sum2\t\t%s' % img1_stat.sum2
+    # print 'img2_stat.sum2\t\t%s' % img2_stat.sum2
+    #
+    # print 'img1_stat.mean\t\t%s' % img1_stat.mean
+    # print 'img2_stat.mean\t\t%s' % img2_stat.mean
+    #
+    # print 'img1_stat.median\t%s' % img1_stat.median
+    # print 'img2_stat.median\t%s' % img2_stat.median
+    #
+    # print 'img1_stat.rms\t\t%s' % img1_stat.rms
+    # print 'img2_stat.rms\t\t%s' % img2_stat.rms
+    #
+    # print 'img1_stat.vars\t\t%s' % img1_stat.var
+    # print 'img2_stat.vars\t\t%s' % img2_stat.var
+    #
+    # print 'img1_stat.stddev\t%s' % img1_stat.stddev
+    # print 'img2_stat.stddev\t%s' % img2_stat.stddev
 
-    print 'img1_stat.count\t\t%s' % img1_stat.count
-    print 'img2_stat.count\t\t%s' % img2_stat.count
+    # utils.spacer()
 
-    print 'img1_stat.sum\t\t%s' % img1_stat.sum
-    print 'img2_stat.sum\t\t%s' % img2_stat.sum
+    if imageMatch(img1_stat, img2_stat):
+        print 'these images are very likely matches!'
+    else:
+        print 'these images are probably not matches'
 
-    print 'img1_stat.sum2\t\t%s' % img1_stat.sum2
-    print 'img2_stat.sum2\t\t%s' % img2_stat.sum2
-
-    print 'img1_stat.mean\t\t%s' % img1_stat.mean
-    print 'img2_stat.mean\t\t%s' % img2_stat.mean
-
-    print 'img1_stat.median\t%s' % img1_stat.median
-    print 'img2_stat.median\t%s' % img2_stat.median
-
-    print 'img1_stat.rms\t\t%s' % img1_stat.rms
-    print 'img2_stat.rms\t\t%s' % img2_stat.rms
-
-    print 'img1_stat.vars\t\t%s' % img1_stat.var
-    print 'img2_stat.vars\t\t%s' % img2_stat.var
-
-    print 'img1_stat.stddev\t%s' % img1_stat.stddev
-    print 'img2_stat.stddev\t%s' % img2_stat.stddev
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    # # print histogram1
-    # print len(histogram1)
-    # # print histogram2
-    # print len(histogram2)
-
-
-
-
-
-    # if img1_histogram == img2_histogram:
-    #     print 'these images match!'
-    # else:
-    #     print 'these images do not match'
 
 
 #------------------------------------------------------------------------------
@@ -120,16 +99,12 @@ def compareImages(image1, image2):
 #------------------------------------------------------------------------------
 
 def main():
-    print 'lets compare two images!'
+    print 'lets compare some images!'
 
     script = sys.argv[0]
     image1 = sys.argv[1]
     image2 = sys.argv[2]
-    compareImages(image1, image2)
-
-
-
-
+    
 
 if __name__ == '__main__':
     main()
