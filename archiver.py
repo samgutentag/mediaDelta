@@ -65,13 +65,8 @@ def getArchiveMediaFileLocation(inputFile, destinationDir, user):
     counter = '0001'
 
     #   format:  <YYYY><MM><DD>.<HH><MM><SS><sss.<creator>.<counter>.<extension>
-    archiveFileName = '%s%s%s.%s%s%s%s.%s.%s.%s' % (mediaFileObject.dateTime.year,
-                                                    mediaFileObject.dateTime.month,
-                                                    mediaFileObject.dateTime.day,
-                                                    mediaFileObject.dateTime.hour,
-                                                    mediaFileObject.dateTime.minute,
-                                                    mediaFileObject.dateTime.second,
-                                                    mediaFileObject.dateTime.millisecond,
+    archiveFileName = '%s%s%s.%s%s%s%s.%s.%s.%s' % (mediaFileObject.dateTime.year, mediaFileObject.dateTime.month, mediaFileObject.dateTime.day,
+                                                    mediaFileObject.dateTime.hour, mediaFileObject.dateTime.minute, mediaFileObject.dateTime.second, mediaFileObject.dateTime.millisecond,
                                                     mediaFileObject.creator,
                                                     counter,
                                                     mediaFileObject.extension)
@@ -80,14 +75,13 @@ def getArchiveMediaFileLocation(inputFile, destinationDir, user):
     archiveFilePath = '%s/%s/%s/%s.%s/' % (destinationDir,
                                             mediaFileObject.type,
                                             mediaFileObject.dateTime.year,
-                                            mediaFileObject.dateTime.year,
-                                            mediaFileObject.dateTime.month)
+                                            mediaFileObject.dateTime.year, mediaFileObject.dateTime.month)
 
     return (archiveFilePath, archiveFileName)
 
 
 #------------------------------------------------------------------------------
-#		Main Function
+#	Main Function
 #------------------------------------------------------------------------------
 
 def main():
@@ -148,6 +142,12 @@ def main():
 
         fileProcessCounter += 1
 
+    #   Say Goodbye!
+    utils.spacer()
+    print 'ALL DONE!'
+    logging.info('ALL DONE!')
+    utils.bigSpacer()
+
     #   Move log file to destination directory
     currentDirectory = os.getcwd() + '/'
     logFilePath = currentDirectory + logFileName
@@ -159,12 +159,6 @@ def main():
 
     logFileDestination = logFileDestinationDir  + logFileName
     shutil.move(logFilePath, logFileDestination)
-
-    #   Say Goodbye!
-    utils.spacer()
-    print 'ALL DONE!'
-    logging.info('ALL DONE!')
-    utils.bigSpacer()
 
 
 if __name__ == '__main__':

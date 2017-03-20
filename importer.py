@@ -61,13 +61,8 @@ def getImportMediaFileLocation(inputFile, destinationDir, user, counter):
     #   format: <user>.<camera>.<YYYY><MM><DD>.<HH><mm><SS><sss>.<counter>.<extention>
     importFileName = '%s.%s.%s%s%s.%s%s%s%s.%s.%s' %   (user,
                                                     mediaFileObject.camera.model,
-                                                    mediaFileObject.dateTime.year,
-                                                    mediaFileObject.dateTime.month,
-                                                    mediaFileObject.dateTime.day,
-                                                    mediaFileObject.dateTime.hour,
-                                                    mediaFileObject.dateTime.minute,
-                                                    mediaFileObject.dateTime.second,
-                                                    mediaFileObject.dateTime.millisecond,
+                                                    mediaFileObject.dateTime.year, mediaFileObject.dateTime.month, mediaFileObject.dateTime.day,
+                                                    mediaFileObject.dateTime.hour, mediaFileObject.dateTime.minute, mediaFileObject.dateTime.second, mediaFileObject.dateTime.millisecond,
                                                     str(counter),
                                                     mediaFileObject.extension.lower())
 
@@ -75,9 +70,7 @@ def getImportMediaFileLocation(inputFile, destinationDir, user, counter):
     importFilePath = '%s/%s/%s/%s%s%s/' % (destinationDir,
                                         mediaFileObject.camera.model,
                                         mediaFileObject.type,
-                                        mediaFileObject.dateTime.year,
-                                        mediaFileObject.dateTime.month,
-                                        mediaFileObject.dateTime.day)
+                                        mediaFileObject.dateTime.year, mediaFileObject.dateTime.month, mediaFileObject.dateTime.day)
 
     return (importFilePath, importFileName)
 
@@ -138,21 +131,15 @@ def main():
 
         importPath = importFileLocation[0] + importFileLocation[1]
 
-        # check if destination directory exists, if not create it
-        if not os.path.exists(importFileLocation[0]):
-            os.makedirs(importFileLocation[0])
-
-        # check if file exists
-        if os.path.isfile(importPath):
-            logging.info('\tfile has already been imported, skipping')
-            print '\tfile has already been imported, skipping'
-
-        else:
-            logging.info("\timporting\t'%s'\n\tto\t\t'%s'", file, importPath)
-            print "\timporting\t'%s'\n\tto\t\t'%s'" % (file, importPath)
-            shutil.copy2(file, importPath)
+        utils.safeCopy(file, importFileLocation[0], importFileLocation[1])
 
         fileProcessCounter += 1
+
+    #   Say Goodbye!
+    utils.spacer()
+    print 'ALL DONE!'
+    logging.info('ALL DONE!')
+    utils.bigSpacer()
 
     #   Move log file to destination directory
     currentDirectory = os.getcwd() + '/'
@@ -166,11 +153,7 @@ def main():
     logFileDestination = logFileDestinationDir  + logFileName
     shutil.move(logFilePath, logFileDestination)
 
-    #   Say Goodbye!
-    utils.spacer()
-    print 'ALL DONE!'
-    logging.info('ALL DONE!')
-    utils.bigSpacer()
+
 
 
 if __name__ == '__main__':

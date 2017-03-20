@@ -198,46 +198,10 @@ def getMediaFileType(exifData):
 
     return (mediaType, fileType, fileExtension)
 
-# construct file path and name of 'correctly' named file
-# returns (destinationDirectoryName, destinationFileName) list
-def getCorrectedFilePath(destinationDir, mediaFileObject, event):
-    fileName = ''
-    dirName = ''
-    counter = '0001'
-
-    # clean destinationDir to not include tail slashes, if they exist
-    while destinationDir.endswith('/'):
-        destinationDir = destinationDir[:-1]
-
-    #  format:  'destination/mediaType(plural)/YYYY/YYYY.MM/MM.<eventName>/'
-    #  example: 'photos/images/2016/2016.12/12.christmas/'
-    #  example: 'photos/videos/2016/2016.11/11.thanksgiving'
-    dirName = '%s/%ss/%s/%s.%s/%s.%s/' % (destinationDir,
-                                            mediaFileObject.type,
-                                            mediaFileObject.dateTime.year,
-                                            mediaFileObject.dateTime.year,
-                                            mediaFileObject.dateTime.month,
-                                            mediaFileObject.dateTime.month,
-                                            event)
-
-    fileName = '%s%s%s.%s%s%s%s.%s.%s.%s.%s' % (mediaFileObject.dateTime.year,
-                                                mediaFileObject.dateTime.month,
-                                                mediaFileObject.dateTime.day,
-                                                mediaFileObject.dateTime.hour,
-                                                mediaFileObject.dateTime.minute,
-                                                mediaFileObject.dateTime.second,
-                                                mediaFileObject.dateTime.millisecond,
-                                                event,
-                                                mediaFileObject.creator,
-                                                counter,
-                                                mediaFileObject.extension)
-
-    return (dirName, fileName)
-
 # copy files and preserve metadata
 # handles copies by incrementing a copy counter
 # will overwrite when copies exceed 9,999
-# returns (destinationDirectoryName, destinationFileName) list
+# returns (destinationDirectoryName, destinationFileName)
 def safeCopy(sourceFile, destinationDirectoryName, destinationFileName):
 
     destinationAbsoluteFilePath = destinationDirectoryName + destinationFileName
@@ -461,94 +425,66 @@ def getDateTimeObject(exifData):
 #------------------------------------------------------------------------------
 
 # # clean up camera information for file naming
-# def cameraLabelCleaner(camera, userName):
-#
-#     cleanCameraString = ''
-#
-#     # special cases for known cameras
-#     # adjustments for Apple cameras, (iPhones, iPads, etc)
-#     if camera.make.upper() == 'APPLE':
-#         cleanCameraString = camera.make + '.' + camera.model + '.' + userName
-#
-#     # adjustments for Canon cameras
-#     elif camera.make.upper() == 'CANON':
-#             # left pad all canon serial numbers with zeros to be 12 digits long
-#             if camera.serial == 'NONE':
-#                 tempSerialNumber = ''
-#             else:
-#                 tempSerialNumber = camera.serial
-#
-#             while len(tempSerialNumber) < 13:
-#                 tempSerialNumber = '0' + tempSerialNumber
-#
-#             cleanCameraString = camera.model + '.' + userName + '.' + tempSerialNumber
-#
-#         # adjustments for Kodak cameras
-#     elif camera.make.upper() == 'EASTMAN KODAK COMPANY':
-#             cleanCameraString = camera.model
-#
-#         # adjustments for GoPro cameras
-#     elif camera.make.upper() == 'GOPRO':
-#             cleanCameraString = camera.make + '.' + camera.model + '.' + userName
-#
-#         # adjustments for Sony cameras
-#     elif camera.make.upper() == 'SONY':
-#             # sony camera models tend to have '-' in them, replace with '.'
-#             tempModel = camera.model
-#             tempModel = tempModel.replace('-', '.')
-#
-#             cleanCameraString = camera.make + '.' + tempModel + '.' + userName
-#
-#         # adjustments for Nikon cameras
-#     elif camera.make.upper() == 'NIKON CORPORATION':
-#             cleanCameraString = camera.model + '.' + userName
-#
-#     elif camera.make != 'NONE':
-#         cleanCameraString = cleanCameraString + '.' + camera.make
-#
-#     elif camera.model != 'NONE':
-#         cleanCameraString = cleanCameraString + '.' + camera.model
-#
-#     else:
-#         # print 'camera make not was not an option...'
-#         # camera.printInfo()
-#         cleanCameraString = 'UNKNOWNCAMERA'
-#
-#
-#     # remove anly leading '.'
-#     while cleanCameraString[0] == '.':
-#         cleanCameraString = cleanCameraString[1:]
-#
-#
-#     return cleanCameraString
+def cameraLabelCleaner(camera, userName):
 
-# # builds a dictionary of all unique camera objects found, and a file sample to match
-# def getUniqueCameras(mediaFile):
-#     # originalFilePath = str(mediaFile).split("'")[1]
-#     # when a single file is passed, the file name needs to be trimmed
-#     try:
-#         originalFilePath = str(mediaFile).split("'")[1]
-#     # when a file is passed as part of a directory, it does not need to be trimmed
-#     except:
-#         originalFilePath = mediaFile
-#
-#     # print ">>> getting camera info for '%s'" % originalFilePath
-#     extension = str(originalFilePath.split('.')[-1])
-#
-#     # ignore dot files i.e. '.DS_Store'
-#     if originalFilePath.split('.')[0].endswith('/'):
-#         # print 'ignoring %s' % originalFilePath
-#         return 'IGNORE'
-#
-#     # spacer()
-#     exifTagsDict = JSONToDict(pyexifinfo.get_json(originalFilePath))
-#
-#     # spacer()
-#     # cameraInfo = getCameraInformation(exifTagsDict)
-#     cameraInfo = getCameraInformation(exifTagsDict, cameraMake, cameraModel)
-#     # cameraInfo.printInfo()
-#
-#     return cameraInfo
+    cleanCameraString = ''
+
+    # special cases for known cameras
+    # adjustments for Apple cameras, (iPhones, iPads, etc)
+    if camera.make.upper() == 'APPLE':
+        cleanCameraString = camera.make + '.' + camera.model + '.' + userName
+
+    # adjustments for Canon cameras
+    elif camera.make.upper() == 'CANON':
+            # left pad all canon serial numbers with zeros to be 12 digits long
+            if camera.serial == 'NONE':
+                tempSerialNumber = ''
+            else:
+                tempSerialNumber = camera.serial
+
+            while len(tempSerialNumber) < 13:
+                tempSerialNumber = '0' + tempSerialNumber
+
+            cleanCameraString = camera.model + '.' + userName + '.' + tempSerialNumber
+
+        # adjustments for Kodak cameras
+    elif camera.make.upper() == 'EASTMAN KODAK COMPANY':
+            cleanCameraString = camera.model
+
+        # adjustments for GoPro cameras
+    elif camera.make.upper() == 'GOPRO':
+            cleanCameraString = camera.make + '.' + camera.model + '.' + userName
+
+        # adjustments for Sony cameras
+    elif camera.make.upper() == 'SONY':
+            # sony camera models tend to have '-' in them, replace with '.'
+            tempModel = camera.model
+            tempModel = tempModel.replace('-', '.')
+
+            cleanCameraString = camera.make + '.' + tempModel + '.' + userName
+
+        # adjustments for Nikon cameras
+    elif camera.make.upper() == 'NIKON CORPORATION':
+            cleanCameraString = camera.model + '.' + userName
+
+    elif camera.make != 'NONE':
+        cleanCameraString = cleanCameraString + '.' + camera.make
+
+    elif camera.model != 'NONE':
+        cleanCameraString = cleanCameraString + '.' + camera.model
+
+    else:
+        # print 'camera make not was not an option...'
+        # camera.printInfo()
+        cleanCameraString = 'UNKNOWNCAMERA'
+
+
+    # remove anly leading '.'
+    while cleanCameraString[0] == '.':
+        cleanCameraString = cleanCameraString[1:]
+
+
+    return cleanCameraString
 
 # sorts out camera information and returns a camera object
 def getCameraObject(exifData):
@@ -640,12 +576,15 @@ def prettyPrintTags(exifInfo):
     return True
 
 # print dateTime tags
-def prettyPrintDateTimeTags(exifDict):
-    dateTimeTagsDict = []
+def prettyPrintDateTimeTags(exifInfo):
+    dateTimeTagsDict = {}
+    exifDict = JSONToDict(pyexifinfo.get_json(exifInfo))
 
     # select only dateTime tags
     sortedDict = sorted(exifDict.iteritems())
-    for tag, entry in sortedDict:
+    # for tag, entry in sortedDict:
+    for tag, entry in sorted(exifDict.iteritems()):
+        # print tag.lower()
         if 'date' in tag.lower():
             dateTimeTagsDict[tag] = entry
 
@@ -670,46 +609,9 @@ def prettyPrintDict(dictionary):
 
     return True
 
-
-#------------------------------------------------------------------------------
-#		file processing functions
-#------------------------------------------------------------------------------
-
-# # main processing of media file, gets exif data,
-# # sets up destination directory and filename, copies file
-# def processMediaFile(inputFile, destinationDir, creator, event):
-#
-#     startTime = datetime.now()
-#
-#     print ">>> processing '%s'" % inputFile
-#     logging.info(">>> processing '%s'", inputFile)
-#
-#     # create a media file object for the input file
-#     try:
-#         mediaFileObject = getMediaFileObject(inputFile, creator)
-#
-#         # make Corrected File Path
-#         correctedFilePath = getCorrectedFilePath(destinationDir, mediaFileObject, event)
-#
-#         # copy file, returns destinationDirectory and destinationFile
-#         destinationFile = makeCopy(inputFile, correctedFilePath[0], correctedFilePath[1])
-#
-#         print 'Processed file in %s' % str(datetime.now() - startTime)
-#         logging.info('Processed file in %s', str(datetime.now() - startTime))
-#
-#     except:
-#         print '\t>>> could not create a MediaFileObject, skipping %s' % inputFile
-#         logging.warning('\t>>> could not create a MediaFileObject, skipping %s', inputFile)
-
-
 #------------------------------------------------------------------------------
 #		file backup functions
 #------------------------------------------------------------------------------
-
-
-
-
-
 
 # creates a backup of files if and only if they do not already exist in the destinationDir structure
 def backupMediaFile(sourceDir, inputFile, destinationDir):

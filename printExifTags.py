@@ -1,11 +1,19 @@
 #!/usr/bin/end python
 
 #------------------------------------------------------------------------------
-#		Sample Usage
-#------------------------------------------------------------------------------
+#		Description
+#       Used to print out exif tags from a passed directory of images or a
+#       single image file.
 #
-#   > python printExifTags.py -d ~/Desktop/testPhotos
-#   > python printExifTags.py -f ~/Desktop/testPhotos/samplePhoto.jpg
+#       Writes a log file to a 'logs' directory under the current working
+#       directory, will create one if it is not already present
+#
+#------------------------------------------------------------------------------
+#		Sample Usage
+#   >   python printExifTags.py -s /Volumes/EOS_DIGITAL/
+#   >   python printExifTags.py -s ~/Desktop/sampleImages/image.0001.CR2
+#
+#------------------------------------------------------------------------------
 #
 #------------------------------------------------------------------------------
 
@@ -27,18 +35,16 @@ def main():
     parser = argparse.ArgumentParser(description='Output EXIF data of a given media file or files in a directory')
 
     # passing a single file
-    parser.add_argument('-f', '--mediaFile', dest='mediaFile',
-                        required=False,
-                        help='pass a single file to process',
-                        metavar='MEDIA_FILE',
-                        type=lambda x: utils.openMediaFile(parser, x))
+    parser.add_argument('-s', '--mediaSource', dest='mediaSource',
+                        required=True,
+                        help='Pass a directory of files or a single file to print its EXIF tags',
+                        metavar='MEDIA_SOURCE')
 
-    # passing a directory (with or without sub directories) of files
-    parser.add_argument('-d', '--mediaDirectory', dest='mediaDirectory',
+    parser.add_argument('-date', '--dateOnly',
+                        action='store_true', default = False,
                         required=False,
-                        help='pass a directory of files to process, WARNING: RECURSIVE',
-                        metavar='MEDIA_DIRECTORY',
-                        type=lambda x: utils.openMediaDirectory(parser, x))
+                        help='if passed, script will only print out the dateTime tags')
+
 
     args = vars(parser.parse_args())
 
@@ -56,110 +62,86 @@ def main():
     utils.prettyPrintDict(args)
     utils.spacer()
 
-    startTime = datetime.now()
     fileCount = 0
 
     # attempt to process a passed file
-    if args['mediaFile']:
+    # if args['mediaFile']:
+    if os.path.isfile(args['mediaSource']):
 
         try:
-            fileCount = 1
-            utils.prettyPrintTags(args['mediaFile'])
+
+            if args['dateOnly']:
+                print "printing Date EXIF tags for '%s'\n" % args['mediaSource']
+                logging.info("printing Date EXIF tags for '%s'\n", args['mediaSource'])
+
+                utils.prettyPrintDateTimeTags(args['mediaSource'])
+            else:
+                print "printing EXIF tags for '%s'\n" % args['mediaSource']
+                logging.info("printing EXIF tags for '%s'\n", args['mediaSource'])
+
+                utils.prettyPrintTags(args['mediaSource'])
         except:
-            print '>>> unable to process %s' % args['mediaFile']
-            logging.info('>>> unable to process %s', args['mediaFile'])
-
-
-        logFile_destinationDir = args['mediaFile'][:args['mediaFile'].rfind('/')+1]
-
+            print '>>> unable to process %s' % args['mediaSource']
+            logging.info('>>> unable to process %s', args['mediaSource'])
 
     # attempts to process a directory of files
-    elif args['mediaDirectory']:
+    elif os.path.isdir(args['mediaSource']):
 
         # process a directory of files
-        filesToProcess = utils.getDirectoryContents(args['mediaDirectory'])
+        filesToProcess = utils.getDirectoryContents(args['mediaSource'])
         fileProcessCounter = 1
         fileCount = len(filesToProcess)
-
-        elapsedTimeList = []
 
         for file in filesToProcess:
             print '\n%s of %s' % (fileProcessCounter, len(filesToProcess))
             logging.info('\n%s of %s', fileProcessCounter, len(filesToProcess))
-
-            startTime = datetime.now()
+            print "printing EXIF tags for '%s'\n" % file
+            logging.info("printing EXIF tags for '%s'\n", file)
 
             try:
-                utils.prettyPrintTags(file)
+                if args['dateOnly']:
+                    print "printing Date EXIF tags for '%s'\n" % args['mediaSource']
+                    logging.info("printing Date EXIF tags for '%s'\n", file)
+                    utils.prettyPrintDateTimeTags(file)
+                else:
+                    print "printing EXIF tags for '%s'\n" % file
+                    logging.info("printing EXIF tags for '%s'\n", file)
+                    utils.prettyPrintTags(file)
 
             except:
                 print '\tskipping %s' % file
                 logging.info('\tskipping %s', file)
 
-            endTime = datetime.now()
-
-            elapsedTime = endTime - startTime
-
-            elapsedTimeList.append(elapsedTime)
-
-            # use time of first file for average of first
-            if fileProcessCounter == 1:
-
-                # calculate average file process time
-                totalTime = 0
-                for item in elapsedTimeList:
-                    timeInSeconds = item.total_seconds()
-                    totalTime = totalTime + timeInSeconds
-
-                averageTime = totalTime / float(fileProcessCounter)
-
-            # every 10 files, get the average elapsed time per file
-            elif fileProcessCounter % 10 == 0:
-
-                # calculate average file process time
-                totalTime = 0
-                for item in elapsedTimeList:
-                    timeInSeconds = item.total_seconds()
-                    totalTime = totalTime + timeInSeconds
-
-                averageTime = totalTime / float(fileProcessCounter)
-
-            logging.info('Averaging %s per file', str(timedelta(seconds=averageTime)))
-
-            filesRemaining = fileCount - fileProcessCounter
-            estimatedTimeRemaining = float(filesRemaining) * averageTime
-
-            print 'Estimated Time Remaining:\t %s' % str(timedelta(seconds=estimatedTimeRemaining))
-            logging.info('Estimated Time Remaining:\t %s', str(timedelta(seconds=estimatedTimeRemaining)))
-
+            utils.spacer()
             fileProcessCounter += 1
 
-        logFile_destinationDir = args['mediaDirectory'][:args['mediaDirectory'].rfind('/')+1]
+    # utils.spacer()
 
-    utils.spacer()
-
-    #---------------------------------------------------------------------------
-    #   Move logging file
-    #---------------------------------------------------------------------------
-
-    # clean destinationDir to not include tail slashes, if they exist
-    logFile_destinationDir = logFile_destinationDir + 'logs/'
-
-    # check if destination directory exists, if not create it
-    if not os.path.exists(logFile_destinationDir):
-        os.makedirs(logFile_destinationDir)
-
-    logFileDestination = logFile_destinationDir + logFileName
-    print logFileDestination
-    shutil.move(logFileName, logFileDestination)
-
-    print 'Logfile located at \'%s\'' % logFileDestination
-
+    #   Say Goodbye!
     utils.spacer()
     print 'ALL DONE!'
+    logging.info('ALL DONE!')
     utils.bigSpacer()
+
+    #   Move log file to destination directory
+    currentDirectory = os.getcwd() + '/'
+    logFilePath = currentDirectory + logFileName
+    logFileDestinationDir = os.getcwd() + '/logs/'
+
+    #   Check if destination directory exists, if not create it
+    if not os.path.exists(logFileDestinationDir):
+        os.makedirs(logFileDestinationDir)
+
+    logFileDestination = logFileDestinationDir  + logFileName
+    shutil.move(logFilePath, logFileDestination)
 
 
 
 if __name__ == '__main__':
     main()
+
+
+
+
+
+#EOF
