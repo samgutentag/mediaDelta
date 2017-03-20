@@ -8,6 +8,7 @@ import shutil
 from datetime import datetime
 import logging
 
+
 # special stuff to handle known non ascii cahracters, blame Sony! (not really)
 import sys  # import sys package, if not already imported
 reload(sys)
@@ -78,8 +79,50 @@ class MediaFileObject:
 
 
 #------------------------------------------------------------------------------
-#		functions
+#       pretty printer functions
 #------------------------------------------------------------------------------
+
+# print exif tags, skips encoding tags
+def prettyPrintTags(exifInfo):
+
+    exifDict = JSONToDict(pyexifinfo.get_json(exifInfo))
+    prettyPrintDict(exifDict)
+
+    return True
+
+# print dateTime tags
+def prettyPrintDateTimeTags(exifInfo):
+    dateTimeTagsDict = {}
+    exifDict = JSONToDict(pyexifinfo.get_json(exifInfo))
+
+    # select only dateTime tags
+    sortedDict = sorted(exifDict.iteritems())
+    # for tag, entry in sortedDict:
+    for tag, entry in sorted(exifDict.iteritems()):
+        # print tag.lower()
+        if 'date' in tag.lower():
+            dateTimeTagsDict[tag] = entry
+
+    prettyPrintDict(dateTimeTagsDict)
+
+    return True
+
+# pretty print a dictionary in key value pairs, well spaced
+def prettyPrintDict(inpitDictionary):
+    longestKey = 0
+
+    for key in inpitDictionary:
+        if len(key) > longestKey:
+            longestKey = len(key)
+
+    sortedDict = sorted(inpitDictionary.iteritems())
+    for key, value in sortedDict:
+        spacesNeeded = longestKey - len(key) + 4
+        spaces = ' ' * spacesNeeded
+        print '%s%s%s' % (key, spaces, value)
+        logging.info('%s%s%s', key, spaces, value)
+
+    return True
 
 # uniform spacers
 def spacer():
@@ -90,7 +133,6 @@ def spacer():
     logging.info('\n')
     logging.info('#' + '-'*79)
     logging.info('\n')
-
 def bigSpacer():
     print '\n'
     print '#' + '!'*79
@@ -102,39 +144,12 @@ def bigSpacer():
     logging.info('#' + '!'*79)
     logging.info('\n')
 
-# checks that a given file exists, and opens it
-def openMediaFile(parser, arg):
-    if not os.path.exists(arg):
-        parser.error('The file \'%s\' does not exist' % arg)
-        logging.warning('The file \'%s\' does not exist', arg)
-    else:
-        return arg
-
-# checks that a given directory exists
-def openMediaDirectory(parser, arg):
-    if not os.path.exists(arg):
-        parser.error('The directory \'%s\' does not exist' % arg)
-        logging.warning('The directory \'%s\' does not exist', arg)
-    else:
-        return arg
-
-# convert json information gathered by exif tools into a dictionary
-def JSONToDict(data):
-    if len(data) < 1:
-        print '>>> this file has no exif data'
-        logging.warning('>>> this file has no exif data')
-        return
-    else:
-        # return a sorted dictionary of all exif tag, value pairs
-        dataDict = dict(sorted(data[0].iteritems()))
-        return dataDict
-
 
 #------------------------------------------------------------------------------
 #		file relocation functions
 #------------------------------------------------------------------------------
 
-# gets contents of a directory, returns directory contents as a list
+# returns directory contents as a list
 # prunes only valid media file formats
 def getDirectoryContents(dir):
 
@@ -152,7 +167,7 @@ def getDirectoryContents(dir):
 
     return directory_contents
 
-# check if file is a known image or video format, returns [bool, string] tuple
+# check if file is a known image or video format, returns boolean
 def isValidMediaFileType(file):
 
     # get extension of file
@@ -169,6 +184,7 @@ def isValidMediaFileType(file):
     else:
         return False
 
+# check if a file is a known ignorable file type, returns boolean
 def isIgnorableSystemFile(file):
     # get extension of file
     extensionToCheck = file.split('.')[-1].upper()
@@ -181,27 +197,23 @@ def isIgnorableSystemFile(file):
     else:
         return False
 
-# read exifTags for media file type info
-# returns a list of mediaType, fileType, fileExtensions
-# example (video, MOV, MOV) -> movie file
-# example (image, JPEG, JPG) -> image file
-def getMediaFileType(exifData):
+# convert json information gathered by exif tools into a dictionary
+# if file has no EXIF data, an empty dictionary is returned
+def JSONToDict(data):
+    if len(data) < 1:
+        print '>>> this file has no exif data'
+        logging.warning('>>> this file has no exif data')
+        dataDict = {}
+    else:
+        # return a sorted dictionary of all exif tag, value pairs
+        dataDict = dict(sorted(data[0].iteritems()))
 
-    # get media type from 'File:MIMEType' value, (video or image)
-    mediaType = exifData['File:MIMEType'].split('/')[0].upper()
-
-    # get file type from 'File:FileType' value
-    fileType = exifData['File:FileType'].upper()
-
-    # get file extension from 'File:FileTypeExtension' value
-    fileExtension = exifData['File:FileTypeExtension'].upper()
-
-    return (mediaType, fileType, fileExtension)
+    return dataDict
 
 # copy files and preserve metadata
 # handles copies by incrementing a copy counter
-# will overwrite when copies exceed 9,999
-# returns (destinationDirectoryName, destinationFileName)
+# will overwrite when copies exceed 9999
+# returns absolute file path file was copied to
 def safeCopy(sourceFile, destinationDirectoryName, destinationFileName):
 
     destinationAbsoluteFilePath = destinationDirectoryName + destinationFileName
@@ -424,7 +436,7 @@ def getDateTimeObject(exifData):
 #		CameraObject Functions
 #------------------------------------------------------------------------------
 
-# # clean up camera information for file naming
+# clean up camera information for file naming
 def cameraLabelCleaner(camera, userName):
 
     cleanCameraString = ''
@@ -563,51 +575,23 @@ def getMediaFileObject(file, creatorName):
         return False
 
 
-#------------------------------------------------------------------------------
-#       pretty printer functions
-#------------------------------------------------------------------------------
+# read exifTags for media file type info
+# returns a list of mediaType, fileType, fileExtensions
+# example (video, MOV, MOV) -> movie file
+# example (image, JPEG, JPG) -> image file
+def getMediaFileType(exifData):
 
-# print exif tags, skips encoding tags
-def prettyPrintTags(exifInfo):
+    # get media type from 'File:MIMEType' value, (video or image)
+    mediaType = exifData['File:MIMEType'].split('/')[0].upper()
 
-    exifDict = JSONToDict(pyexifinfo.get_json(exifInfo))
-    prettyPrintDict(exifDict)
+    # get file type from 'File:FileType' value
+    fileType = exifData['File:FileType'].upper()
 
-    return True
+    # get file extension from 'File:FileTypeExtension' value
+    fileExtension = exifData['File:FileTypeExtension'].upper()
 
-# print dateTime tags
-def prettyPrintDateTimeTags(exifInfo):
-    dateTimeTagsDict = {}
-    exifDict = JSONToDict(pyexifinfo.get_json(exifInfo))
+    return (mediaType, fileType, fileExtension)
 
-    # select only dateTime tags
-    sortedDict = sorted(exifDict.iteritems())
-    # for tag, entry in sortedDict:
-    for tag, entry in sorted(exifDict.iteritems()):
-        # print tag.lower()
-        if 'date' in tag.lower():
-            dateTimeTagsDict[tag] = entry
-
-    prettyPrintDict(dateTimeTagsDict)
-
-    return True
-
-# pretty print a dictionary in key value pairs, well spaced
-def prettyPrintDict(dictionary):
-    longestKey = 0
-
-    for key in dictionary:
-        if len(key) > longestKey:
-            longestKey = len(key)
-
-    sortedDict = sorted(dictionary.iteritems())
-    for key, value in sortedDict:
-        spacesNeeded = longestKey - len(key) + 4
-        spaces = ' ' * spacesNeeded
-        print '%s%s%s' % (key, spaces, value)
-        logging.info('%s%s%s', key, spaces, value)
-
-    return True
 
 #------------------------------------------------------------------------------
 #		file backup functions

@@ -95,8 +95,6 @@ def main():
         for file in filesToProcess:
             print '\n%s of %s' % (fileProcessCounter, len(filesToProcess))
             logging.info('\n%s of %s', fileProcessCounter, len(filesToProcess))
-            print "printing EXIF tags for '%s'\n" % file
-            logging.info("printing EXIF tags for '%s'\n", file)
 
             try:
                 if args['dateOnly']:
