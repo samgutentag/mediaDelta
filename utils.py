@@ -8,6 +8,8 @@ import shutil
 from datetime import datetime
 import logging
 
+import shlex, subprocess
+
 
 # special stuff to handle known non ascii cahracters, blame Sony! (not really)
 import sys  # import sys package, if not already imported
@@ -640,3 +642,19 @@ def backupMediaFile(sourceDir, inputFile, destinationDir):
     logging.info('\t[%s]', elapsedTime)
 
     return (backupFileAbsolutePath, elapsedTime)
+
+
+#------------------------------------------------------------------------------
+#		EXIFTools wrappers
+#------------------------------------------------------------------------------
+
+
+def setExifTag(tag, value, file):
+
+    #   construct command line function as a set of arguments
+    command = "exiftool -%s=%s %s" % (tag.lower(), value, file)
+    args = shlex.split(command)
+    print args
+
+    #   execute command line function
+    # subprocess.Popen(args)
