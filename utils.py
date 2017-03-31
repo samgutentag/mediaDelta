@@ -513,12 +513,22 @@ def getCameraObject(exifData):
         # get serial number string i.e. '192029004068'
         if 'exif:serialnumber' in key.lower():
             serialNumber = str(exifData[key])
+
         # get make string i.e. 'Canon'
+        # looks for user generate xmp exif tag if an originl from camera can not be found
         if 'exif:make' in key.lower():
             cameraMake = str(exifData[key])
+        if 'xmp:make' in key.lower():
+            cameraMake = str(exifData[key])
+
         # get model string i.e. 'Canon EOS 5D Mark III'
+        # looks for user generate xmp exif tag if an originl from camera can not be found
         if 'exif:model' in key.lower():
             cameraModel = str(exifData[key])
+        if 'xmp:model' in key.lower():
+            cameraModel = str(exifData[key])
+
+
         # get software string i.e. 'Adobe Photoshop Lightroom 6.3 (Macintosh)''
         if 'exif:software' in key.lower():
             softwareName = str(exifData[key])
@@ -658,3 +668,4 @@ def setExifTag(tag, value, file):
 
     #   execute command line function
     # subprocess.Popen(args)
+    os.system(command)
