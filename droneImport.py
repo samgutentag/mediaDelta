@@ -3,22 +3,25 @@
 #------------------------------------------------------------------------------
 #		Description
 #       Script imports media files from a user passed directory to a user
-#       specified destination.  For example, a user imports from an SD card to
-#       a portable hard drive.  Does very little to check if duplicates exists
-#       or are being made.
+#       specified destination.  This version of the importer script is designed
+#       for media that comes from a single source device or camera.  Passing
+#       tags for make and model.  In the future it will write the eif data to
+#       the copied file. For example, a user imports from an SD card to a
+#       portable hard drive.  Does very little to check if duplicates exists or
+#       are being made.
 #
 #       Output destination is formatted by getting username from the user and
 #       exif data from the media files being processed.
 #
 #       The output path is formatted as such:
-#       <destinationDir>/<camera>/<mediaType>/<YYYY><MM><DD>/
+#       <destinationDir>/<mediaType>/<camera>/<YYYY><MM><DD>/
 #
 #       The output filename is formatted as such:
 #       <user>.<camera>.<YYYY><MM><DD>.<HH><mm><SS><sss>.<counter>.<extention>
 #
 #------------------------------------------------------------------------------
 #		Sample Usage
-#   >   python importer.py -u $USER -s /Volumes/EOS_DIGITAL/ -d /Volumes/IMAGE_500/STAGING/
+#   >   python droneImporter.py -u $USER  -make DJI -model DJI.Mavic.Pro -s /Volumes/EOS_DIGITAL/ -d /Volumes/IMAGE_500/STAGING/
 #
 #------------------------------------------------------------------------------
 #
@@ -44,7 +47,7 @@ sys.setdefaultencoding('utf-8')
 #------------------------------------------------------------------------------
 
 #   formats file name and destination directory for easy sorting
-def getImportMediaFileLocation(inputFile, destinationDir, user, counter):
+def getImportMediaFileLocation(inputFile, destinationDir, user, counter, make, model):
 
     print ">>> import processing '%s'" % inputFile
     logging.info(">>> import processing '%s'", inputFile)
@@ -55,8 +58,8 @@ def getImportMediaFileLocation(inputFile, destinationDir, user, counter):
         mediaFileObject = utils.getMediaFileObject(inputFile, user)
 
         #   set mediaFileObject camera make and model for drone
-        mediaFileObject.camera.make = 'DJI'
-        mediaFileObject.camera.model = 'DJI.Mavic.Pro'
+        mediaFileObject.camera.make = make
+        mediaFileObject.camera.model = model
 
     except:
         print 'ERROR:\tcould not create mediaFileObject from \'%s\', skipping...' % inputFile
@@ -74,8 +77,8 @@ def getImportMediaFileLocation(inputFile, destinationDir, user, counter):
 
     #   format: <destinationDir>/<camera>/<mediaType>/<YYYY><MM><DD>/
     importFilePath = '%s/%s/%s/%s%s%s/' % (destinationDir,
-                                        mediaFileObject.camera.model,
                                         mediaFileObject.type,
+                                        mediaFileObject.camera.model,
                                         mediaFileObject.dateTime.year, mediaFileObject.dateTime.month, mediaFileObject.dateTime.day)
 
     return (importFilePath, importFileName)
@@ -94,10 +97,15 @@ def main():
                         help = 'tag files with the person who captured them',
                         metavar='USER_NAME')
 
-    # parser.add_argument('-drone', dest='droneName',
-    #                     required = True,
-    #                     help = 'tag files with the drone model used to capture them',
-    #                     metavar='DRONE_NAME')
+    parser.add_argument('-make', '--droneMake', dest='droneMake',
+                        required = True,
+                        help = 'pass the drone make for usage in organizing and writing exiftags',
+                        metavar='DRONE_MAKE')
+
+    parser.add_argument('-model', '--droneModel', dest='droneModel',
+                        required = True,
+                        help = 'pass the drone model for usage in organizing and writing exiftags',
+                        metavar='DRONE_MODEL')
 
     parser.add_argument('-r', '--resolution', dest='downsizeResolution',
                         required = False,
@@ -143,15 +151,15 @@ def main():
         print '\n%s of %s' % (fileProcessCounter, fileCount)
         logging.info('\n%s of %s', fileProcessCounter, fileCount)
 
-        importFileLocation = getImportMediaFileLocation(file, destDir, args['username'], fileProcessCounter)
+        importFileLocation = getImportMediaFileLocation(file, destDir, args['username'], fileProcessCounter, args['droneMake'], args['droneModel'])
 
         utils.safeCopy(file, importFileLocation[0], importFileLocation[1])
 
         importPath = importFileLocation[0] + importFileLocation[1]
 
         #   set exif data on copied file to match drone info
-        utils.setExifTag('-make', 'DJI', importPath)
-        utils.setExifTag('-model', 'DJI.Mavic.Pro', importPath)
+        utils.setExifTag('-make', args['droneMake'], importPath)
+        utils.setExifTag('-model', args['droneModel'], importPath)
 
 
         fileProcessCounter += 1

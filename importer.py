@@ -11,7 +11,7 @@
 #       exif data from the media files being processed.
 #
 #       The output path is formatted as such:
-#       <destinationDir>/<camera>/<mediaType>/<YYYY><MM><DD>/
+#       <destinationDir>/<mediaType>/<camera>/<YYYY><MM><DD>/
 #
 #       The output filename is formatted as such:
 #       <user>.<camera>.<YYYY><MM><DD>.<HH><mm><SS><sss>.<counter>.<extention>
@@ -68,8 +68,8 @@ def getImportMediaFileLocation(inputFile, destinationDir, user, counter):
 
     #   format: <destinationDir>/<camera>/<mediaType>/<YYYY><MM><DD>/
     importFilePath = '%s/%s/%s/%s%s%s/' % (destinationDir,
-                                        mediaFileObject.camera.model,
                                         mediaFileObject.type,
+                                        mediaFileObject.camera.model,
                                         mediaFileObject.dateTime.year, mediaFileObject.dateTime.month, mediaFileObject.dateTime.day)
 
     return (importFilePath, importFileName)

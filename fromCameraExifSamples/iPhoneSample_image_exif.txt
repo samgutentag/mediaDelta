@@ -1,0 +1,172 @@
+
+
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+Arguments...
+dateOnly       False
+mediaSource    /Users/samgutentag/Desktop/sampleMedia/iPhoneSampleMedia/iPhoneSample_image.JPG
+
+
+#-------------------------------------------------------------------------------
+
+
+printing EXIF tags for '/Users/samgutentag/Desktop/sampleMedia/iPhoneSampleMedia/iPhoneSample_image.JPG'
+
+Composite:Aperture                       2.8
+Composite:CircleOfConfusion              0.003 mm
+Composite:FOV                            35.1 deg
+Composite:FocalLength35efl               6.6 mm (35 mm equivalent: 57.0 mm)
+Composite:GPSAltitude                    103.2 m Above Sea Level
+Composite:GPSDateTime                    2017:01:02 22:11:08Z
+Composite:GPSLatitude                    37 deg 51' 5.43" N
+Composite:GPSLongitude                   122 deg 33' 36.10" W
+Composite:GPSPosition                    37 deg 51' 5.43" N, 122 deg 33' 36.10" W
+Composite:HyperfocalDistance             4.47 m
+Composite:ImageSize                      4032x3024
+Composite:LightValue                     15.0
+Composite:Megapixels                     12.2
+Composite:RunTimeSincePowerUp            4 days 0:41:07
+Composite:ScaleFactor35efl               8.6
+Composite:ShutterSpeed                   1/812
+Composite:SubSecCreateDate               2017:01:02 14:11:08.900
+Composite:SubSecDateTimeOriginal         2017:01:02 14:11:08.900
+EXIF:ApertureValue                       2.8
+EXIF:BrightnessValue                     10.44433873
+EXIF:ColorSpace                          Uncalibrated
+EXIF:ComponentsConfiguration             Y, Cb, Cr, -
+EXIF:Compression                         JPEG (old-style)
+EXIF:CreateDate                          2017:01:02 14:11:08
+EXIF:CustomRendered                      Unknown (8)
+EXIF:DateTimeOriginal                    2017:01:02 14:11:08
+EXIF:ExifImageHeight                     3024
+EXIF:ExifImageWidth                      4032
+EXIF:ExifVersion                         0221
+EXIF:ExposureCompensation                0
+EXIF:ExposureMode                        Auto
+EXIF:ExposureProgram                     Program AE
+EXIF:ExposureTime                        1/812
+EXIF:FNumber                             2.8
+EXIF:Flash                               Off, Did not fire
+EXIF:FlashpixVersion                     0100
+EXIF:FocalLength                         6.6 mm
+EXIF:FocalLengthIn35mmFormat             57 mm
+EXIF:GPSAltitude                         103.2798165 m
+EXIF:GPSAltitudeRef                      Above Sea Level
+EXIF:GPSDateStamp                        2017:01:02
+EXIF:GPSDestBearing                      181.0803571
+EXIF:GPSDestBearingRef                   True North
+EXIF:GPSHPositioningError                5 m
+EXIF:GPSImgDirection                     181.0803571
+EXIF:GPSImgDirectionRef                  True North
+EXIF:GPSLatitude                         37 deg 51' 5.43"
+EXIF:GPSLatitudeRef                      North
+EXIF:GPSLongitude                        122 deg 33' 36.10"
+EXIF:GPSLongitudeRef                     West
+EXIF:GPSSpeed                            0
+EXIF:GPSSpeedRef                         km/h
+EXIF:GPSTimeStamp                        22:11:08
+EXIF:ISO                                 20
+EXIF:LensInfo                            3.99-6.6mm f/1.8-2.8
+EXIF:LensMake                            Apple
+EXIF:LensModel                           iPhone 7 Plus back dual camera 6.6mm f/2.8
+EXIF:Make                                Apple
+EXIF:MeteringMode                        Spot
+EXIF:Model                               iPhone 7 Plus
+EXIF:ModifyDate                          2017:01:02 14:11:08
+EXIF:Orientation                         Rotate 90 CW
+EXIF:ResolutionUnit                      inches
+EXIF:SceneCaptureType                    Standard
+EXIF:SceneType                           Directly photographed
+EXIF:SensingMethod                       One-chip color area
+EXIF:ShutterSpeedValue                   1/812
+EXIF:Software                            10.2
+EXIF:SubSecTimeDigitized                 900
+EXIF:SubSecTimeOriginal                  900
+EXIF:SubjectArea                         2148 2125 749 756
+EXIF:ThumbnailImage                      (Binary data 6160 bytes, use -b option to extract)
+EXIF:ThumbnailLength                     6160
+EXIF:ThumbnailOffset                     1518
+EXIF:WhiteBalance                        Auto
+EXIF:XResolution                         72
+EXIF:YCbCrPositioning                    Centered
+EXIF:YResolution                         72
+ExifTool:ExifToolVersion                 10.4
+File:BitsPerSample                       8
+File:ColorComponents                     3
+File:Directory                           /Users/samgutentag/Desktop/sampleMedia/iPhoneSampleMedia
+File:EncodingProcess                     Baseline DCT, Huffman coding
+File:ExifByteOrder                       Big-endian (Motorola, MM)
+File:FileAccessDate                      2017:03:31 07:26:14-07:00
+File:FileInodeChangeDate                 2017:03:31 06:59:11-07:00
+File:FileModifyDate                      2017:01:02 14:11:08-08:00
+File:FileName                            iPhoneSample_image.JPG
+File:FilePermissions                     rw-------
+File:FileSize                            1050 kB
+File:FileType                            JPEG
+File:FileTypeExtension                   jpg
+File:ImageHeight                         3024
+File:ImageWidth                          4032
+File:MIMEType                            image/jpeg
+File:YCbCrSubSampling                    YCbCr4:2:0 (2 2)
+ICC_Profile:BlueMatrixColumn             0.1571 0.06657 0.78407
+ICC_Profile:BlueTRC                      (Binary data 32 bytes, use -b option to extract)
+ICC_Profile:CMMFlags                     Not Embedded, Independent
+ICC_Profile:ChromaticAdaptation          1.04788 0.02292 -0.0502 0.02959 0.99048 -0.01706 -0.00923 0.01508 0.75168
+ICC_Profile:ColorSpaceData               RGB 
+ICC_Profile:ConnectionSpaceIlluminant    0.9642 1 0.82491
+ICC_Profile:DeviceAttributes             Reflective, Glossy, Positive, Color
+ICC_Profile:DeviceManufacturer           APPL
+ICC_Profile:DeviceModel                  
+ICC_Profile:GreenMatrixColumn            0.29198 0.69225 0.04189
+ICC_Profile:GreenTRC                     (Binary data 32 bytes, use -b option to extract)
+ICC_Profile:MediaWhitePoint              0.95045 1 1.08905
+ICC_Profile:PrimaryPlatform              Apple Computer Inc.
+ICC_Profile:ProfileCMMType               appl
+ICC_Profile:ProfileClass                 Display Device Profile
+ICC_Profile:ProfileConnectionSpace       XYZ 
+ICC_Profile:ProfileCopyright             Copyright Apple Inc., 2015
+ICC_Profile:ProfileCreator               appl
+ICC_Profile:ProfileDateTime              2015:10:14 13:08:57
+ICC_Profile:ProfileDescription           Display P3
+ICC_Profile:ProfileFileSignature         acsp
+ICC_Profile:ProfileID                    e5bb0e9867bd46cd4bbe446ebd1b7598
+ICC_Profile:ProfileVersion               4.0.0
+ICC_Profile:RedMatrixColumn              0.51512 0.2412 -0.00105
+ICC_Profile:RedTRC                       (Binary data 32 bytes, use -b option to extract)
+ICC_Profile:RenderingIntent              Perceptual
+MakerNotes:AccelerationVector            0.0122217969 -1.001796407 0.06353619607
+MakerNotes:ImageUniqueID                 BABE945F-A3C8-4EBE-A31B-DC46E247B679
+MakerNotes:RunTimeEpoch                  0
+MakerNotes:RunTimeFlags                  Valid
+MakerNotes:RunTimeScale                  1000000000
+MakerNotes:RunTimeValue                  348067093192125
+SourceFile                               /Users/samgutentag/Desktop/sampleMedia/iPhoneSampleMedia/iPhoneSample_image.JPG
+XMP:RegionAppliedToDimensionsH           3024
+XMP:RegionAppliedToDimensionsUnit        pixel
+XMP:RegionAppliedToDimensionsW           4032
+XMP:RegionAreaH                          0.327
+XMP:RegionAreaUnit                       normalized
+XMP:RegionAreaW                          0.245
+XMP:RegionAreaX                          0.5745
+XMP:RegionAreaY                          0.6545
+XMP:RegionExtensionsAngleInfoRoll        270
+XMP:RegionExtensionsAngleInfoYaw         315
+XMP:RegionExtensionsConfidenceLevel      1000
+XMP:RegionExtensionsFaceID               1
+XMP:RegionExtensionsTimeStamp            8353609236751
+XMP:RegionType                           Face
+XMP:XMPToolkit                           XMP Core 5.4.0
+
+
+#-------------------------------------------------------------------------------
+
+
+ALL DONE!
+
+
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+

@@ -1,0 +1,164 @@
+
+
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+Arguments...
+dateOnly       False
+mediaSource    /Users/samgutentag/Desktop/sampleMedia/mavicSampleMedia/mavicSample_image.jpg
+
+
+#-------------------------------------------------------------------------------
+
+
+printing EXIF tags for '/Users/samgutentag/Desktop/sampleMedia/mavicSampleMedia/mavicSample_image.jpg'
+
+Composite:Aperture                2.2
+Composite:CircleOfConfusion       0.005 mm
+Composite:FOV                     69.4 deg
+Composite:FocalLength35efl        4.7 mm (35 mm equivalent: 26.0 mm)
+Composite:GPSAltitude             25.1 m Below Sea Level
+Composite:GPSLatitude             37 deg 48' 12.25" N
+Composite:GPSLongitude            122 deg 25' 31.52" W
+Composite:GPSPosition             37 deg 48' 12.25" N, 122 deg 25' 31.52" W
+Composite:HyperfocalDistance      1.86 m
+Composite:ImageSize               4000x3000
+Composite:LightValue              5.2
+Composite:Megapixels              12.0
+Composite:ScaleFactor35efl        5.5
+Composite:ShutterSpeed            1/13
+EXIF:ApertureValue                2.2
+EXIF:ColorSpace                   sRGB
+EXIF:ComponentsConfiguration      -, Cr, Cb, Y
+EXIF:CompressedBitsPerPixel       4.693576667
+EXIF:Compression                  JPEG (old-style)
+EXIF:Contrast                     Normal
+EXIF:CreateDate                   2017:03:26 14:42:50
+EXIF:CustomRendered               Normal
+EXIF:DateTimeOriginal             2017:03:26 14:42:50
+EXIF:DeviceSettingDescription     (Binary data 4 bytes, use -b option to extract)
+EXIF:DigitalZoomRatio             undef
+EXIF:ExifImageHeight              3000
+EXIF:ExifImageWidth               4000
+EXIF:ExifVersion                  0230
+EXIF:ExposureCompensation         -0.344
+EXIF:ExposureIndex                undef
+EXIF:ExposureMode                 Auto
+EXIF:ExposureProgram              Program AE
+EXIF:ExposureTime                 1/13
+EXIF:FNumber                      2.2
+EXIF:FileSource                   Digital Camera
+EXIF:Flash                        No flash function
+EXIF:FlashpixVersion              0010
+EXIF:FocalLength                  4.7 mm
+EXIF:FocalLengthIn35mmFormat      26 mm
+EXIF:GPSAltitude                  25.183 m
+EXIF:GPSAltitudeRef               Below Sea Level
+EXIF:GPSLatitude                  37 deg 48' 12.25"
+EXIF:GPSLatitudeRef               North
+EXIF:GPSLongitude                 122 deg 25' 31.52"
+EXIF:GPSLongitudeRef              West
+EXIF:GPSVersionID                 2.3.0.0
+EXIF:GainControl                  None
+EXIF:ISO                          170
+EXIF:ImageDescription             DCIM\100MEDIA\DJI_0001.JPG
+EXIF:InteropIndex                 R98 - DCF basic file (sRGB)
+EXIF:InteropVersion               0100
+EXIF:LightSource                  Tungsten (Incandescent)
+EXIF:Make                         DJI
+EXIF:MaxApertureValue             2.2
+EXIF:MeteringMode                 Center-weighted average
+EXIF:Model                        FC220
+EXIF:ModifyDate                   2017:03:26 14:42:51
+EXIF:Orientation                  Horizontal (normal)
+EXIF:ResolutionUnit               inches
+EXIF:Saturation                   Normal
+EXIF:SceneCaptureType             Standard
+EXIF:SceneType                    Directly photographed
+EXIF:Sharpness                    Normal
+EXIF:ShutterSpeedValue            1/12
+EXIF:Software                     v02.05.434
+EXIF:SubjectDistance              0 m
+EXIF:SubjectDistanceRange         Unknown
+EXIF:ThumbnailImage               (Binary data 7860 bytes, use -b option to extract)
+EXIF:ThumbnailLength              7860
+EXIF:ThumbnailOffset              41984
+EXIF:WhiteBalance                 Manual
+EXIF:XPComment                    0.9.142
+EXIF:XPKeywords                   N
+EXIF:XResolution                  72
+EXIF:YCbCrPositioning             Centered
+EXIF:YResolution                  72
+ExifTool:ExifToolVersion          10.4
+ExifTool:Warning                  [minor] Possibly incorrect maker notes offsets (fix by 1415?)
+File:BitsPerSample                8
+File:ColorComponents              3
+File:Directory                    /Users/samgutentag/Desktop/sampleMedia/mavicSampleMedia
+File:EncodingProcess              Baseline DCT, Huffman coding
+File:ExifByteOrder                Little-endian (Intel, II)
+File:FileAccessDate               2017:03:31 07:22:30-07:00
+File:FileInodeChangeDate          2017:03:31 07:00:20-07:00
+File:FileModifyDate               2017:03:26 14:42:52-07:00
+File:FileName                     mavicSample_image.jpg
+File:FilePermissions              rwxrwxrwx
+File:FileSize                     7.0 MB
+File:FileType                     JPEG
+File:FileTypeExtension            jpg
+File:ImageHeight                  3000
+File:ImageWidth                   4000
+File:MIMEType                     image/jpeg
+File:YCbCrSubSampling             YCbCr4:2:2 (2 1)
+MPF:DependentImage1EntryNumber    0
+MPF:DependentImage2EntryNumber    0
+MPF:ImageUIDList                  (Binary data 66 bytes, use -b option to extract)
+MPF:MPFVersion                    0010
+MPF:MPImageFlags                  Dependent child image
+MPF:MPImageFormat                 JPEG
+MPF:MPImageLength                 233864
+MPF:MPImageStart                  7098545
+MPF:MPImageType                   Large Thumbnail (VGA equivalent)
+MPF:NumberOfImages                2
+MPF:PreviewImage                  (Binary data 233864 bytes, use -b option to extract)
+MPF:TotalFrames                   1
+MakerNotes:CameraPitch            +0.00
+MakerNotes:CameraRoll             +0.00
+MakerNotes:CameraYaw              -3.3
+MakerNotes:Make                   DJI
+MakerNotes:Pitch                  +3.00
+MakerNotes:Roll                   -0.1
+MakerNotes:SpeedX                 +0.00
+MakerNotes:SpeedY                 +0.00
+MakerNotes:SpeedZ                 +0.00
+MakerNotes:Yaw                    -3.2
+SourceFile                        /Users/samgutentag/Desktop/sampleMedia/mavicSampleMedia/mavicSample_image.jpg
+XMP:About                         DJI Meta Data
+XMP:AbsoluteAltitude              -25.18
+XMP:AlreadyApplied                False
+XMP:CreateDate                    2017:03:26
+XMP:FlightPitchDegree             +3.00
+XMP:FlightRollDegree              -0.1
+XMP:FlightYawDegree               -3.2
+XMP:Format                        image/jpg
+XMP:GimbalPitchDegree             +0.00
+XMP:GimbalRollDegree              +0.00
+XMP:GimbalYawDegree               -3.3
+XMP:HasCrop                       False
+XMP:HasSettings                   False
+XMP:Make                          DJI
+XMP:Model                         FC220
+XMP:ModifyDate                    2017:03:26
+XMP:RelativeAltitude              +0.00
+XMP:Version                       7.0
+
+
+#-------------------------------------------------------------------------------
+
+
+ALL DONE!
+
+
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
