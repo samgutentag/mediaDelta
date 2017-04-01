@@ -661,16 +661,30 @@ def backupMediaFile(sourceDir, inputFile, destinationDir):
 #   takes a list of arguments and a list of files to pass the against exiftools
 def setExifTags(argsList, fileList):
 
-    print argsList
-    print fileList
-
+    #   append all arguments to 'exiftools' command line tool
     executeArgs = ['exiftool'] + argsList
 
+    #   append all files to run arguments against
     for item in fileList:
         executeArgs.append(str(item))
 
-
+    spacer()
+    print 'Running exiftools...'
+    logging.info('Running exiftools...')
     subprocess.call(executeArgs)
+
+
+    # #   remove '_original' file that is created by exiftool
+    # for file in fileList:
+    #     tempFile = item + '_original'
+    #
+    #     spacer()
+    #     print item
+    #     print tempFile
+    #
+    #     if os.path.exists(tempFile):
+    #         os.remove(tempFile)
+    #     spacer()
 
 
 #   use handbrakeCLI on a given file

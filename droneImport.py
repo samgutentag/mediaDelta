@@ -163,9 +163,8 @@ def main():
         filesToAdjustExifData.append(importPath)
 
         #   create downrezed video file with handbrakeCLI
-        utils.handbrakeCLI(handBrakeArgs, file)
-
-
+        # handBrakeArgs = []
+        # utils.handbrakeCLI(handBrakeArgs, file)
 
         fileProcessCounter += 1
 
