@@ -104,7 +104,7 @@ def main():
 
     parser.add_argument('-model', '--droneModel', dest='droneModel',
                         required = True,
-                        help = 'pass the drone model for usage in organizing and writing exiftags',
+                        help = 'pass the drone model for usage in organizing and writing exiftags, use periods in place of spaces',
                         metavar='DRONE_MODEL')
 
     parser.add_argument('-r', '--resolution', dest='downsizeResolution',
@@ -145,6 +145,8 @@ def main():
     while destDir[-1] == '/':
         destDir = destDir[:-1]
 
+    filesToAdjustExifData = []
+
     #   Process files and import if not already imported
     for file in filesToProcess:
 
@@ -158,11 +160,23 @@ def main():
         importPath = importFileLocation[0] + importFileLocation[1]
 
         #   set exif data on copied file to match drone info
-        utils.setExifTag('-make', args['droneMake'], importPath)
-        utils.setExifTag('-model', args['droneModel'], importPath)
+        filesToAdjustExifData.append(importPath)
+
+        #   create downrezed video file with handbrakeCLI
+        utils.handbrakeCLI(handBrakeArgs, file)
+
 
 
         fileProcessCounter += 1
+
+
+    #   run command to update exif info on all the files we just imported
+    exifArg_make = '-make=%s' % args['droneMake']
+    exifArg_model = '-model=%s' % args['droneModel'].replace('.', ' ')
+
+    exifArgs = [exifArg_make, exifArg_model]
+
+    utils.setExifTags(exifArgs, filesToAdjustExifData)
 
     #   Say Goodbye!
     utils.spacer()

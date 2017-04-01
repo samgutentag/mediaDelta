@@ -7,8 +7,8 @@ import os
 import shutil
 from datetime import datetime
 import logging
+import subprocess
 
-import shlex, subprocess
 
 
 # special stuff to handle known non ascii cahracters, blame Sony! (not really)
@@ -655,17 +655,24 @@ def backupMediaFile(sourceDir, inputFile, destinationDir):
 
 
 #------------------------------------------------------------------------------
-#		EXIFTools wrappers
+#		Command Line Tool Wrappers
 #------------------------------------------------------------------------------
 
+#   takes a list of arguments and a list of files to pass the against exiftools
+def setExifTags(argsList, fileList):
 
-def setExifTag(tag, value, file):
+    print argsList
+    print fileList
 
-    #   construct command line function as a set of arguments
-    command = "exiftool -%s=%s %s" % (tag.lower(), value, file)
-    args = shlex.split(command)
-    print args
+    executeArgs = ['exiftool'] + argsList
 
-    #   execute command line function
-    # subprocess.Popen(args)
-    os.system(command)
+    for item in fileList:
+        executeArgs.append(str(item))
+
+
+    subprocess.call(executeArgs)
+
+
+#   use handbrakeCLI on a given file
+def handbrakeCLI(handBrakeArgs, file):
+    print 'using handbrakeCLI to encode video... (not really yet)'
