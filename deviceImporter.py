@@ -32,6 +32,7 @@ import utils
 import logging
 import shutil
 import os
+import clipConverter
 
 from datetime import datetime
 from datetime import timedelta
@@ -57,7 +58,7 @@ def getImportMediaFileLocation(inputFile, destinationDir, user, counter, make, m
         #   generate a mediaFileObject from the given input file
         mediaFileObject = utils.getMediaFileObject(inputFile, user)
 
-        #   set mediaFileObject camera make and model for drone
+        #   set mediaFileObject camera make and model for device
         mediaFileObject.camera.make = make
         mediaFileObject.camera.model = model
 
@@ -83,6 +84,26 @@ def getImportMediaFileLocation(inputFile, destinationDir, user, counter, make, m
 
     return (importFilePath, importFileName)
 
+def resizeClips(clipList, width, height):
+
+
+
+    for clip in clipList:
+        #   file path for clip
+        clipPath = clip[0] + clip[1]
+        print '><><><><><><><><><><><><><' + clipPath
+
+        #   create downrezed video file
+        downRez_fileName = clip[0] + 'downRez_%sx%s/' % (width, height) + clip[1]
+
+        # create downRez Directory if it does not already exist
+        if not os.path.exists(clip[0] + 'downRez_%sx%s/' % (width, height)):
+            os.makedirs(clip[0] + 'downRez_%sx%s/' % (width, height))
+
+        #   convert Clip and write it to disk
+        clipConverter.resizeClip(clipPath, downRez_fileName, width, height)
+
+
 
 #------------------------------------------------------------------------------
 #   Main Function
@@ -97,15 +118,15 @@ def main():
                         help = 'tag files with the person who captured them',
                         metavar='USER_NAME')
 
-    parser.add_argument('-make', '--droneMake', dest='droneMake',
+    parser.add_argument('-make', '--deviceMake', dest='deviceMake',
                         required = True,
-                        help = 'pass the drone make for usage in organizing and writing exiftags',
-                        metavar='DRONE_MAKE')
+                        help = 'pass the device make for usage in organizing and writing exiftags',
+                        metavar='DREVICEMAKE')
 
-    parser.add_argument('-model', '--droneModel', dest='droneModel',
+    parser.add_argument('-model', '--deviceModel', dest='deviceModel',
                         required = True,
-                        help = 'pass the drone model for usage in organizing and writing exiftags, use periods in place of spaces',
-                        metavar='DRONE_MODEL')
+                        help = 'pass the device model for usage in organizing and writing exiftags, use periods in place of spaces',
+                        metavar='DEVICE_MODEL')
 
     parser.add_argument('-r', '--resolution', dest='downsizeResolution',
                         required = False,
@@ -146,6 +167,7 @@ def main():
         destDir = destDir[:-1]
 
     filesToAdjustExifData = []
+    clipList = []
 
     #   Process files and import if not already imported
     for file in filesToProcess:
@@ -153,29 +175,31 @@ def main():
         print '\n%s of %s' % (fileProcessCounter, fileCount)
         logging.info('\n%s of %s', fileProcessCounter, fileCount)
 
-        importFileLocation = getImportMediaFileLocation(file, destDir, args['username'], fileProcessCounter, args['droneMake'], args['droneModel'])
+        importFileLocation = getImportMediaFileLocation(file, destDir, args['username'], fileProcessCounter, args['deviceMake'], args['deviceModel'])
 
         utils.safeCopy(file, importFileLocation[0], importFileLocation[1])
 
         importPath = importFileLocation[0] + importFileLocation[1]
 
-        #   set exif data on copied file to match drone info
+        #   set exif data on copied file to match device info
         filesToAdjustExifData.append(importPath)
 
-        #   create downrezed video file with handbrakeCLI
-        # handBrakeArgs = []
-        # utils.handbrakeCLI(handBrakeArgs, file)
+        # add clip to clipList
+        clipList.append(importFileLocation)
 
         fileProcessCounter += 1
 
 
+    # make downsized copies of all clips
+    resizeClips(clipList, 1920, 1080)
+
     #   run command to update exif info on all the files we just imported
-    exifArg_make = '-make=%s' % args['droneMake']
-    exifArg_model = '-model=%s' % args['droneModel'].replace('.', ' ')
+    exifArg_make = '-make=%s' % args['deviceMake']
+    exifArg_model = '-model=%s' % args['deviceModel'].replace('.', ' ')
 
     exifArgs = [exifArg_make, exifArg_model]
 
-    utils.setExifTags(exifArgs, filesToAdjustExifData)
+    # utils.setExifTags(exifArgs, filesToAdjustExifData)
 
     #   Say Goodbye!
     utils.spacer()
