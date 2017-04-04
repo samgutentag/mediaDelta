@@ -31,6 +31,7 @@ from datetime import timedelta
 import logging
 import shutil
 import os
+import getpass
 
 
 # special stuff to handle known non ascii cahracters, blame sony! (not really)
@@ -43,7 +44,7 @@ sys.setdefaultencoding('utf-8')
 #------------------------------------------------------------------------------
 
 #   formats file name and destination directory for easy sorting
-def getArchiveMediaFileLocation(inputFile, destinationDir, user):
+def getArchiveMediaFileDestination(inputFile, destinationDir, user):
 
     startTime = datetime.now()
 
@@ -90,8 +91,9 @@ def main():
     parser = argparse.ArgumentParser(description='Read EXIF data of a given media file, update filename and sort into structured directory')
 
     parser.add_argument('-u', '--username', dest='username',
-                        required = True,
-                        help = 'user provided creator name, used for tagging with multiple artists or photographers into a single collection',
+                        required = False,
+                        default = getpass.getuser(),       # default to current user
+                        help = 'tag files with the person who captured them',
                         metavar='USER_NAME')
 
     parser.add_argument('-s', '--source', dest='sourceDirectory',
@@ -134,11 +136,11 @@ def main():
         logging.info('\n%s of %s ', fileProcessCounter, fileCount)
 
         # archivedFilePath = utils.archiveMediaFile(file, args['outputDirectory'], args['creatorName'])
-        archiveFileLocation = getArchiveMediaFileLocation(file, destDir, args['username'])
+        archiveFileDestination = getArchiveMediaFileDestination(file, destDir, args['username'])
 
-        archivePath = archiveFileLocation[0] + archiveFileLocation[1]
+        archivePath = archiveFileDestination[0] + archiveFileDestination[1]
 
-        utils.safeCopy(file, archiveFileLocation[0], archiveFileLocation[1])
+        utils.safeCopy(file, archiveFileDestination[0], archiveFileDestination[1])
 
         fileProcessCounter += 1
 

@@ -8,6 +8,7 @@ import shutil
 from datetime import datetime
 import logging
 import subprocess
+import getpass
 
 
 
@@ -548,7 +549,7 @@ def getCameraObject(exifData):
 #------------------------------------------------------------------------------
 
 # uses information from exifData to create a MediaFileObject if possible
-def getMediaFileObject(file, creatorName):
+def getMediaFileObject(file, creatorName=getpass.getuser()):
     # print 'building MediaFileObject from %s' % file
 
     # if the file is a valid media file type, else skip all this
@@ -561,7 +562,7 @@ def getMediaFileObject(file, creatorName):
         # Get file type information
         fileTypeInfo = getMediaFileType(exifTagsDict)
         mediaType = fileTypeInfo[0]
-        extension = fileTypeInfo[2]
+        extension = fileTypeInfo[1]
 
         # get DateTimeObject for file
         dateTimeObject = getDateTimeObject(exifTagsDict)
@@ -596,13 +597,10 @@ def getMediaFileType(exifData):
     # get media type from 'File:MIMEType' value, (video or image)
     mediaType = exifData['File:MIMEType'].split('/')[0].upper()
 
-    # get file type from 'File:FileType' value
-    fileType = exifData['File:FileType'].upper()
-
     # get file extension from 'File:FileTypeExtension' value
     fileExtension = exifData['File:FileTypeExtension'].upper()
 
-    return (mediaType, fileType, fileExtension)
+    return (mediaType, fileExtension)
 
 
 #------------------------------------------------------------------------------
@@ -674,19 +672,12 @@ def setExifTags(argsList, fileList):
     subprocess.call(executeArgs)
 
 
-    # #   remove '_original' file that is created by exiftool
-    # for file in fileList:
-    #     tempFile = item + '_original'
-    #
-    #     spacer()
-    #     print item
-    #     print tempFile
-    #
-    #     if os.path.exists(tempFile):
-    #         os.remove(tempFile)
-    #     spacer()
+#   writes all exiftags from a srouce media file to the target media file
+def matchExifTags(sourceFile, targetFile):
 
+    #   append all arguments to 'exiftools' command line tool
+    executeArgs = ['exiftool -tagsFromFile'] + [sourceFile] + [targetFile]
 
-#   use handbrakeCLI on a given file
-def handbrakeCLI(handBrakeArgs, file):
-    print 'using handbrakeCLI to encode video... (not really yet)'
+    print 'Running exiftools...'
+    logging.info('Running exiftools...')
+    subprocess.call(executeArgs)

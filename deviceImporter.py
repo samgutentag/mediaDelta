@@ -33,6 +33,7 @@ import logging
 import shutil
 import os
 import clipConverter
+import getpass
 
 from datetime import datetime
 from datetime import timedelta
@@ -48,7 +49,7 @@ sys.setdefaultencoding('utf-8')
 #------------------------------------------------------------------------------
 
 #   formats file name and destination directory for easy sorting
-def getImportMediaFileLocation(inputFile, destinationDir, user, counter, make, model):
+def getImportMediaFileDestination(inputFile, destinationDir, user, counter, make, model):
 
     print ">>> import processing '%s'" % inputFile
     logging.info(">>> import processing '%s'", inputFile)
@@ -84,27 +85,6 @@ def getImportMediaFileLocation(inputFile, destinationDir, user, counter, make, m
 
     return (importFilePath, importFileName)
 
-def resizeClips(clipList, width, height):
-
-
-
-    for clip in clipList:
-        #   file path for clip
-        clipPath = clip[0] + clip[1]
-        print '><><><><><><><><><><><><><' + clipPath
-
-        #   create downrezed video file
-        downRez_fileName = clip[0] + 'downRez_%sx%s/' % (width, height) + clip[1]
-
-        # create downRez Directory if it does not already exist
-        if not os.path.exists(clip[0] + 'downRez_%sx%s/' % (width, height)):
-            os.makedirs(clip[0] + 'downRez_%sx%s/' % (width, height))
-
-        #   convert Clip and write it to disk
-        clipConverter.resizeClip(clipPath, downRez_fileName, width, height)
-
-
-
 #------------------------------------------------------------------------------
 #   Main Function
 #------------------------------------------------------------------------------
@@ -114,7 +94,8 @@ def main():
     parser = argparse.ArgumentParser(description="Import Data from a memory card to a staging drive")
 
     parser.add_argument('-u', '--username', dest='username',
-                        required = True,
+                        required = False,
+                        default = getpass.getuser(),       # default to current user
                         help = 'tag files with the person who captured them',
                         metavar='USER_NAME')
 
@@ -127,11 +108,6 @@ def main():
                         required = True,
                         help = 'pass the device model for usage in organizing and writing exiftags, use periods in place of spaces',
                         metavar='DEVICE_MODEL')
-
-    parser.add_argument('-r', '--resolution', dest='downsizeResolution',
-                        required = False,
-                        help = 'specify resolutions to downsize original clips to, ideal for social media sharing',
-                        metavar='DOWNSIZE_RESOLUTION')
 
     parser.add_argument('-s', '--source', dest='sourceDirectory',
                         required = True,
@@ -147,7 +123,7 @@ def main():
 
     #   setup logging
     logDateTime = datetime.now().strftime('%Y%m%d%H%M%S')
-    logFileName = 'importer_%s.log' % logDateTime
+    logFileName = 'deviceImporter_%s.log' % logDateTime
     logging.basicConfig(format='%(message)s', filename=logFileName, level=logging.DEBUG)
 
     #   print arguments
@@ -167,7 +143,6 @@ def main():
         destDir = destDir[:-1]
 
     filesToAdjustExifData = []
-    clipList = []
 
     #   Process files and import if not already imported
     for file in filesToProcess:
@@ -175,23 +150,16 @@ def main():
         print '\n%s of %s' % (fileProcessCounter, fileCount)
         logging.info('\n%s of %s', fileProcessCounter, fileCount)
 
-        importFileLocation = getImportMediaFileLocation(file, destDir, args['username'], fileProcessCounter, args['deviceMake'], args['deviceModel'])
+        importFileDestination = getImportMediaFileDestination(file, destDir, args['username'], fileProcessCounter, args['deviceMake'], args['deviceModel'])
 
-        utils.safeCopy(file, importFileLocation[0], importFileLocation[1])
+        utils.safeCopy(file, importFileDestination[0], importFileDestination[1])
 
-        importPath = importFileLocation[0] + importFileLocation[1]
+        importPath = importFileDestination[0] + importFileDestination[1]
 
         #   set exif data on copied file to match device info
         filesToAdjustExifData.append(importPath)
 
-        # add clip to clipList
-        clipList.append(importFileLocation)
-
         fileProcessCounter += 1
-
-
-    # make downsized copies of all clips
-    resizeClips(clipList, 1920, 1080)
 
     #   run command to update exif info on all the files we just imported
     exifArg_make = '-make=%s' % args['deviceMake']
@@ -199,7 +167,7 @@ def main():
 
     exifArgs = [exifArg_make, exifArg_model]
 
-    # utils.setExifTags(exifArgs, filesToAdjustExifData)
+    utils.setExifTags(exifArgs, filesToAdjustExifData)
 
     #   Say Goodbye!
     utils.spacer()

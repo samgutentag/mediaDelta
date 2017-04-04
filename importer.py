@@ -29,6 +29,7 @@ import utils
 import logging
 import shutil
 import os
+import getpass
 
 from datetime import datetime
 from datetime import timedelta
@@ -44,7 +45,7 @@ sys.setdefaultencoding('utf-8')
 #------------------------------------------------------------------------------
 
 #   formats file name and destination directory for easy sorting
-def getImportMediaFileLocation(inputFile, destinationDir, user, counter):
+def getImportMediaFileDestination(inputFile, destinationDir, user, counter):
 
     print ">>> import processing '%s'" % inputFile
     logging.info(">>> import processing '%s'", inputFile)
@@ -84,7 +85,8 @@ def main():
     parser = argparse.ArgumentParser(description="Import Data from a memory card to a staging drive")
 
     parser.add_argument('-u', '--username', dest='username',
-                        required = True,
+                        required = False,
+                        default = getpass.getuser(),       # default to current user
                         help = 'tag files with the person who captured them',
                         metavar='USER_NAME')
 
@@ -127,11 +129,11 @@ def main():
         print '\n%s of %s' % (fileProcessCounter, fileCount)
         logging.info('\n%s of %s', fileProcessCounter, fileCount)
 
-        importFileLocation = getImportMediaFileLocation(file, destDir, args['username'], fileProcessCounter)
+        importFileDestination = getImportMediaFileDestination(file, destDir, args['username'], fileProcessCounter)
 
-        importPath = importFileLocation[0] + importFileLocation[1]
+        importPath = importFileDestination[0] + importFileDestination[1]
 
-        utils.safeCopy(file, importFileLocation[0], importFileLocation[1])
+        utils.safeCopy(file, importFileDestination[0], importFileDestination[1])
 
         fileProcessCounter += 1
 
