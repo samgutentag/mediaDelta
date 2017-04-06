@@ -3,33 +3,29 @@ Assumptions
 	First ExifTool should be installed on the host machine, it can be downloaded here
 	http://www.sno.phy.queensu.ca/~phil/exiftool/
 
-	pyexifinfo should be installed as an awesome python wrapper for it!
-
-	https://github.com/guinslym/pyexifinfo
-
 	> pip install -U pyexifinfo
+	> brew install moviepy
 
 
 
-Goal Sample Folder Structure
+Order of Operations
 
-	photos/
-		images/
-			YYYY/
-				YYYY.MM/
-					MM.<eventNameInCamelCase>/
-						YYYYMMDD.HHMMSSsss.<eventName>.<creator>.<count(4 digit)>.<extention>
-		videos/
-			YYYY/
-				YYYY.MM/
-					MM.<eventNameInCamelCase>/
-						YYYYMMDD.HHMMSSsss.<eventName>.<creator>.<count(4 digit)>.<extention>
+00.	Smile
+
+01.	Take Images with camera or drone or phone or potato
+
+02.	Import from card using
+	a.	"importer.py" to '/STAGING_DRIVE/STAGING'
+	b.	"deviceImporter.py" to '/STAGING_DRIVE/STAGING'
+
+03.	Use Lightroom to go over images and import (via "Copy as DNG") to '/ORANGE_VAULT/MASTERS'
+
+04.	Run "archiver.py"
+	a.	'/STAGING_DRIVE/STAGING/IMAGE' to '/BACKUP_DRIVE/IMAGE_ARCHIVE'
+	b.	'/STAGING_DRIVE/STAGING/VIDEO' to '/BACKUP_DRIVE/VIDEO_ARCHIVE'
+
+05.	Process photos in Lightroom as desired, export selects to "Photos.app"
 
 
-printExifTags.py
-	prints all exif tags for a single file or a directory of files
 
-TO DO:
-
-cameraReporter.py
-	generates a camera report of all files in a directory, or in a single file, and collects them in a dictionary that is easy to get counts for
+HardDrive Setup

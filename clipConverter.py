@@ -23,6 +23,8 @@ def resizeClip(inputFilePath, outputFilePath, width, height):
 
     #   write resized clip to a new file
     clip_resized.write_videofile(outputFilePath,
+                        # fps = 23.975,
+                        # fps = 60,
                         codec='libx264')
 
 
