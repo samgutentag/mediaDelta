@@ -111,6 +111,33 @@ def prettyPrintDateTimeTags(exifInfo):
 
     return True
 
+#   print camera tags
+def prettyPrintCameraTags(exifInfo):
+    cameraTagsDict = {}
+    exifDict = JSONToDict(pyexifinfo.get_json(exifInfo))
+
+    #   select only make, model, serial, and software tags
+    sortedDict = sorted(exifDict.iteritems())
+
+    #   for tag, entry in sortedDict
+    for tag, entry in sortedDict:
+        #   only write selected tags we want
+        if 'make' in tag.lower():
+            cameraTagsDict[tag] = entry
+
+        elif 'model' in tag.lower():
+            cameraTagsDict[tag] = entry
+
+        elif 'serial' in tag.lower():
+            cameraTagsDict[tag] = entry
+
+        elif 'software' in tag.lower():
+            cameraTagsDict[tag] = entry
+
+    prettyPrintDict(cameraTagsDict)
+
+    return True
+
 #   pretty print a dictionary in key value pairs, well spaced
 def prettyPrintDict(inpitDictionary):
     longestKey = 0
@@ -520,19 +547,25 @@ def getCameraObject(exifData):
         # looks for user generate xmp exif tag if an originl from camera can not be found
         if 'exif:make' in key.lower():
             cameraMake = str(exifData[key])
-        if 'xmp:make' in key.lower():
+        if 'xmp:make' in key.lower():               #   if we manually set the exif data, it will be here
+            cameraMake = str(exifData[key])
+        if 'quicktime:make' in key.lower():         #   if its a video file, this is where we problable need to look
             cameraMake = str(exifData[key])
 
         # get model string i.e. 'Canon EOS 5D Mark III'
         # looks for user generate xmp exif tag if an originl from camera can not be found
         if 'exif:model' in key.lower():
             cameraModel = str(exifData[key])
-        if 'xmp:model' in key.lower():
+        if 'xmp:model' in key.lower():              #   if we manually set the exif data, it will be here
+            cameraModel = str(exifData[key])
+        if 'quicktime:model' in key.lower():        #   if its a video file, this is where we problable need to look
             cameraModel = str(exifData[key])
 
 
         # get software string i.e. 'Adobe Photoshop Lightroom 6.3 (Macintosh)''
         if 'exif:software' in key.lower():
+            softwareName = str(exifData[key])
+        if 'quicktime:software' in key.lower():     #   if its a video file, this is where we problable need to look
             softwareName = str(exifData[key])
 
     # special case for iOS devices reporting software version
