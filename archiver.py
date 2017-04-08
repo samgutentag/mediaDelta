@@ -32,6 +32,7 @@ import logging
 import shutil
 import os
 import getpass
+import progressBar
 
 
 # special stuff to handle known non ascii cahracters, blame sony! (not really)
@@ -48,7 +49,7 @@ def getArchiveMediaFileDestination(inputFile, destinationDir, user):
 
     startTime = datetime.now()
 
-    print ">>> archive processing '%s'" % inputFile
+    print "\n>>> archive processing '%s'" % inputFile
     logging.info(">>> archive processing '%s'",inputFile)
 
     try:
@@ -130,9 +131,12 @@ def main():
         destDir = destDir[:-1]
 
     #   Process files and archive them to their final destination, handles duplicates
+    iterationCounter = 0
+    # progressBar.print_progress(iterationCounter, fileCount, prefix='import',  decimals=1, bar_length=100, complete_symbol='#', incomplete_symbol='-')
+    progressBar.print_progress(iterationCounter, fileCount, decimals=1, bar_length=100, complete_symbol='#', incomplete_symbol='-')
     for file in filesToProcess:
 
-        print '\n%s of %s ' % (fileProcessCounter, fileCount)
+        # print '\n%s of %s ' % (fileProcessCounter, fileCount)
         logging.info('\n%s of %s ', fileProcessCounter, fileCount)
 
         # archivedFilePath = utils.archiveMediaFile(file, args['outputDirectory'], args['creatorName'])
@@ -141,6 +145,10 @@ def main():
         archivePath = archiveFileDestination[0] + archiveFileDestination[1]
 
         utils.safeCopy(file, archiveFileDestination[0], archiveFileDestination[1])
+
+        #   Update progressBar
+        iterationCounter += 1
+        progressBar.print_progress(iterationCounter, fileCount, decimals=1, bar_length=100, complete_symbol='#', incomplete_symbol='-')
 
         fileProcessCounter += 1
 
