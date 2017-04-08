@@ -34,6 +34,7 @@ import shutil
 import os
 import clipConverter
 import getpass
+import progressBar
 
 from datetime import datetime
 from datetime import timedelta
@@ -51,7 +52,7 @@ sys.setdefaultencoding('utf-8')
 #   formats file name and destination directory for easy sorting
 def getImportMediaFileDestination(inputFile, destinationDir, user, counter, make, model):
 
-    print ">>> import processing '%s'" % inputFile
+    print "\n>>> import processing '%s'" % inputFile
     logging.info(">>> import processing '%s'", inputFile)
 
 
@@ -145,9 +146,13 @@ def main():
     filesToAdjustExifData = []
 
     #   Process files and import if not already imported
+    iterationCounter = 0
+    # progressBar.print_progress(iterationCounter, fileCount, prefix='import',  decimals=1, bar_length=100, complete_symbol='#', incomplete_symbol='-')
+    progressBar.print_progress(iterationCounter, fileCount, decimals=1, bar_length=100, complete_symbol='#', incomplete_symbol='-')
     for file in filesToProcess:
 
-        print '\n%s of %s' % (fileProcessCounter, fileCount)
+
+        # progress_prefix = '\n%s of %s' % (fileProcessCounter, fileCount)
         logging.info('\n%s of %s', fileProcessCounter, fileCount)
 
         importFileDestination = getImportMediaFileDestination(file, destDir, args['username'], fileProcessCounter, args['deviceMake'], args['deviceModel'])
@@ -158,6 +163,11 @@ def main():
 
         #   set exif data on copied file to match device info
         filesToAdjustExifData.append(importPath)
+
+        #   Update progressBar
+        iterationCounter += 1
+        # progressBar.print_progress(iterationCounter, fileCount, prefix=progress_prefix, decimals=1, bar_length=100, complete_symbol='#', incomplete_symbol='-')
+        progressBar.print_progress(iterationCounter, fileCount, decimals=1, bar_length=100, complete_symbol='#', incomplete_symbol='-')
 
         fileProcessCounter += 1
 

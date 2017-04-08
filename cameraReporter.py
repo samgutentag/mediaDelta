@@ -142,7 +142,5 @@ def main():
 
     pyExifTools.bigSpacer()
 
-
-
 if __name__ == '__main__':
     main()

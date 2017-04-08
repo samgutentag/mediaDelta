@@ -9,10 +9,11 @@ from datetime import datetime
 import logging
 import subprocess
 import getpass
+import progressBar
 
 
 
-# special stuff to handle known non ascii cahracters, blame Sony! (not really)
+#   special stuff to handle known non ascii cahracters, blame Sony! (not really)
 import sys  # import sys package, if not already imported
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -85,7 +86,7 @@ class MediaFileObject:
 #       pretty printer functions
 #------------------------------------------------------------------------------
 
-# print exif tags, skips encoding tags
+#   print exif tags, skips encoding tags
 def prettyPrintTags(exifInfo):
 
     exifDict = JSONToDict(pyexifinfo.get_json(exifInfo))
@@ -93,7 +94,7 @@ def prettyPrintTags(exifInfo):
 
     return True
 
-# print dateTime tags
+#   print dateTime tags
 def prettyPrintDateTimeTags(exifInfo):
     dateTimeTagsDict = {}
     exifDict = JSONToDict(pyexifinfo.get_json(exifInfo))
@@ -110,7 +111,7 @@ def prettyPrintDateTimeTags(exifInfo):
 
     return True
 
-# pretty print a dictionary in key value pairs, well spaced
+#   pretty print a dictionary in key value pairs, well spaced
 def prettyPrintDict(inpitDictionary):
     longestKey = 0
 
@@ -127,7 +128,7 @@ def prettyPrintDict(inpitDictionary):
 
     return True
 
-# uniform spacers
+#   uniform spacers
 def spacer():
     print '\n'
     print '#' + '-'*79
@@ -152,8 +153,8 @@ def bigSpacer():
 #		file relocation functions
 #------------------------------------------------------------------------------
 
-# returns directory contents as a list
-# prunes only valid media file formats
+#   returns directory contents as a list
+#   prunes only valid media file formats
 def getDirectoryContents(dir):
 
     directory_contents = []
@@ -170,7 +171,7 @@ def getDirectoryContents(dir):
 
     return directory_contents
 
-# check if file is a known image or video format, returns boolean
+#   check if file is a known image or video format, returns boolean
 def isValidMediaFileType(file):
 
     # get extension of file
@@ -187,7 +188,7 @@ def isValidMediaFileType(file):
     else:
         return False
 
-# check if a file is a known ignorable file type, returns boolean
+#   check if a file is a known ignorable file type, returns boolean
 def isIgnorableSystemFile(file):
     # get extension of file
     extensionToCheck = file.split('.')[-1].upper()
@@ -200,8 +201,8 @@ def isIgnorableSystemFile(file):
     else:
         return False
 
-# convert json information gathered by exif tools into a dictionary
-# if file has no EXIF data, an empty dictionary is returned
+#   convert json information gathered by exif tools into a dictionary
+#   if file has no EXIF data, an empty dictionary is returned
 def JSONToDict(data):
     if len(data) < 1:
         print '>>> this file has no exif data'
@@ -213,10 +214,10 @@ def JSONToDict(data):
 
     return dataDict
 
-# copy files and preserve metadata
-# handles copies by incrementing a copy counter
-# will overwrite when copies exceed 9999
-# returns absolute file path file was copied to
+#   copy files and preserve metadata
+#   handles copies by incrementing a copy counter
+#   will overwrite when copies exceed 9999
+#   returns absolute file path file was copied to
 def safeCopy(sourceFile, destinationDirectoryName, destinationFileName):
 
     destinationAbsoluteFilePath = destinationDirectoryName + destinationFileName
@@ -278,7 +279,7 @@ def safeCopy(sourceFile, destinationDirectoryName, destinationFileName):
 #		DateTimeObject functions
 #------------------------------------------------------------------------------
 
-# compare two DateTimeObjects and return earlier one
+#   compare two DateTimeObjects and return earlier one
 def getEarlierDateTime(tagA, tagB):
 
     # converts DateTimeObject pieces into an integer for comparison
@@ -291,8 +292,8 @@ def getEarlierDateTime(tagA, tagB):
     else:
         return tagB
 
-# gets earlist date time tag, excludes dates in photoshop or camera profiles
-# returns the earliest DateTimeObject, filters out dates prior to 1975
+#       gets earlist date time tag, excludes dates in photoshop or camera profiles
+#   returns the earliest DateTimeObject, filters out dates prior to 1975
 def getDateTimeObject(exifData):
 
     # default values
@@ -439,7 +440,7 @@ def getDateTimeObject(exifData):
 #		CameraObject Functions
 #------------------------------------------------------------------------------
 
-# clean up camera information for file naming
+#   clean up camera information for file naming
 def cameraLabelCleaner(camera, userName):
 
     cleanCameraString = ''
@@ -501,7 +502,7 @@ def cameraLabelCleaner(camera, userName):
 
     return cleanCameraString
 
-# sorts out camera information and returns a camera object
+#   sorts out camera information and returns a camera object
 def getCameraObject(exifData):
     # we want make, model, serial number, software
     cameraMake = 'NONE'
@@ -548,7 +549,7 @@ def getCameraObject(exifData):
 #		MediaFileObject Functions
 #------------------------------------------------------------------------------
 
-# uses information from exifData to create a MediaFileObject if possible
+#   uses information from exifData to create a MediaFileObject if possible
 def getMediaFileObject(file, creatorName=getpass.getuser()):
     # print 'building MediaFileObject from %s' % file
 
@@ -588,10 +589,10 @@ def getMediaFileObject(file, creatorName=getpass.getuser()):
         return False
 
 
-# read exifTags for media file type info
-# returns a list of mediaType, fileType, fileExtensions
-# example (video, MOV, MOV) -> movie file
-# example (image, JPEG, JPG) -> image file
+#   read exifTags for media file type info
+#   returns a list of mediaType, fileType, fileExtensions
+#   example (video, MOV, MOV) -> movie file
+#   example (image, JPEG, JPG) -> image file
 def getMediaFileType(exifData):
 
     # get media type from 'File:MIMEType' value, (video or image)
@@ -607,7 +608,7 @@ def getMediaFileType(exifData):
 #		file backup functions
 #------------------------------------------------------------------------------
 
-# creates a backup of files if and only if they do not already exist in the destinationDir structure
+#   creates a backup of files if and only if they do not already exist in the destinationDir structure
 def backupMediaFile(sourceDir, inputFile, destinationDir):
     startTime = datetime.now()
 
@@ -659,12 +660,30 @@ def backupMediaFile(sourceDir, inputFile, destinationDir):
 #   takes a list of arguments and a list of files to pass the against exiftools
 def setExifTags(argsList, fileList):
 
+    fileCount = len(fileList)
+
+    iterationCounter = 1
+    # progress_prefix = '\n%s of %s' % (iterationCounter, fileCount)
+    logging.info('\n%s of %s', iterationCounter, fileCount)
+
+    # progressBar.print_progress(iterationCounter, fileCount, prefix=progress_prefix, decimals=1, bar_length=100, complete_symbol='#', incomplete_symbol='-')
+    progressBar.print_progress(iterationCounter, fileCount, decimals=1, bar_length=100, complete_symbol='#', incomplete_symbol='-')
+
     #   append all arguments to 'exiftools' command line tool
     executeArgs = ['exiftool'] + argsList
 
     #   append all files to run arguments against
     for item in fileList:
+
+        #   print and log action
+        print "updating exif tags for '%s'" % item
+        logging.info("updating exif tags for '%s'", item)
+
+
         executeArgs.append(str(item))
+        # progressBar.print_progress(iterationCounter, fileCount, prefix=progress_prefix, decimals=1, bar_length=100, complete_symbol='#', incomplete_symbol='-')
+        progressBar.print_progress(iterationCounter, fileCount, decimals=1, bar_length=100, complete_symbol='#', incomplete_symbol='-')
+        iterationCounter +=1
 
     spacer()
     print 'Running exiftools...'

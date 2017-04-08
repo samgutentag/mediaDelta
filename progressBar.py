@@ -5,7 +5,7 @@ import sys, time
 def main():
 
     names = ['Megan', 'Sam', 'Aaron', 'Jonah', 'Olivia', 'Max', 'Piper', 'Bailey', 'Kaiser']
-    
+
 
     for name in names:
 
@@ -20,14 +20,14 @@ def main():
 
             prefix_string = '%d : %s' %(names.index(name)+1, name)
             print_progress(counter, maxCounter, prefix=prefix_string)
-            
+
             time.sleep(0.1)
 
             counter += 1
 
 # Print iterations progress
 def print_progress(iteration, total, prefix='', suffix='', decimals=1, bar_length=100, complete_symbol='#', incomplete_symbol='-'):
-    
+
     """
     Call in a loop to create terminal progress bar
     @params:
@@ -44,8 +44,17 @@ def print_progress(iteration, total, prefix='', suffix='', decimals=1, bar_lengt
     str_format = "{0:." + str(decimals) + "f}"
     percents = str_format.format(100 * (iteration / float(total)))
     filled_length = int(round(bar_length * iteration / float(total)))
-    
+
     bar = complete_symbol * filled_length + incomplete_symbol * (bar_length - filled_length)
+
+    #   _-_-_-1 of 1234567
+    #   1234567 of 1234567
+
+    if prefix == '':
+        prefix_a = ' ' * (len(str(total)) - len(str(iteration))) + str(iteration)
+        prefix_b = str(total)
+        prefix = '%s of %s' % (prefix_a, prefix_b)
+
 
     sys.stdout.write('\r%s\t|%s| %s%s %s' % (prefix, bar, percents, '%', suffix)),
 
@@ -57,4 +66,3 @@ def print_progress(iteration, total, prefix='', suffix='', decimals=1, bar_lengt
 
 if __name__ == '__main__':
     main()
-

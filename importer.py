@@ -30,6 +30,7 @@ import logging
 import shutil
 import os
 import getpass
+import progressBar
 
 from datetime import datetime
 from datetime import timedelta
@@ -47,7 +48,7 @@ sys.setdefaultencoding('utf-8')
 #   formats file name and destination directory for easy sorting
 def getImportMediaFileDestination(inputFile, destinationDir, user, counter):
 
-    print ">>> import processing '%s'" % inputFile
+    print "\n>>> import processing '%s'" % inputFile
     logging.info(">>> import processing '%s'", inputFile)
 
     try:
@@ -124,9 +125,12 @@ def main():
         destDir = destDir[:-1]
 
     #   Process files and import if not already imported
+    iterationCounter = 0
+    # progressBar.print_progress(iterationCounter, fileCount, prefix='import',  decimals=1, bar_length=100, complete_symbol='#', incomplete_symbol='-')
+    progressBar.print_progress(iterationCounter, fileCount, decimals=1, bar_length=100, complete_symbol='#', incomplete_symbol='-')
     for file in filesToProcess:
 
-        print '\n%s of %s' % (fileProcessCounter, fileCount)
+        # progress_prefix = '\n%s of %s' % (fileProcessCounter, fileCount)
         logging.info('\n%s of %s', fileProcessCounter, fileCount)
 
         importFileDestination = getImportMediaFileDestination(file, destDir, args['username'], fileProcessCounter)
@@ -134,6 +138,11 @@ def main():
         importPath = importFileDestination[0] + importFileDestination[1]
 
         utils.safeCopy(file, importFileDestination[0], importFileDestination[1])
+
+        #   Update progressBar
+        iterationCounter += 1
+        # progressBar.print_progress(iterationCounter, fileCount, prefix=progress_prefix, decimals=1, bar_length=100, complete_symbol='#', incomplete_symbol='-')
+        progressBar.print_progress(iterationCounter, fileCount, decimals=1, bar_length=100, complete_symbol='#', incomplete_symbol='-')
 
         fileProcessCounter += 1
 
