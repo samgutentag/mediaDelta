@@ -469,6 +469,8 @@ def getDateTimeObject(exifData):
 #   clean up camera information for file naming
 def cameraObjectCleaner(cameraObject):
 
+    cameraObject.printInfo()
+
     # special cases for known cameras
     # adjustments for Apple cameras, (iPhones, iPads, etc)
     if cameraObject.make.upper() == 'APPLE':
@@ -476,17 +478,19 @@ def cameraObjectCleaner(cameraObject):
         cameraObject.model = '%s.iOS%s' % (cameraObject.model, cameraObject.software)
         cameraObject.serial = cameraObject.serial
         cameraObject.software = 'iOS.%s' % cameraObject.software
-        return cameraObject
+        cameraObject.printInfo()
 
 
     #   adjustements for casio cameras
-    elif cameraObject.make.upper() == 'CASIO COMPUTER CO.,LTD':
+    if cameraObject.make.upper() == 'CASIO.COMPUTER.CO.,LTD.':
         cameraObject.make = 'Casio'
-        cameraObject.model = '%s.%s' % (cameraObject.make, cameraObject.model)
+        cameraObject.model = 'Casio.%s' % cameraObject.model
         cameraObject.serial = cameraObject.serial
         cameraObject.software = cameraObject.software
-        return cameraObject
+        cameraObject.printInfo()
 
+
+    return cameraObject
 
     # # adjustments for Canon cameras
     # elif camera.make.upper() == 'CANON':
