@@ -14,16 +14,11 @@
   - "importer.py" to '/STAGING_DRIVE/STAGING'
   - "deviceImporter.py" to '/STAGING_DRIVE/STAGING'
 
-<<<<<<< HEAD
-=======
 - Use Lightroom to go over images and import (via "Copy as DNG") to '/MASTERS_DRIVE/MASTERS' AND TO 'MASTERS_BACKUP_DRIVE/MASTERS'
 
->>>>>>> dca2229bffd0645dc4e60272faf1e4156be7962d
 - Run "archiver.py"
   - '/STAGING_DRIVE/STAGING/IMAGE' to '/ARCHIVE_DRIVE/IMAGE_ARCHIVE'
   - '/STAGING_DRIVE/STAGING/VIDEO' to '/ARCHIVE_DRIVE/VIDEO_ARCHIVE'
-
-- Use Lightroom to go over images and import selects (via "Copy as DNG") to '/ORANGE_VAULT/MASTERS'
 
 - Process photos in Lightroom as desired, export selects to "Photos.app"
 
