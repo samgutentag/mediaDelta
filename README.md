@@ -1,11 +1,12 @@
 **Assumptions**
 
 - These tools all need the following utilities installed on the host machine
-
+    '''
 	> pip install -U pyexifinfo
 	> pip install -U moviepy
 	> pip install -U PyExifTool
 	> brew install ffmpeg
+    '''
 
 **Order of Operations**
 - create media with camera or drone or phone or potato
@@ -23,7 +24,6 @@
 - Process photos in Lightroom as desired, export selects to "Photos.app"
 
 **Hard Drive Setup**
-Current Setup Includes
 	-	500GB 	STAGING_DRIVE_1			Apple Sticker Drive
 	-	500GB	MASTERS_BACKUP_DRIVE	GoPro Sticker Drive
 	-	2TB		ARCHIVE_DRIVE			Desktop Drive
