@@ -108,23 +108,23 @@ def main():
             print '\n%s of %s' % (fileProcessCounter, len(filesToProcess))
             logging.info('\n%s of %s', fileProcessCounter, len(filesToProcess))
 
-            # try:
-            if args['dateOnly']:
-                print "printing Date EXIF tags for '%s'\n" % file
-                logging.info("printing Date EXIF tags for '%s'\n", file)
-                utils.prettyPrintDateTimeTags(file)
-            elif args['cameraOnly']:
-                print "printing Camera EXIF tags for '%s'\n" % file
-                logging.info("printing Camera EXIF tags for '%s'\n", file)
-                utils.prettyPrintCameraTags(file)
-            else:
-                print "printing EXIF tags for '%s'\n" % file
-                logging.info("printing EXIF tags for '%s'\n", file)
-                utils.prettyPrintTags(file)
+            try:
+                if args['dateOnly']:
+                    print "printing Date EXIF tags for '%s'\n" % file
+                    logging.info("printing Date EXIF tags for '%s'\n", file)
+                    utils.prettyPrintDateTimeTags(file)
+                elif args['cameraOnly']:
+                    print "printing Camera EXIF tags for '%s'\n" % file
+                    logging.info("printing Camera EXIF tags for '%s'\n", file)
+                    utils.prettyPrintCameraTags(file)
+                else:
+                    print "printing EXIF tags for '%s'\n" % file
+                    logging.info("printing EXIF tags for '%s'\n", file)
+                    utils.prettyPrintTags(file)
 
-            # except:
-            #     print '\tskipping %s' % file
-            #     logging.info('\tskipping %s', file)
+            except:
+                print '\tskipping %s' % file
+                logging.info('\tskipping %s', file)
 
             utils.spacer()
             fileProcessCounter += 1

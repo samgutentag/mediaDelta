@@ -25,7 +25,7 @@ sys.setdefaultencoding('utf-8')
 class CameraObject:
 
     def __init__(self, make, model, serial, software):
-        self.make = make
+        self.make = str(make).replace(' ','.')
         self.model = str(model).replace(' ','.')
         self.serial = serial
         self.software = str(software).split('(')[0].replace(' ', '.')
@@ -253,7 +253,6 @@ def safeCopy(sourceFile, destinationDirectoryName, destinationFileName):
     # fails out after 9999 copies are found, instead dumps all subsequent files to
     # counter '9999', WILL OVERWRITE
     def incrementCounter(sourceName):
-
         origCounter = sourceName.split('.')[-2]
 
         # get current counter value
@@ -468,66 +467,89 @@ def getDateTimeObject(exifData):
 #------------------------------------------------------------------------------
 
 #   clean up camera information for file naming
-def cameraLabelCleaner(camera, userName):
-
-    cleanCameraString = ''
+def cameraObjectCleaner(cameraObject):
 
     # special cases for known cameras
     # adjustments for Apple cameras, (iPhones, iPads, etc)
-    if camera.make.upper() == 'APPLE':
-        cleanCameraString = camera.make + '.' + camera.model + '.' + userName
-
-    # adjustments for Canon cameras
-    elif camera.make.upper() == 'CANON':
-            # left pad all canon serial numbers with zeros to be 12 digits long
-            if camera.serial == 'NONE':
-                tempSerialNumber = ''
-            else:
-                tempSerialNumber = camera.serial
-
-            while len(tempSerialNumber) < 13:
-                tempSerialNumber = '0' + tempSerialNumber
-
-            cleanCameraString = camera.model + '.' + userName + '.' + tempSerialNumber
-
-        # adjustments for Kodak cameras
-    elif camera.make.upper() == 'EASTMAN KODAK COMPANY':
-            cleanCameraString = camera.model
-
-        # adjustments for GoPro cameras
-    elif camera.make.upper() == 'GOPRO':
-            cleanCameraString = camera.make + '.' + camera.model + '.' + userName
-
-        # adjustments for Sony cameras
-    elif camera.make.upper() == 'SONY':
-            # sony camera models tend to have '-' in them, replace with '.'
-            tempModel = camera.model
-            tempModel = tempModel.replace('-', '.')
-
-            cleanCameraString = camera.make + '.' + tempModel + '.' + userName
-
-        # adjustments for Nikon cameras
-    elif camera.make.upper() == 'NIKON CORPORATION':
-            cleanCameraString = camera.model + '.' + userName
-
-    elif camera.make != 'NONE':
-        cleanCameraString = cleanCameraString + '.' + camera.make
-
-    elif camera.model != 'NONE':
-        cleanCameraString = cleanCameraString + '.' + camera.model
-
-    else:
-        # print 'camera make not was not an option...'
-        # camera.printInfo()
-        cleanCameraString = 'UNKNOWNCAMERA'
+    if cameraObject.make.upper() == 'APPLE':
+        cameraObject.make = 'Apple'
+        cameraObject.model = '%s.iOS%s' % (cameraObject.model, cameraObject.software)
+        cameraObject.serial = cameraObject.serial
+        cameraObject.software = 'iOS.%s' % cameraObject.software
+        return cameraObject
 
 
-    # remove anly leading '.'
-    while cleanCameraString[0] == '.':
-        cleanCameraString = cleanCameraString[1:]
+    #   adjustements for casio cameras
+    elif cameraObject.make.upper() == 'CASIO COMPUTER CO.,LTD':
+        cameraObject.make = 'Casio'
+        cameraObject.model = '%s.%s' % (cameraObject.make, cameraObject.model)
+        cameraObject.serial = cameraObject.serial
+        cameraObject.software = cameraObject.software
+        return cameraObject
 
 
-    return cleanCameraString
+    # # adjustments for Canon cameras
+    # elif camera.make.upper() == 'CANON':
+    #         # left pad all canon serial numbers with zeros to be 12 digits long
+    #         if camera.serial == 'NONE':
+    #             tempSerialNumber = ''
+    #         else:
+    #             tempSerialNumber = camera.serial
+    #
+    #         while len(tempSerialNumber) < 13:
+    #             tempSerialNumber = '0' + tempSerialNumber
+    #
+    #         cleanCameraString = camera.model + '.' + userName + '.' + tempSerialNumber
+
+
+
+
+    #
+    # # adjustments for Kodak cameras
+    # elif camera.make.upper() == 'EASTMAN KODAK COMPANY':
+    #         cleanCameraString = camera.model
+    #
+    # # adjustments for GoPro cameras
+    # elif camera.make.upper() == 'GOPRO':
+    #         cleanCameraString = camera.make + '.' + camera.model + '.' + userName
+    #
+    # # adjustments for Sony cameras
+    # elif camera.make.upper() == 'SONY':
+    #         # sony camera models tend to have '-' in them, replace with '.'
+    #         tempModel = camera.model
+    #         tempModel = tempModel.replace('-', '.')
+    #
+    #         cleanCameraString = camera.make + '.' + tempModel + '.' + userName
+    #
+    # # adjustments for Nikon cameras
+    # elif camera.make.upper() == 'NIKON CORPORATION':
+    #         cleanCameraString = camera.model + '.' + userName
+    #
+    # elif camera.make != 'NONE':
+    #     cleanCameraString = cleanCameraString + '.' + camera.make
+    #
+    # elif camera.model != 'NONE':
+    #     cleanCameraString = cleanCameraString + '.' + camera.model
+    #
+    # else:
+    #     # print 'camera make not was not an option...'
+    #     # camera.printInfo()
+    #     cleanCameraString = 'UNKNOWNCAMERA'
+    #
+    #
+    # # remove anly leading '.'
+    # while cleanCameraString[0] == '.':
+    #     cleanCameraString = cleanCameraString[1:]
+
+
+    return cameraObject
+
+
+
+
+
+
+
 
 #   sorts out camera information and returns a camera object
 def getCameraObject(exifData):
@@ -568,12 +590,9 @@ def getCameraObject(exifData):
         if 'quicktime:software' in key.lower():     #   if its a video file, this is where we problable need to look
             softwareName = str(exifData[key])
 
-    # special case for iOS devices reporting software version
-    if cameraMake.lower() == 'apple':
-        softwareName = 'iOS %s' % softwareName
-
     # build CameraObject
-    cameraObject = CameraObject(cameraMake, cameraModel, serialNumber, softwareName)
+    cameraObject = cameraObjectCleaner(CameraObject(cameraMake, cameraModel, serialNumber, softwareName))
+    # cameraObject = CameraObject(cameraMake, cameraModel, serialNumber, softwareName)
 
     return cameraObject
 
