@@ -4,13 +4,17 @@
 #		Sample Usage
 #------------------------------------------------------------------------------
 #
-#   > python cameraReporter.py -d ~/Desktop/testPhotos
-#   > python cameraReporter.py -f ~/Desktop/testPhotos/samplePhoto.jpg
+#   > python cameraReporter.py -s ~/Desktop/testPhotos
 #
 #------------------------------------------------------------------------------
 
-import pyExifTools
+import utils
+import shutil
 import argparse
+import logging
+import getpass
+import os
+from datetime import datetime
 
 # special stuff to handle known non ascii cahracters, blame sony! (not really)
 import sys  # import sys package, if not already imported
@@ -60,6 +64,19 @@ def getUniqueCameras(mediaFile, cameraDict):
 
     return cameraDict
 
+
+def addToCameraDict(cameraDict, cameraObject, file):
+
+
+    cameraObjectString = cameraObject.make + cameraObject.model + cameraObject.serial + cameraObject.software
+
+    if cameraObjectString not in cameraDict:
+        cameraDict[cameraObjectString] = [cameraObject, file]
+    else:
+        cameraDict[cameraObjectString].append(file)
+
+    return cameraDict
+
 def printCameraReport(cameraDict):
 
     # print list of all unique cameras, and their count
@@ -84,63 +101,76 @@ def main():
     # setup parser
     parser = argparse.ArgumentParser(description='Read EXIF data of a given media file, update filename and sort into structured directory')
 
-    # passing a single file
-    parser.add_argument('-f', '--mediaFile', dest='mediaFile',
-                        required=False,
-                        help='pass a single file to process',
-                        metavar='MEDIA_FILE',
-                        type=lambda x: pyExifTools.openMediaFile(parser, x))
+    parser.add_argument('-s', '--source', dest='sourceDirectory',
+                        required = True,
+                        help = 'the source directory of the files we want to convert, typically a memory card',
+                        metavar='SOURCE_DIRECTORY')
 
-    # passing a directory (with or without sub directories) of files
-    parser.add_argument('-d', '--mediaDirectory', dest='mediaDirectory',
-                        required=False,
-                        help='pass a directory of files to process, WARNING: RECURSIVE',
-                        metavar='MEDIA_DIRECTORY',
-                        type=lambda x: pyExifTools.openMediaDirectory(parser, x))
 
     args = vars(parser.parse_args())
 
-    pyExifTools.bigSpacer()
+    #   setup logging
+    logDateTime = datetime.now().strftime('%Y%m%d%H%M%S')
+    logFileName = 'cameraReporter_%s.log' % logDateTime
+    logging.basicConfig(format='%(message)s', filename=logFileName, level=logging.DEBUG)
 
+    #   print arguments
+    utils.bigSpacer()
     print 'Arguments...'
-    pyExifTools.prettyPrintDict(args)
+    utils.prettyPrintDict(args)
+    utils.spacer()
 
+    #   Get source directory contents
+    filesToProcess = utils.getDirectoryContents(args['sourceDirectory'])
+    fileProcessCounter = 1
+    fileCount = len(filesToProcess)
+
+    #   this dictionary is as follows
+        #   key:    cameraObject
+        #   value:  list of filtes whose camera Object match
     cameraDict = {}
 
-    # attempt to process a passed file
-    if args['mediaFile']:
-        try:
-            cameraDict = getUniqueCameras(args['mediaFile'], cameraDict)
-            print cameraDict
-        except:
-            print '>>> Could not process file'
+    #   build list of camera objects from the passed filesToProcess
+    for file in filesToProcess:
 
-    # attempts to process a directory of files
-    elif args['mediaDirectory']:
+        #   make mediaObject from file
 
-        # process a directory of files
-        filesToProcess = pyExifTools.getDirectoryContents(args['mediaDirectory'])
+        mediaFileObject = utils.getMediaFileObject(file)
+        cameraObject = mediaFileObject.camera
 
-        fileProcessCounter = 1
-        pyExifTools.bigSpacer()
-        for file in filesToProcess:
-
-            print 'Processing %s of %s' % (fileProcessCounter, len(filesToProcess))
-            try:
-                cameraDict = getUniqueCameras(file, cameraDict)
-            except:
-                print '>>> Could not process file'
+        #   add (cameraObject, filePath) to cameraDict
+        cameraDict = addToCameraDict(cameraDict, cameraObject, file)
 
 
-            fileProcessCounter += 1
+    # print type(cameraDict)
 
-        pyExifTools.bigSpacer()
+    print cameraDict
+    utils.spacer()
+
+    for key, value in sorted(cameraDict.iteritems()):
+        camObject = cameraDict[key][0]
+        camObject.printInfo()
+
+    #   Say Goodbye!
+    utils.spacer()
+    print 'ALL DONE!'
+    logging.info('ALL DONE!')
+    utils.bigSpacer()
+
+    #   Move log file to destination directory
+    currentDirectory = os.getcwd() + '/'
+    logFilePath = currentDirectory + logFileName
+    logFileDestinationDir = os.getcwd() + '/logs/'
+
+    #   Check if destination directory exists, if not create it
+    if not os.path.exists(logFileDestinationDir):
+        os.makedirs(logFileDestinationDir)
+
+    logFileDestination = logFileDestinationDir  + logFileName
+    shutil.move(logFilePath, logFileDestination)
 
 
 
-    printCameraReport(cameraDict)
-
-    pyExifTools.bigSpacer()
 
 if __name__ == '__main__':
     main()

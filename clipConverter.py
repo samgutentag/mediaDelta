@@ -125,7 +125,7 @@ def main():
             destDir = destDir + '/'
 
     else:
-        #   set destinattion dir to be sibling of source directory
+        #   set destination dir to be sibling of source directory
         destDir = args['sourceDirectory']
         #   Clean up destination directory name
         while destDir[-1] == '/':
