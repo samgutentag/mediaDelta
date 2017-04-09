@@ -79,19 +79,34 @@ def addToCameraDict(cameraDict, cameraObject, file):
 
 def printCameraReport(cameraDict):
 
-    # print list of all unique cameras, and their count
-    for key,value in sorted(cameraDict.iteritems()):
-        pyExifTools.spacer()
-        print '(%i)\t%s' % (len(value), key)
+    for key, value in sorted(cameraDict.iteritems()):
+        cameraObj = value[0]
+        numFiles = len(value) - 1
+        fileList = value[1:]
 
-    pyExifTools.bigSpacer()
+        utils.spacer()
+        print '%s.%s\t\t%s files' % (cameraObj.make, cameraObj.model, numFiles)
+        cameraObj.printInfo()
+        print 'Files:'
 
-    # print list of all unique cameras, their count, and all files that have the camera
-    for key,value in sorted(cameraDict.iteritems()):
-        pyExifTools.spacer()
-        print '(%i)\t%s' % (len(value), key)
-        for val in value:
-            print '\t%s' % (val[-1])
+        #   print list of files
+        for item in fileList:
+            print '\t%s' % item
+
+    #
+    # # print list of all unique cameras, and their count
+    # for key,value in sorted(cameraDict.iteritems()):
+    #     pyExifTools.spacer()
+    #     print '(%i)\t%s' % (len(value), key)
+    #
+    # pyExifTools.bigSpacer()
+    #
+    # # print list of all unique cameras, their count, and all files that have the camera
+    # for key,value in sorted(cameraDict.iteritems()):
+    #     pyExifTools.spacer()
+    #     print '(%i)\t%s' % (len(value), key)
+    #     for val in value:
+    #         print '\t%s' % (val[-1])
 
 #------------------------------------------------------------------------------
 #		main function
@@ -142,14 +157,7 @@ def main():
         cameraDict = addToCameraDict(cameraDict, cameraObject, file)
 
 
-    # print type(cameraDict)
-
-    print cameraDict
-    utils.spacer()
-
-    for key, value in sorted(cameraDict.iteritems()):
-        camObject = cameraDict[key][0]
-        camObject.printInfo()
+    printCameraReport(cameraDict)
 
     #   Say Goodbye!
     utils.spacer()

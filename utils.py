@@ -34,7 +34,7 @@ class CameraObject:
         print 'Camera Make:\t\t%s' % self.make
         print 'Camera Model:\t\t%s' % self.model
         print 'Serial Number:\t\t%s' % self.serial
-        print 'Software:\t\t%s' % self.software
+        print 'Software:\t\t\t%s' % self.software
 
 class DateTimeObject:
 
@@ -475,11 +475,10 @@ def cameraObjectCleaner(cameraObject):
     # adjustments for Apple cameras, (iPhones, iPads, etc)
     if cameraObject.make.upper() == 'APPLE':
         cameraObject.make = 'Apple'
-        cameraObject.model = '%s.iOS%s' % (cameraObject.model, cameraObject.software)
+        cameraObject.model = cameraObject.model
         cameraObject.serial = cameraObject.serial
         cameraObject.software = 'iOS.%s' % cameraObject.software
         # cameraObject.printInfo()
-
 
     #   adjustements for casio cameras
     if cameraObject.make.upper() == 'CASIO.COMPUTER.CO.,LTD.':
@@ -489,6 +488,13 @@ def cameraObjectCleaner(cameraObject):
         cameraObject.software = cameraObject.software
         # cameraObject.printInfo()
 
+    #   adjustements for Canon cameras
+    if cameraObject.make.upper() == 'CANON':
+        cameraObject.make = cameraObject.make
+        cameraObject.model = cameraObject.model[6:]
+        cameraObject.serial = cameraObject.serial
+        cameraObject.software = cameraObject.software
+        # cameraObject.printInfo()
 
     return cameraObject
 
@@ -546,7 +552,7 @@ def cameraObjectCleaner(cameraObject):
     #     cleanCameraString = cleanCameraString[1:]
 
 
-    return cameraObject
+    # return cameraObject
 
 
 
@@ -560,43 +566,90 @@ def getCameraObject(exifData):
     # we want make, model, serial number, software
     cameraMake = 'NONE'
     cameraModel  = 'NONE'
-    serialNumber = 'NONE'
+    cameraSerial = 'NONE'
     softwareName = 'NONE'
 
-    # update CameraObject pieces if they can be found
-    for key,value in exifData.iteritems():
-        # get serial number string i.e. '192029004068'
-        if 'exif:serialnumber' in key.lower():
-            serialNumber = str(exifData[key])
+    # # update CameraObject pieces if they can be found
+    # for key,value in exifData.iteritems():
+    #
+    #     # print '%s\t\t%s' % (key, value)
+    #
+    #     # get serial number string i.e. '192029004068'
+    #     if 'exif:serialnumber' in key.lower():
+    #         cameraSerial = str(exifData[key])
+    #
+    #     # # get make string i.e. 'Canon'
+    #     # # looks for user generate xmp exif tag if an originl from camera can not be found
+    #     # elif 'exif:make' in key.lower():
+    #     #     cameraMake = str(exifData[key])
+    #     # elif 'quicktime:make' in key.lower():
+    #     #     cameraMake = str(exifData[key])
+    #
+    #
+    #     # # get model string i.e. 'Canon EOS 5D Mark III'
+    #     # # looks for user generate xmp exif tag if an originl from camera can not be found
+    #     # elif 'exif:model' in key.lower():
+    #     #     cameraModel = str(exifData[key])
+    #     # elif 'quicktime:model' in key.lower():
+    #     #     cameraModel = str(exifData[key])
+    #
+    #     # # get software string i.e. 'Adobe Photoshop Lightroom 6.3 (Macintosh)''
+    #     # elif 'exif:software' in key.lower():
+    #     #     softwareName = str(exifData[key])
+    #     # elif 'quicktime:software' in key.lower():
+    #     #     softwareName = str(exifData[key])
+    #
+    #     #
+    #     # #   Manually writted tags get the 'xmp' prefix, these should override any other tags we find in the file
+    #     # elif 'xmp:make' in key.lower():
+    #     #     print 'found xmp:make! %s' % str(exifData[key])
+    #     #     cameraMake = str(exifData[key])
+    #     # elif 'xmp:model' in key.lower():
+    #     #     print 'found xmp:model! %s' % str(exifData[key])
+    #     #     cameraModel = str(exifData[key])
+    #
 
-        # get make string i.e. 'Canon'
-        # looks for user generate xmp exif tag if an originl from camera can not be found
-        if 'exif:make' in key.lower():
-            cameraMake = str(exifData[key])
-        if 'xmp:make' in key.lower():               #   if we manually set the exif data, it will be here
-            cameraMake = str(exifData[key])
-        if 'quicktime:make' in key.lower():         #   if its a video file, this is where we problable need to look
-            cameraMake = str(exifData[key])
+    #   get cameraMake metadata
+    try:
+        cameraMake = exifData['EXIF:Make']
 
-        # get model string i.e. 'Canon EOS 5D Mark III'
-        # looks for user generate xmp exif tag if an originl from camera can not be found
-        if 'exif:model' in key.lower():
-            cameraModel = str(exifData[key])
-        if 'xmp:model' in key.lower():              #   if we manually set the exif data, it will be here
-            cameraModel = str(exifData[key])
-        if 'quicktime:model' in key.lower():        #   if its a video file, this is where we problable need to look
-            cameraModel = str(exifData[key])
+    except:
+        try:
+            cameraMake = exifData['QuickTime:Make']
+        except:
+            try:
+                cameraMake = exifData['XMP:Make']
+            except:
+                pass
 
+    #   get cameraModel metadata
+    try:
+        cameraModel = exifData['EXIF:Model']
+    except:
+        try:
+            cameraModel = exifData['QuickTime:Model']
+        except:
+            try:
+                cameraModel = exifData['XMP:Model']
+            except:
+                pass
 
-        # get software string i.e. 'Adobe Photoshop Lightroom 6.3 (Macintosh)''
-        if 'exif:software' in key.lower():
-            softwareName = str(exifData[key])
-        if 'quicktime:software' in key.lower():     #   if its a video file, this is where we problable need to look
-            softwareName = str(exifData[key])
+    #   get software metadata
+    try:
+        softwareName = exifData['EXIF:Software']
+    except:
+        pass
+
+    #   get camera serial Number
+    try:
+        cameraSerial = exifData['EXIF:SerialNumber']
+    except:
+        pass
+
 
     # build CameraObject
-    cameraObject = cameraObjectCleaner(CameraObject(cameraMake, cameraModel, serialNumber, softwareName))
-    # cameraObject = CameraObject(cameraMake, cameraModel, serialNumber, softwareName)
+    cameraObject = CameraObject(cameraMake, cameraModel, cameraSerial, softwareName)
+    cameraObject = cameraObjectCleaner(cameraObject)
 
     return cameraObject
 
