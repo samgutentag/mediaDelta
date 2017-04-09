@@ -29,7 +29,7 @@ sys.setdefaultencoding('utf-8')
 #   builds a dictionary of all unique camera objects found, and a file sample to match
 def addToCameraDict(cameraDict, cameraObject, file):
 
-    cameraObjectString = cameraObject.make + cameraObject.model + cameraObject.serial + cameraObject.software
+    cameraObjectString = str(cameraObject.make) + str(cameraObject.model) + str(cameraObject.serial) + str(cameraObject.software)
 
     if cameraObjectString not in cameraDict:
         cameraDict[cameraObjectString] = [cameraObject, file]
@@ -68,7 +68,7 @@ def main():
 
     parser.add_argument('-s', '--source', dest='sourceDirectory',
                         required = True,
-                        help = 'the source directory of the files we want to convert, typically a memory card',
+                        help = 'the source directory of the files we want to gather camera information on',
                         metavar='SOURCE_DIRECTORY')
 
 

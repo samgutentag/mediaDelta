@@ -502,7 +502,7 @@ def cameraObjectCleaner(cameraObject):
         cameraObject.make = 'Apple'
         cameraObject.model = cameraObject.model
         cameraObject.serial = cameraObject.serial
-        cameraObject.software = 'iOS.%s' % cameraObject.software
+        cameraObject.software = 'iOS'
         # cameraObject.printInfo()
 
     #   adjustements for casio cameras
@@ -518,8 +518,20 @@ def cameraObjectCleaner(cameraObject):
         cameraObject.make = cameraObject.make
         cameraObject.model = cameraObject.model[6:]
         cameraObject.serial = cameraObject.serial
-        cameraObject.software = cameraObject.software
+        cameraObject.software = 'NONE'
         # cameraObject.printInfo()
+
+
+
+    if cameraObject.make.upper() == 'EASTMAN.KODAK.COMPANY':
+        cameraObject.make = 'Kodak'
+        cameraObject.model = cameraObject.model[6:]
+        cameraObject.serial = cameraObject.serial
+        cameraObject.software = 'NONE''
+
+
+
+
 
     return cameraObject
 
@@ -711,6 +723,8 @@ def getMediaFileObject(file, creatorName=getpass.getuser()):
         try:
             dimensions = exifTagsDict['Composite:ImageSize']
             width, height = dimensions.split('x')
+        except:
+            width, height = '0'
 
 
 
