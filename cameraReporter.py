@@ -101,7 +101,7 @@ def main():
     #   build list of camera objects from the passed filesToProcess
     for file in filesToProcess:
 
-        logging.info('\n%s of %s', fileProcessCounter-1, fileCount)
+        # logging.info('\n%s of %s', fileProcessCounter+1, fileCount)
 
         #   make mediaObject from file
         mediaFileObject = utils.getMediaFileObject(file)

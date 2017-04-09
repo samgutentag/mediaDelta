@@ -36,6 +36,11 @@ class CameraObject:
         print 'Serial Number:\t\t%s' % self.serial
         print 'Software:\t\t\t%s' % self.software
 
+        logging.info('Camera Make:\t\t%s', self.make)
+        logging.info('Camera Model:\t\t%s', self.model)
+        logging.info('Serial Number:\t\t%s', self.serial)
+        logging.info('Software:\t\t\t%s', self.software)
+
 class DateTimeObject:
 
     def __init__(self, tag, year, month, day, hour, minute, second, millisecond):
@@ -65,6 +70,15 @@ class DateTimeObject:
         print 'Second:\t\t\t%s' % self.second
         print 'Millisecond:\t\t%s' % self.millisecond
 
+        logging.info('Tag:\t\t\t%s', self.tag)
+        logging.info('Year:\t\t\t%s', self.year)
+        logging.info('Month:\t\t\t%s', self.month)
+        logging.info('Day:\t\t\t%s', self.day)
+        logging.info('Hour:\t\t\t%s', self.hour)
+        logging.info('Minute:\t\t\t%s', self.minute)
+        logging.info('Second:\t\t\t%s', self.second)
+        logging.info('Millisecond:\t\t%s', self.millisecond)
+
 class MediaFileObject:
 
     def __init__(self, type, extension, dateTimeObject, cameraObject, creator):
@@ -78,6 +92,11 @@ class MediaFileObject:
         print 'Type:\t\t\t%s' % (self.type)
         print 'Extension:\t\t%s' % (self.extension)
         print 'Creator:\t\t%s' % (self.creator)
+
+        logging.info('Type:\t\t\t%s', self.type)
+        logging.info('Extension:\t\t%s', self.extension)
+        logging.info('Creator:\t\t%s', self.creator)
+
         self.camera.printInfo()
         self.dateTime.printInfo()
 
