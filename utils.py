@@ -527,7 +527,7 @@ def cameraObjectCleaner(cameraObject):
         cameraObject.make = 'Kodak'
         cameraObject.model = cameraObject.model[6:]
         cameraObject.serial = cameraObject.serial
-        cameraObject.software = 'NONE''
+        cameraObject.software = 'NONE'
 
 
 
