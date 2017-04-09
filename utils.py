@@ -81,21 +81,27 @@ class DateTimeObject:
 
 class MediaFileObject:
 
-    def __init__(self, type, extension, dateTimeObject, cameraObject, creator):
+    def __init__(self, type, extension, dateTimeObject, cameraObject, creator, width, height):
         self.type = type
         self.extension = extension
         self.dateTime = dateTimeObject
         self.camera = cameraObject
         self.creator = creator
+        self.width = width
+        self.height = height
 
     def printInfo(self):
         print 'Type:\t\t\t%s' % (self.type)
         print 'Extension:\t\t%s' % (self.extension)
         print 'Creator:\t\t%s' % (self.creator)
+        print 'Width:\t\t\t%s' % (self.width)
+        print 'Height:\t\t\t%s' % (self.height)
 
         logging.info('Type:\t\t\t%s', self.type)
         logging.info('Extension:\t\t%s', self.extension)
         logging.info('Creator:\t\t%s', self.creator)
+        logging.info('Width:\t\t\t%s', self.width)
+        logging.info('Height:\t\t\t%s', self.height)
 
         self.camera.printInfo()
         self.dateTime.printInfo()
@@ -158,14 +164,14 @@ def prettyPrintCameraTags(exifInfo):
     return True
 
 #   pretty print a dictionary in key value pairs, well spaced
-def prettyPrintDict(inpitDictionary):
+def prettyPrintDict(inputDictionary):
     longestKey = 0
 
-    for key in inpitDictionary:
+    for key in inputDictionary:
         if len(key) > longestKey:
             longestKey = len(key)
 
-    sortedDict = sorted(inpitDictionary.iteritems())
+    sortedDict = sorted(inputDictionary.iteritems())
     for key, value in sortedDict:
         spacesNeeded = longestKey - len(key) + 4
         spaces = ' ' * spacesNeeded
@@ -701,12 +707,21 @@ def getMediaFileObject(file, creatorName=getpass.getuser()):
         # get creatorName for file
         creator = creatorName.lower()
 
+        #   get dimensions of media file
+        try:
+            dimensions = exifTagsDict['Composite:ImageSize']
+            width, height = dimensions.split('x')
+
+
+
         # init MediaFileObject
         mediaFileObject = MediaFileObject(mediaType,
                                             extension,
                                             dateTimeObject,
                                             cameraObject,
-                                            creator)
+                                            creator,
+                                            width,
+                                            height)
 
         return mediaFileObject
 

@@ -27,14 +27,9 @@ def resizeClip(inputFilePath, outputFilePath, width, height):
                         # fps = 60,
                         codec='libx264')
 
-
     #    write exif tags from original file to the new converted file
-
-
     print 'finished'
     logging.info('finished')
-
-
 
 def resizeClipList(clipList, width, height):
 
@@ -53,11 +48,6 @@ def resizeClipList(clipList, width, height):
 
         #   convert Clip and write it to disk
         resizeClip(clipPath, downRez_fileName, width, height)
-
-
-
-
-
 
 def main():
 
@@ -104,7 +94,7 @@ def main():
     fileCount = len(filesToProcess)
 
 
-    #   Sanitize input width and height values, basicallt just round them down to the next even number
+    #   Sanitize input width and height values to be even numbers
     resizeWidth = args['resizeWidth']
     if int(resizeWidth) % 2 == 1:
         resizeWidth = resizeWidth - 1
@@ -114,7 +104,7 @@ def main():
         resizeHeight = resizeHeight - 1
 
 
-    #   if a destinationDir was passed use it, else set one as siblign of sourceDirectory
+    #   if a destinationDir was passed use it, else set one as sibling of sourceDirectory
     if args['destinationDirectory']:
         destDir = args['destinationDirectory']
         #   Clean up destination directory name
@@ -198,9 +188,6 @@ def main():
 
     logFileDestination = logFileDestinationDir  + logFileName
     shutil.move(logFilePath, logFileDestination)
-
-
-
 
 if __name__ == '__main__':
     main()
