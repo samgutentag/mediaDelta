@@ -95,6 +95,8 @@ def main():
         #   value:  list [cameraObject, file1, file2, file3, ...]
     cameraDict = {}
 
+    print 'Creating Camera Report...'
+
     #   start progressBar
     progressBar.print_progress(fileProcessCounter, fileCount, decimals=1, bar_length=100, complete_symbol='#', incomplete_symbol='-')
 
