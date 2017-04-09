@@ -96,6 +96,7 @@ def main():
     cameraDict = {}
 
     print 'Creating Camera Report...'
+    logging.info('Creating Camera Report...')
 
     #   start progressBar
     progressBar.print_progress(fileProcessCounter, fileCount, decimals=1, bar_length=100, complete_symbol='#', incomplete_symbol='-')
