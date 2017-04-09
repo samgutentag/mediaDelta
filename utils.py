@@ -611,26 +611,25 @@ def getCameraObject(exifData):
 
     #   get cameraMake metadata
     try:
-        cameraMake = exifData['EXIF:Make']
-
+        cameraMake = exifData['XMP:Make']
     except:
         try:
-            cameraMake = exifData['QuickTime:Make']
+            cameraMake = exifData['EXIF:Make']
         except:
             try:
-                cameraMake = exifData['XMP:Make']
+                cameraMake = exifData['QuickTime:Make']
             except:
                 pass
 
     #   get cameraModel metadata
     try:
-        cameraModel = exifData['EXIF:Model']
+        cameraModel = exifData['XMP:Model']
     except:
         try:
-            cameraModel = exifData['QuickTime:Model']
+            cameraModel = exifData['EXIF:Model']
         except:
             try:
-                cameraModel = exifData['XMP:Model']
+                cameraModel = exifData['QuickTime:Model']
             except:
                 pass
 
