@@ -126,11 +126,9 @@ def main():
 
     #   Process files and import if not already imported
     iterationCounter = 0
-    # progressBar.print_progress(iterationCounter, fileCount, prefix='import',  decimals=1, bar_length=100, complete_symbol='#', incomplete_symbol='-')
     progressBar.print_progress(iterationCounter, fileCount, decimals=1, bar_length=100, complete_symbol='#', incomplete_symbol='-')
     for file in filesToProcess:
 
-        # progress_prefix = '\n%s of %s' % (fileProcessCounter, fileCount)
         logging.info('\n%s of %s', fileProcessCounter, fileCount)
 
         importFileDestination = getImportMediaFileDestination(file, destDir, args['username'], fileProcessCounter)
@@ -141,7 +139,6 @@ def main():
 
         #   Update progressBar
         iterationCounter += 1
-        # progressBar.print_progress(iterationCounter, fileCount, prefix=progress_prefix, decimals=1, bar_length=100, complete_symbol='#', incomplete_symbol='-')
         progressBar.print_progress(iterationCounter, fileCount, decimals=1, bar_length=100, complete_symbol='#', incomplete_symbol='-')
 
         fileProcessCounter += 1

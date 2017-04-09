@@ -26,48 +26,8 @@ sys.setdefaultencoding('utf-8')
 #		file processing functions
 #------------------------------------------------------------------------------
 
-# builds a dictionary of all unique camera objects found, and a file sample to match
-def getUniqueCameras(mediaFile, cameraDict):
-    # originalFilePath = str(mediaFile).split("'")[1]
-    # when a single file is passed, the file name needs to be trimmed
-    try:
-        originalFilePath = str(mediaFile).split("'")[1]
-    # when a file is passed as part of a directory, it does not need to be trimmed
-    except:
-        originalFilePath = mediaFile
-
-    # print ">>> getting camera info for '%s'" % originalFilePath
-    extension = str(originalFilePath.split('.')[-1])
-
-    # ignore dot files i.e. '.DS_Store'
-    if originalFilePath.split('.')[0].endswith('/'):
-        # print 'ignoring %s' % originalFilePath
-        return 'IGNORE'
-
-    exifTagsDict = pyExifTools.JSONToDict(pyExifTools.p.get_json(originalFilePath))
-
-    cameraInfo = pyExifTools.getCameraInformation(exifTagsDict)
-
-    # cameraInfo.printInfo()
-
-    # camString = '%s_%s_%s_%s' % (cameraInfo.make, cameraInfo.model, cameraInfo.serial, cameraInfo.software)
-    camString = '%s_%s' % (cameraInfo.make, cameraInfo.model)
-
-    if camString == 'NONE_NONE':
-        camString = '%s' % (cameraInfo.software)
-
-    # if camera is not alrady in dictionary, add it
-    if camString not in cameraDict:
-        cameraDict[camString] = [[cameraInfo, mediaFile]]
-    # else the camera already exists, so append file to its list
-    else:
-        cameraDict[camString].append([cameraInfo, mediaFile])
-
-    return cameraDict
-
-
+#   builds a dictionary of all unique camera objects found, and a file sample to match
 def addToCameraDict(cameraDict, cameraObject, file):
-
 
     cameraObjectString = cameraObject.make + cameraObject.model + cameraObject.serial + cameraObject.software
 
@@ -78,6 +38,7 @@ def addToCameraDict(cameraDict, cameraObject, file):
 
     return cameraDict
 
+#   pretty print the camera report
 def printCameraReport(cameraDict):
 
     for key, value in sorted(cameraDict.iteritems()):
@@ -87,12 +48,15 @@ def printCameraReport(cameraDict):
 
         utils.spacer()
         print '%s.%s\t\t%s files' % (cameraObj.make, cameraObj.model, numFiles)
+        logging.info('%s.%s\t\t%s files', cameraObj.make, cameraObj.model, numFiles)
         cameraObj.printInfo()
         print 'Files:'
+        logging.info('Files:')
 
         #   print list of files
         for item in fileList:
             print '\t%s' % item
+            logging.info('\t%s', item)
 
 #------------------------------------------------------------------------------
 #		main function
@@ -127,8 +91,8 @@ def main():
     fileCount = len(filesToProcess)
 
     #   this dictionary is as follows
-        #   key:    cameraObject
-        #   value:  list of filtes whose camera Object match
+        #   key:    cameraObject as a string
+        #   value:  list [cameraObject, file1, file2, file3, ...]
     cameraDict = {}
 
     #   start progressBar
@@ -136,6 +100,8 @@ def main():
 
     #   build list of camera objects from the passed filesToProcess
     for file in filesToProcess:
+
+        logging.info('\n%s of %s', fileProcessCounter-1, fileCount)
 
         #   make mediaObject from file
         mediaFileObject = utils.getMediaFileObject(file)
