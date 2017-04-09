@@ -15,6 +15,7 @@ import logging
 import getpass
 import os
 from datetime import datetime
+import progressBar
 
 # special stuff to handle known non ascii cahracters, blame sony! (not really)
 import sys  # import sys package, if not already imported
@@ -93,21 +94,6 @@ def printCameraReport(cameraDict):
         for item in fileList:
             print '\t%s' % item
 
-    #
-    # # print list of all unique cameras, and their count
-    # for key,value in sorted(cameraDict.iteritems()):
-    #     pyExifTools.spacer()
-    #     print '(%i)\t%s' % (len(value), key)
-    #
-    # pyExifTools.bigSpacer()
-    #
-    # # print list of all unique cameras, their count, and all files that have the camera
-    # for key,value in sorted(cameraDict.iteritems()):
-    #     pyExifTools.spacer()
-    #     print '(%i)\t%s' % (len(value), key)
-    #     for val in value:
-    #         print '\t%s' % (val[-1])
-
 #------------------------------------------------------------------------------
 #		main function
 #------------------------------------------------------------------------------
@@ -137,7 +123,7 @@ def main():
 
     #   Get source directory contents
     filesToProcess = utils.getDirectoryContents(args['sourceDirectory'])
-    fileProcessCounter = 1
+    fileProcessCounter = 0
     fileCount = len(filesToProcess)
 
     #   this dictionary is as follows
@@ -145,16 +131,22 @@ def main():
         #   value:  list of filtes whose camera Object match
     cameraDict = {}
 
+    #   start progressBar
+    progressBar.print_progress(fileProcessCounter, fileCount, decimals=1, bar_length=100, complete_symbol='#', incomplete_symbol='-')
+
     #   build list of camera objects from the passed filesToProcess
     for file in filesToProcess:
 
         #   make mediaObject from file
-
         mediaFileObject = utils.getMediaFileObject(file)
         cameraObject = mediaFileObject.camera
 
         #   add (cameraObject, filePath) to cameraDict
         cameraDict = addToCameraDict(cameraDict, cameraObject, file)
+
+        #   update progressBar
+        fileProcessCounter += 1
+        progressBar.print_progress(fileProcessCounter, fileCount, decimals=1, bar_length=100, complete_symbol='#', incomplete_symbol='-')
 
 
     printCameraReport(cameraDict)
@@ -181,4 +173,27 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+        main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#EOF
