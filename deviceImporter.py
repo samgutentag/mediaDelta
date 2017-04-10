@@ -120,7 +120,7 @@ def main():
                         help='the destination directory of the files we want to import, typically on an external hard drive',
                         metavar='DESTINATION_DIRECTORY')
 
-    parser.add_argument('-move', '--move',
+    parser.add_argument('-move', '--moveOnly',
                         action='store_true', default = False,
                         required=False,
                         help='if passed, script will move teh files from source to destination, not make copies')
@@ -162,7 +162,7 @@ def main():
 
         importFileDestination = getImportMediaFileDestination(file, destDir, args['username'], fileProcessCounter, args['deviceMake'], args['deviceModel'])
 
-        if args['move']:
+        if args['moveOnly']:
             utils.safeMove(file, importFileDestination[0], importFileDestination[1])
         else:
             utils.safeCopy(file, importFileDestination[0], importFileDestination[1])
