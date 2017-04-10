@@ -69,9 +69,9 @@ def getImportMediaFileDestination(inputFile, destinationDir, user, counter):
                                                     mediaFileObject.extension.lower())
 
     #   format: <destinationDir>/<camera>/<mediaType>/<YYYY><MM><DD>/
-    importFilePath = '%s/%s/%s/%s%s%s/' % (destinationDir,
+    importFilePath = '%s/%s/%s.%s/%s%s%s/' % (destinationDir,
                                         mediaFileObject.type,
-                                        mediaFileObject.camera.model,
+                                        mediaFileObject.camera.make, mediaFileObject.camera.model,
                                         mediaFileObject.dateTime.year, mediaFileObject.dateTime.month, mediaFileObject.dateTime.day)
 
     return (importFilePath, importFileName)
@@ -100,6 +100,11 @@ def main():
                         required = True,
                         help='the destination directory of the files we want to import, typically on an external hard drive',
                         metavar='DESTINATION_DIRECTORY')
+
+    parser.add_argument('-move', '--move',
+                        action='store_true', default = False,
+                        required=False,
+                        help='if passed, script will move teh files from source to destination, not make copies')
 
     args = vars(parser.parse_args())
 
@@ -135,7 +140,10 @@ def main():
 
         importPath = importFileDestination[0] + importFileDestination[1]
 
-        utils.safeCopy(file, importFileDestination[0], importFileDestination[1])
+        if args['move']:
+            utils.safeMove(file, importFileDestination[0], importFileDestination[1])
+        else:
+            utils.safeCopy(file, importFileDestination[0], importFileDestination[1])
 
         #   Update progressBar
         iterationCounter += 1

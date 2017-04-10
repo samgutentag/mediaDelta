@@ -266,7 +266,7 @@ def JSONToDict(data):
 
     return dataDict
 
-#   copy files and preserve metadata
+#   copy or move files and preserve metadata
 #   handles copies by incrementing a copy counter
 #   will overwrite when copies exceed 9999
 #   returns absolute file path file was copied to
@@ -322,6 +322,60 @@ def safeCopy(sourceFile, destinationDirectoryName, destinationFileName):
             break
 
     shutil.copy2(sourceFile, str(destinationAbsoluteFilePath))
+
+    return str(destinationAbsoluteFilePath)
+def safeMove(sourceFile, destinationDirectoryName, destinationFileName):
+
+    destinationAbsoluteFilePath = destinationDirectoryName + destinationFileName
+
+    # increment counter when file already exists, helps elliminate file overwrite
+    # fails out after 9999 copies are found, instead dumps all subsequent files to
+    # counter '9999', WILL OVERWRITE
+    def incrementCounter(sourceName):
+        origCounter = sourceName.split('.')[-2]
+
+        # get current counter value
+        currentCounter = sourceName.split('.')[-2]
+
+        # trim leading zeros
+        while currentCounter[:1] == '0':
+            currentCounter = currentCounter[1:]
+
+        # format to integer and increment
+        if int(currentCounter) < 9999:
+            counter = int(currentCounter) + 1
+        else:
+            counter = 9999
+
+        # format to string and left side zero pad counter
+        newCounterString = str(counter)
+        while len(newCounterString) < 4:
+            newCounterString = '0' + newCounterString
+
+        # add prefix and suffix '.', to help replace function better find only
+        # counter portion of the file name string
+        origCounterString = '.' + origCounter + '.'
+        newCounterString = '.' + newCounterString + '.'
+
+        incrementendFileName = sourceName.replace(origCounterString, newCounterString)
+
+        return incrementendFileName
+
+    # check if destination directory exists, if not create it
+    if not os.path.exists(destinationDirectoryName):
+        os.makedirs(destinationDirectoryName)
+
+    # check if file exists
+    while os.path.isfile(destinationAbsoluteFilePath):
+        # print 'file exists, attempting to increment counter...'
+        # this file exists! increment the counter
+        destinationAbsoluteFilePath = incrementCounter(destinationAbsoluteFilePath)
+
+        # when the counter reaches 9999, break out of while loop!
+        if destinationAbsoluteFilePath.split('.')[-2] == '9999':
+            break
+
+    shutil.move(sourceFile, str(destinationAbsoluteFilePath))
 
     return str(destinationAbsoluteFilePath)
 
@@ -508,7 +562,7 @@ def cameraObjectCleaner(cameraObject):
     #   adjustements for casio cameras
     if cameraObject.make.upper() == 'CASIO.COMPUTER.CO.,LTD.':
         cameraObject.make = 'Casio'
-        cameraObject.model = 'Casio.%s' % cameraObject.model
+        cameraObject.model = cameraObject.model
         cameraObject.serial = cameraObject.serial
         cameraObject.software = cameraObject.software
         # cameraObject.printInfo()
@@ -529,122 +583,16 @@ def cameraObjectCleaner(cameraObject):
         cameraObject.serial = cameraObject.serial
         cameraObject.software = 'NONE'
 
-
-
-
-
     return cameraObject
-
-    # # adjustments for Canon cameras
-    # elif camera.make.upper() == 'CANON':
-    #         # left pad all canon serial numbers with zeros to be 12 digits long
-    #         if camera.serial == 'NONE':
-    #             tempSerialNumber = ''
-    #         else:
-    #             tempSerialNumber = camera.serial
-    #
-    #         while len(tempSerialNumber) < 13:
-    #             tempSerialNumber = '0' + tempSerialNumber
-    #
-    #         cleanCameraString = camera.model + '.' + userName + '.' + tempSerialNumber
-
-
-
-
-    #
-    # # adjustments for Kodak cameras
-    # elif camera.make.upper() == 'EASTMAN KODAK COMPANY':
-    #         cleanCameraString = camera.model
-    #
-    # # adjustments for GoPro cameras
-    # elif camera.make.upper() == 'GOPRO':
-    #         cleanCameraString = camera.make + '.' + camera.model + '.' + userName
-    #
-    # # adjustments for Sony cameras
-    # elif camera.make.upper() == 'SONY':
-    #         # sony camera models tend to have '-' in them, replace with '.'
-    #         tempModel = camera.model
-    #         tempModel = tempModel.replace('-', '.')
-    #
-    #         cleanCameraString = camera.make + '.' + tempModel + '.' + userName
-    #
-    # # adjustments for Nikon cameras
-    # elif camera.make.upper() == 'NIKON CORPORATION':
-    #         cleanCameraString = camera.model + '.' + userName
-    #
-    # elif camera.make != 'NONE':
-    #     cleanCameraString = cleanCameraString + '.' + camera.make
-    #
-    # elif camera.model != 'NONE':
-    #     cleanCameraString = cleanCameraString + '.' + camera.model
-    #
-    # else:
-    #     # print 'camera make not was not an option...'
-    #     # camera.printInfo()
-    #     cleanCameraString = 'UNKNOWNCAMERA'
-    #
-    #
-    # # remove anly leading '.'
-    # while cleanCameraString[0] == '.':
-    #     cleanCameraString = cleanCameraString[1:]
-
-
-    # return cameraObject
-
-
-
-
-
-
 
 
 #   sorts out camera information and returns a camera object
 def getCameraObject(exifData):
-    # we want make, model, serial number, software
+    #   we want make, model, serial number, software
     cameraMake = 'NONE'
     cameraModel  = 'NONE'
     cameraSerial = 'NONE'
     softwareName = 'NONE'
-
-    # # update CameraObject pieces if they can be found
-    # for key,value in exifData.iteritems():
-    #
-    #     # print '%s\t\t%s' % (key, value)
-    #
-    #     # get serial number string i.e. '192029004068'
-    #     if 'exif:serialnumber' in key.lower():
-    #         cameraSerial = str(exifData[key])
-    #
-    #     # # get make string i.e. 'Canon'
-    #     # # looks for user generate xmp exif tag if an originl from camera can not be found
-    #     # elif 'exif:make' in key.lower():
-    #     #     cameraMake = str(exifData[key])
-    #     # elif 'quicktime:make' in key.lower():
-    #     #     cameraMake = str(exifData[key])
-    #
-    #
-    #     # # get model string i.e. 'Canon EOS 5D Mark III'
-    #     # # looks for user generate xmp exif tag if an originl from camera can not be found
-    #     # elif 'exif:model' in key.lower():
-    #     #     cameraModel = str(exifData[key])
-    #     # elif 'quicktime:model' in key.lower():
-    #     #     cameraModel = str(exifData[key])
-    #
-    #     # # get software string i.e. 'Adobe Photoshop Lightroom 6.3 (Macintosh)''
-    #     # elif 'exif:software' in key.lower():
-    #     #     softwareName = str(exifData[key])
-    #     # elif 'quicktime:software' in key.lower():
-    #     #     softwareName = str(exifData[key])
-    #
-    #     #
-    #     # #   Manually writted tags get the 'xmp' prefix, these should override any other tags we find in the file
-    #     # elif 'xmp:make' in key.lower():
-    #     #     print 'found xmp:make! %s' % str(exifData[key])
-    #     #     cameraMake = str(exifData[key])
-    #     # elif 'xmp:model' in key.lower():
-    #     #     print 'found xmp:model! %s' % str(exifData[key])
-    #     #     cameraModel = str(exifData[key])
-    #
 
     #   get cameraMake metadata
     try:
@@ -683,8 +631,10 @@ def getCameraObject(exifData):
         pass
 
 
-    # build CameraObject
+    #   build CameraObject
     cameraObject = CameraObject(cameraMake, cameraModel, cameraSerial, softwareName)
+
+    #   clean camera object with known metadata tag 'fixes'
     cameraObject = cameraObjectCleaner(cameraObject)
 
     return cameraObject
