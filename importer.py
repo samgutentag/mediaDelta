@@ -48,7 +48,7 @@ sys.setdefaultencoding('utf-8')
 #   formats file name and destination directory for easy sorting
 def getImportMediaFileDestination(inputFile, destinationDir, user, counter):
 
-    print "\n>>> import processing '%s'" % inputFile
+    # print "\n>>> import processing '%s'" % inputFile
     logging.info(">>> import processing '%s'", inputFile)
 
     try:
