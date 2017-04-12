@@ -575,11 +575,19 @@ def cameraObjectCleaner(cameraObject):
         cameraObject.software = 'NONE'
         # cameraObject.printInfo()
 
-
-
+    #   adjustements for Kodak Cameras
     if cameraObject.make.upper() == 'EASTMAN.KODAK.COMPANY':
         cameraObject.make = 'Kodak'
         cameraObject.model = cameraObject.model[6:]
+        cameraObject.serial = cameraObject.serial
+        cameraObject.software = 'NONE'
+
+    #   adjustment for GoPro cameras
+    if cameraObject.make.upper() == 'GOPRO':
+        cameraObject.make = 'GoPro'
+        #   specific for Hero3+ Black Edition
+        if cameraObject.model.upper() == 'HERO3+.BLACK.EDITION':
+            cameraObject.model = 'Hero.3.Black'
         cameraObject.serial = cameraObject.serial
         cameraObject.software = 'NONE'
 
@@ -772,7 +780,7 @@ def setExifTags(argsList, fileList):
     # progress_prefix = '\n%s of %s' % (iterationCounter, fileCount)
     logging.info('\n%s of %s', iterationCounter, fileCount)
 
-    # progressBar.print_progress(iterationCounter, fileCount, prefix=progress_prefix, decimals=1, bar_length=100, complete_symbol='#', incomplete_symbol='-')
+    print 'Setting exifs for %s media files...' % str(fileCount)
     progressBar.print_progress(iterationCounter, fileCount, decimals=1, bar_length=100, complete_symbol='#', incomplete_symbol='-')
 
     #   append all arguments to 'exiftools' command line tool
@@ -782,12 +790,11 @@ def setExifTags(argsList, fileList):
     for item in fileList:
 
         #   print and log action
-        print "updating exif tags for '%s'" % item
+        # print "updating exif tags for '%s'" % item
         logging.info("updating exif tags for '%s'", item)
 
 
         executeArgs.append(str(item))
-        # progressBar.print_progress(iterationCounter, fileCount, prefix=progress_prefix, decimals=1, bar_length=100, complete_symbol='#', incomplete_symbol='-')
         progressBar.print_progress(iterationCounter, fileCount, decimals=1, bar_length=100, complete_symbol='#', incomplete_symbol='-')
         iterationCounter +=1
 

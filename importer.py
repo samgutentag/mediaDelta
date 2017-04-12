@@ -131,6 +131,7 @@ def main():
 
     #   Process files and import if not already imported
     iterationCounter = 0
+    print 'Importing %s media files...' % str(fileCount)
     progressBar.print_progress(iterationCounter, fileCount, decimals=1, bar_length=100, complete_symbol='#', incomplete_symbol='-')
     for file in filesToProcess:
 

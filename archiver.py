@@ -49,7 +49,7 @@ def getArchiveMediaFileDestination(inputFile, destinationDir, user):
 
     startTime = datetime.now()
 
-    print "\n>>> archive processing '%s'" % inputFile
+    # print "\n>>> archive processing '%s'" % inputFile
     logging.info(">>> archive processing '%s'",inputFile)
 
     try:
@@ -138,7 +138,7 @@ def main():
 
     #   Process files and archive them to their final destination, handles duplicates
     iterationCounter = 0
-    # progressBar.print_progress(iterationCounter, fileCount, prefix='import',  decimals=1, bar_length=100, complete_symbol='#', incomplete_symbol='-')
+    print 'Archiving %s media files...' % str(fileCount)
     progressBar.print_progress(iterationCounter, fileCount, decimals=1, bar_length=100, complete_symbol='#', incomplete_symbol='-')
     for file in filesToProcess:
 
@@ -151,9 +151,9 @@ def main():
         archivePath = archiveFileDestination[0] + archiveFileDestination[1]
 
         if args['moveOnly']:
-            utils.safeMove(file, importFileDestination[0], importFileDestination[1])
+            utils.safeMove(file, archiveFileDestination[0], archiveFileDestination[1])
         else:
-            utils.safeCopy(file, importFileDestination[0], importFileDestination[1])
+            utils.safeCopy(file, archiveFileDestination[0], archiveFileDestination[1])
 
         #   Update progressBar
         iterationCounter += 1
