@@ -42,13 +42,15 @@ def print_progress(iteration, total, prefix='', suffix='', decimals=1, bar_lengt
     """
 
     str_format = "{0:." + str(decimals) + "f}"
-    percents = str_format.format(100 * (iteration / float(total)))
-    filled_length = int(round(bar_length * iteration / float(total)))
+    if total > 0:
+        percents = str_format.format(100 * (iteration / float(total)))
+        filled_length = int(round(bar_length * iteration / float(total)))
+    else:
+        percents = str_format.format(100)
+        filled_length = 100
+
 
     bar = complete_symbol * filled_length + incomplete_symbol * (bar_length - filled_length)
-
-    #   _-_-_-1 of 1234567
-    #   1234567 of 1234567
 
     if prefix == '':
         prefix_a = ' ' * (len(str(total)) - len(str(iteration))) + str(iteration)
