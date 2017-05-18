@@ -99,7 +99,7 @@ def main():
     logging.info('Creating Camera Report...')
 
     #   start progressBar
-    progressBar.print_progress(fileProcessCounter, fileCount, decimals=1, bar_length=100, complete_symbol='#', incomplete_symbol='-')
+    progressBar.print_progress(fileProcessCounter, fileCount, decimals=1, bar_length=40, complete_symbol='#', incomplete_symbol='-')
 
     #   build list of camera objects from the passed filesToProcess
     for file in filesToProcess:
@@ -115,7 +115,7 @@ def main():
 
         #   update progressBar
         fileProcessCounter += 1
-        progressBar.print_progress(fileProcessCounter, fileCount, decimals=1, bar_length=100, complete_symbol='#', incomplete_symbol='-')
+        progressBar.print_progress(fileProcessCounter, fileCount, decimals=1, bar_length=40, complete_symbol='#', incomplete_symbol='-')
 
 
     printCameraReport(cameraDict)

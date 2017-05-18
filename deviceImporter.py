@@ -154,7 +154,7 @@ def main():
     iterationCounter = 0
     print 'Device Import in progress...\n\t\t\tmake[%s]\n\t\t\t\tmodel[%s]' % (args['deviceMake'], args['deviceModel'])
     print 'Importing %s media files...' % str(fileCount)
-    progressBar.print_progress(iterationCounter, fileCount, decimals=1, bar_length=100, complete_symbol='#', incomplete_symbol='-')
+    progressBar.print_progress(iterationCounter, fileCount, decimals=1, bar_length=40, complete_symbol='#', incomplete_symbol='-')
     for file in filesToProcess:
 
 
@@ -176,7 +176,7 @@ def main():
 
         #   Update progressBar
         iterationCounter += 1
-        progressBar.print_progress(iterationCounter, fileCount, decimals=1, bar_length=100, complete_symbol='#', incomplete_symbol='-')
+        progressBar.print_progress(iterationCounter, fileCount, decimals=1, bar_length=40, complete_symbol='#', incomplete_symbol='-')
 
         fileProcessCounter += 1
 

@@ -795,7 +795,7 @@ def setExifTags(argsList, fileList):
 
 
         executeArgs.append(str(item))
-        progressBar.print_progress(iterationCounter, fileCount, decimals=1, bar_length=4 0, complete_symbol='#', incomplete_symbol='-')
+        progressBar.print_progress(iterationCounter, fileCount, decimals=1, bar_length=40, complete_symbol='#', incomplete_symbol='-')
         iterationCounter +=1
 
     spacer()
