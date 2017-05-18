@@ -781,7 +781,7 @@ def setExifTags(argsList, fileList):
     logging.info('\n%s of %s', iterationCounter, fileCount)
 
     print 'Setting exifs for %s media files...' % str(fileCount)
-    progressBar.print_progress(iterationCounter, fileCount, decimals=1, bar_length=100, complete_symbol='#', incomplete_symbol='-')
+    progressBar.print_progress(iterationCounter, fileCount, decimals=1, bar_length=40, complete_symbol='#', incomplete_symbol='-')
 
     #   append all arguments to 'exiftools' command line tool
     executeArgs = ['exiftool'] + argsList
