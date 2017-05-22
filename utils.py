@@ -230,12 +230,12 @@ def isValidMediaFileType(file):
     extensionToCheck = file.split('.')[-1].upper()
 
     # Weed out some sneaky dot files with valid file extensions
-    prefixCheck = file.split('.')[0][0]
+    prefixCheck = file[0]
     if prefixCheck == '.':
         return False
 
     # 'Valid' media file type extensions
-    validVideoFileExtensions = ['MOV', 'MP4', 'MPG', 'M4V', '3G2', 'ASF', 'AVI']
+    validVideoFileExtensions = ['MOV', 'MP4', 'MPG', 'M4V', '3G2', '3GP', 'ASF', 'AVI', 'WMV']
     validImageFileExtensions = ['JPG', 'PNG', 'TIF', 'TIFF', 'CR2', 'BMP', 'GIF', 'DNG']
 
     if extensionToCheck in validVideoFileExtensions:
