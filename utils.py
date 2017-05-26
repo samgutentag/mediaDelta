@@ -236,7 +236,7 @@ def isValidMediaFileType(file):
 
     # 'Valid' media file type extensions
     validVideoFileExtensions = ['MOV', 'MP4', 'MPG', 'M4V', '3G2', '3GP', 'ASF', 'AVI', 'WMV']
-    validImageFileExtensions = ['JPG', 'PNG', 'TIF', 'TIFF', 'CR2', 'BMP', 'GIF', 'DNG']
+    validImageFileExtensions = ['JPG', 'JPEG', 'PNG', 'TIF', 'TIFF', 'CR2', 'BMP', 'GIF', 'DNG']
 
     if extensionToCheck in validVideoFileExtensions:
         return True
