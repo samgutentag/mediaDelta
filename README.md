@@ -12,8 +12,7 @@
 - create media with camera or drone or phone or potato
 
 - Import from media card using
-  - "importer.py" to '/STAGING_DRIVE/STAGING'
-  - "deviceImporter.py" to '/STAGING_DRIVE/STAGING'
+  - "importer.py" to '/STAGING_DRIVE/staging'
 
 - Use Lightroom to go over images and import (via "Copy as DNG") to '/MASTERS_DRIVE/MASTERS' AND TO 'MASTERS_BACKUP_DRIVE/MASTERS'
 
