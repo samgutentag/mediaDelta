@@ -2,7 +2,7 @@ Skratch pad for some notes!
 
 
 #   Convert directory of cr2 files to jpg files
-> for i in *.cr2; do sips -s format jpeg $i --out "${i%.*}.jpg"; done
+> for i in *.cr2; do sips -s format jpeg $i --out "${i%.*}.jpg"; done; say -v Daniel "Conversion Complete\!"
 
 
 #   Convert series of images to 24fps video file
