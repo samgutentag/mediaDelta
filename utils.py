@@ -125,6 +125,12 @@ def getEXIFPreset(presetName):
         exifArgs['-make='] = 'DJI'
         exifArgs['-model='] = 'Mavic.Pro'
 
+    #   Testing preset
+    if presetName.upper() == 'TEST':
+        #   exif arguments to be run to update exif info
+        exifArgs['-make='] = 'TEST_MAKE'
+        exifArgs['-model='] = 'TEST_MODEL'
+
     return exifArgs
 
 
