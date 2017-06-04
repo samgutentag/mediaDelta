@@ -1,0 +1,29 @@
+Skratch pad for some notes!
+
+
+#   Convert directory of cr2 files to jpg files
+> for i in *.cr2; do sips -s format jpeg $i --out "${i%.*}.jpg"; done
+
+
+#   Convert series of images to 24fps video file
+> ffmpeg -r 24 -f image2 -start_number 1 -i image_%02d.jpg -codec:v prores -profile:v 2 output.mov
+
+converts a sequence [image_xx, … , image_yy] to a movie ‘output.mov’ at frame rate 24
+
+
+#   Slow down or speed up video clips
+> ffmpeg -i <sourceFile>.<ext> -vf “setpts=(<sourceFPS>/<desiredFPS>*PTS” -r “<outputFileFPS” <outputFile>.<ext>
+
+examples:
+	Slow down 60fps source to 24fps, creating a 60fps file (this would be a little choppy)
+	> ffmpeg -i input.mov -vf “setpts=(60/24)*PTS” -r “60” output.mov
+
+	Slow down 60fps source to 24fps, creating a 24fps file
+	> ffmpeg -i input.mov -vf “setpts=(60/24)*PTS” -r “24” output.mov
+
+	Speed up 24fps source to 60fps, creating a 60fps file
+	> ffmpeg -i input.mov -vf “setpts=(24/60)*PTS” -r “60” output.mov
+
+    Syncing Audio Speed changes with Video Speed Changes, playback video and audio at half speed
+    > ffmpeg -i input.mov -filter_complex "[0:v]setpts=0.5*PTS[v];[0:a]atempo=2.0[a]" -map "[v]" -map ["a"] output.mov
+                *** note the atempo and setpts are inverse each other ***
