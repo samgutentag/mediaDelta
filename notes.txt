@@ -15,6 +15,10 @@ Skratch pad for some notes!
 		scale=1920:-1									set output scale, the -1 will match the 1920 to the aspect ration we cropped to
 
 
+#   Crop 4k Drone footage down to 1920x1080HD, assumes 4096x2160 source footage
+> ffmpeg -i input.mov -vf crop=3840:2160:128:0,scale=1920:-1 -codev:v prores:v 2 output.mov
+				128 = (4096-3840)/2
+
 #   Slow down or speed up video clips
 > ffmpeg -i <sourceFile>.<ext> -vf “setpts=(<sourceFPS>/<desiredFPS>*PTS” -r “<outputFileFPS” <outputFile>.<ext>
 
