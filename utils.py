@@ -108,6 +108,27 @@ class MediaFileObject:
 
 
 #------------------------------------------------------------------------------
+#		presets
+#------------------------------------------------------------------------------
+
+#   these are all custom presets, they return a mediaFileObject, set them here
+#   returns a dictionary of key, value pairs
+#   key = '-KEY='       string
+#   value = 'VALUE'     string
+def getEXIFPreset(presetName):
+
+    exifArgs = {}
+
+    #   DJI Mavic preset
+    if presetName.upper() == 'MAVIC' or presetName.upper() == 'DRONE':
+        #   exif arguments to be run to update exif info
+        exifArgs['-make='] = 'DJI'
+        exifArgs['-model='] = 'Mavic.Pro'
+
+    return exifArgs
+
+
+#------------------------------------------------------------------------------
 #       pretty printer functions
 #------------------------------------------------------------------------------
 
@@ -777,7 +798,11 @@ def backupMediaFile(sourceDir, inputFile, destinationDir):
 #------------------------------------------------------------------------------
 
 #   takes a list of arguments and a list of files to pass the against exiftools
-def setExifTags(argsList, fileList):
+def setExifTags(argsDict, fileList):
+
+    argsList = []
+    for key, value in argsDict.iteritems():
+        argsList.append('%s%s' % (key, value))
 
     fileCount = len(fileList)
 
@@ -786,35 +811,41 @@ def setExifTags(argsList, fileList):
     logging.info('\n%s of %s', iterationCounter, fileCount)
 
     print 'Setting exifs for %s media files...' % str(fileCount)
-    progressBar.print_progress(iterationCounter, fileCount, decimals=1, bar_length=40, complete_symbol='#', incomplete_symbol='-')
+    # progressBar.print_progress(iterationCounter, fileCount, decimals=1, bar_length=40, complete_symbol='#', incomplete_symbol='-')
 
     #   append all arguments to 'exiftools' command line tool
     executeArgs = ['exiftool'] + argsList
 
+    #   print and log action
+    # print "updating exif tags for '%s'" % item
+    logging.info("updating exif tags for '%s'", fileList)
+
     #   append all files to run arguments against
     for item in fileList:
 
-        #   print and log action
-        # print "updating exif tags for '%s'" % item
         logging.info("updating exif tags for '%s'", item)
-
 
         executeArgs.append(str(item))
         progressBar.print_progress(iterationCounter, fileCount, decimals=1, bar_length=40, complete_symbol='#', incomplete_symbol='-')
         iterationCounter +=1
 
-    spacer()
+    # spacer()
     print 'Running exiftools...'
     logging.info('Running exiftools...')
     subprocess.call(executeArgs)
 
 
 #   writes all exiftags from a srouce media file to the target media file
+#                                                                               ** THIS MIGHT NOT BE WORKING.... **
 def matchExifTags(sourceFile, targetFile):
 
     #   append all arguments to 'exiftools' command line tool
-    executeArgs = ['exiftool -tagsFromFile'] + [sourceFile] + [targetFile]
+    executeArgs = ['exiftool -TagsFromFile']
+    executeArgs.append(str(sourceFile))
+    executeArgs.append(str(targetFile))
 
     print 'Running exiftools...'
     logging.info('Running exiftools...')
     subprocess.call(executeArgs)
+    # for x in executeArgs:
+    #     print x

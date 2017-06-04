@@ -50,7 +50,8 @@ sys.setdefaultencoding('utf-8')
 #------------------------------------------------------------------------------
 
 #   formats file name and destination directory for easy sorting
-def getImportMediaFileDestination(inputFile, destinationDir, user, counter, make, model):
+# def getImportMediaFileDestination(inputFile, destinationDir, user, counter, make, model):
+def getImportMediaFileDestination(inputFile, destinationDir, user, counter):
 
     # print "\n>>> import processing '%s'" % inputFile
     logging.info(">>> import processing '%s'", inputFile)
@@ -60,9 +61,9 @@ def getImportMediaFileDestination(inputFile, destinationDir, user, counter, make
         #   generate a mediaFileObject from the given input file
         mediaFileObject = utils.getMediaFileObject(inputFile, user)
 
-        #   set mediaFileObject camera make and model for device
-        mediaFileObject.camera.make = make
-        mediaFileObject.camera.model = model
+        # #   set mediaFileObject camera make and model for device
+        # mediaFileObject.camera.make = make
+        # mediaFileObject.camera.model = model
 
     except:
         print 'ERROR:\tcould not create mediaFileObject from \'%s\', skipping...' % inputFile
@@ -101,14 +102,19 @@ def main():
                         metavar='USER_NAME')
 
     parser.add_argument('-make', '--deviceMake', dest='deviceMake',
-                        required = True,
+                        required = False,
                         help = 'pass the device make for usage in organizing and writing exiftags',
                         metavar='DREVICEMAKE')
 
     parser.add_argument('-model', '--deviceModel', dest='deviceModel',
-                        required = True,
+                        required = False,
                         help = 'pass the device model for usage in organizing and writing exiftags, use periods in place of spaces',
                         metavar='DEVICE_MODEL')
+
+    parser.add_argument('-preset', '--devicePreset', dest='devicePreset',
+                        required = False,
+                        help = 'pass a preset with device make and model for usage in organizing and writing exiftags, use periods in place of spaces',
+                        metavar='DEVICE_PRESET')
 
     parser.add_argument('-s', '--source', dest='sourceDirectory',
                         required = True,
@@ -138,6 +144,27 @@ def main():
     utils.prettyPrintDict(args)
     utils.spacer()
 
+
+    #   Check for a prest to have been passed, then look for make and model arguments, then dump out
+    #   PRESETS WILL OVERRIDE MAKE AND MODEL ARGUMENTS
+    exifArgs = {}
+    if args['devicePreset']:
+        print 'Importing files with the \'%s\' devicePreset exif tag updates' % args['devicePreset']
+        logging.info('Importing files with the \'%s\' devicePreset exif tag updates', args['devicePreset'])
+        exifArgs = utils.getEXIFPreset(args['devicePreset'])
+    else:
+        if args['deviceMake'] and args['deviceModel']:
+            print 'Importing files with \'%s\' and \'%s\' passed as deviceMake and deviceModel exif tag updates' % (args['deviceMake'], args['deviceModel'])
+            logging.info('Importing files with \'%s\' and \'%s\' passed as deviceMake and deviceModel exif tag updates', args['deviceMake'], args['deviceModel'])
+
+            #   exif arguments to be run to update exif info
+            exifArgs['-make='] = args['deviceMake']
+            exifArgs['-model='] = args['deviceModel']
+        else:
+            print 'No devicePreset or deviceMake and deviceModel arguments passed, no exif tags will be changed...'
+            logging.info('\nNo devicePreset or deviceMake and deviceModel arguments passed, no exif tags will be changed...')
+
+
     #   Get source directory contents
     filesToProcess = utils.getDirectoryContents(args['sourceDirectory'])
     fileProcessCounter = 1
@@ -152,16 +179,18 @@ def main():
 
     #   Process files and import if not already imported
     iterationCounter = 0
-    print 'Device Import in progress...\n\t\t\tmake[%s]\n\t\t\t\tmodel[%s]' % (args['deviceMake'], args['deviceModel'])
+    # else:
+    #     print 'Import in progress...'
+
     print 'Importing %s media files...' % str(fileCount)
     progressBar.print_progress(iterationCounter, fileCount, decimals=1, bar_length=40, complete_symbol='#', incomplete_symbol='-')
     for file in filesToProcess:
 
-
         # progress_prefix = '\n%s of %s' % (fileProcessCounter, fileCount)
         logging.info('\n%s of %s', fileProcessCounter, fileCount)
 
-        importFileDestination = getImportMediaFileDestination(file, destDir, args['username'], fileProcessCounter, args['deviceMake'], args['deviceModel'])
+        # importFileDestination = getImportMediaFileDestination(file, destDir, args['username'], fileProcessCounter, args['deviceMake'], args['deviceModel'])
+        importFileDestination = getImportMediaFileDestination(file, destDir, args['username'], fileProcessCounter)
 
         if args['moveOnly']:
             utils.safeMove(file, importFileDestination[0], importFileDestination[1])
@@ -171,8 +200,9 @@ def main():
 
         importPath = importFileDestination[0] + importFileDestination[1]
 
-        #   set exif data on copied file to match device info
-        filesToAdjustExifData.append(importPath)
+        if len(exifArgs) > 0:
+            #   set exif data on copied file to match device info
+            filesToAdjustExifData.append(importPath)
 
         #   Update progressBar
         iterationCounter += 1
@@ -180,13 +210,41 @@ def main():
 
         fileProcessCounter += 1
 
-    #   run command to update exif info on all the files we just imported
-    exifArg_make = '-make=%s' % args['deviceMake']
-    exifArg_model = '-model=%s' % args['deviceModel'].replace('.', ' ')
+    #   if there are any exif tags to update, do that now
+    if len(exifArgs) > 0:
+        print 'UPDATING EXIF TAGS'
+        #   set ecif tags of all copied files
+        utils.setExifTags(exifArgs, filesToAdjustExifData)
+    else:
+        print 'NOT UPDATING EXIF TAGS'
 
-    exifArgs = [exifArg_make, exifArg_model]
 
-    utils.setExifTags(exifArgs, filesToAdjustExifData)
+    # now that files have had their exif tags updated, 're import them' with a move command
+    if len(filesToAdjustExifData) > 0:
+        fileProcessCounter = 1
+        print 'Resorting files with updated exif tags...'
+        iterationCounter = 0
+        progressBar.print_progress(iterationCounter, fileCount, decimals=1, bar_length=40, complete_symbol='#', incomplete_symbol='-')
+
+
+        for file in filesToAdjustExifData:
+
+            # progress_prefix = '\n%s of %s' % (fileProcessCounter, fileCount)
+            logging.info('\n%s of %s', fileProcessCounter, fileCount)
+
+            importFileDestination = getImportMediaFileDestination(file, destDir, args['username'], fileProcessCounter)
+
+            utils.safeMove(file, importFileDestination[0], importFileDestination[1])
+
+
+            importPath = importFileDestination[0] + importFileDestination[1]
+
+            #   Update progressBar
+            iterationCounter += 1
+            progressBar.print_progress(iterationCounter, fileCount, decimals=1, bar_length=40, complete_symbol='#', incomplete_symbol='-')
+
+            fileProcessCounter += 1
+
 
     #   Say Goodbye!
     utils.spacer()
