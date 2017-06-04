@@ -31,3 +31,18 @@ examples:
     Syncing Audio Speed changes with Video Speed Changes, playback video and audio at half speed
     > ffmpeg -i input.mov -filter_complex "[0:v]setpts=0.5*PTS[v];[0:a]atempo=2.0[a]" -map "[v]" -map ["a"] output.mov
                 *** note the atempo and setpts are inverse each other ***
+
+#	Convert MOV to mp4
+> ffmpeg -i input.mov -vcodec h264 -acodec aac -strict -2 output.mp4
+
+
+#	Smoothing out video
+
+	#	First create transform.trf
+	> ffmpeg -i clip.mp4 -vf vidstabdetect -f null -
+
+	#	Use the .trf file to create a stabilized video
+	> ffmpeg -i clip.mp4 -vf vidstabtransform=smoothing=5:input="transforms.trf" clip-stabilized.mp4
+
+	#	Bonus: create a side by side comparison video
+	> ffmpeg -i clip.mov -i clip-stabilized.mov -filter_complex "[0:v:0]pad=iw*2:ih[bg]; [bg][1:v:0]overlay=w" clips-merged.mp4
