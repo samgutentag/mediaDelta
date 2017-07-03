@@ -1,7 +1,7 @@
 #!/usr/bin/end python
 
 #------------------------------------------------------------------------------
-#		Sample Usage
+#        Sample Usage
 #------------------------------------------------------------------------------
 #
 #   > python cameraReporter.py -s ~/Desktop/testPhotos
@@ -23,7 +23,7 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 #------------------------------------------------------------------------------
-#		file processing functions
+#        file processing functions
 #------------------------------------------------------------------------------
 
 #   builds a dictionary of all unique camera objects found, and a file sample to match
@@ -59,7 +59,7 @@ def printCameraReport(cameraDict):
             logging.info('\t%s', item)
 
 #------------------------------------------------------------------------------
-#		main function
+#        main function
 #------------------------------------------------------------------------------
 
 def main():

@@ -1,7 +1,7 @@
 #!/usr/bin/end python
 
 #------------------------------------------------------------------------------
-#		Description
+#        Description
 #       Used to print out exif tags from a passed directory of images or a
 #       single image file.
 #
@@ -9,7 +9,7 @@
 #       directory, will create one if it is not already present
 #
 #------------------------------------------------------------------------------
-#		Sample Usage
+#        Sample Usage
 #   >   python printExifTags.py -s /Volumes/EOS_DIGITAL/
 #   >   python printExifTags.py -s ~/Desktop/sampleImages/image.0001.CR2
 #
@@ -27,7 +27,7 @@ import os
 
 
 #------------------------------------------------------------------------------
-#		main function
+#        main function
 #------------------------------------------------------------------------------
 
 def main():

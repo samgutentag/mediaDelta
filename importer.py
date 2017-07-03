@@ -1,7 +1,7 @@
 #!/usr/bin/end python
 
 #------------------------------------------------------------------------------
-#		Description
+#        Description
 #       Script imports media files from a user passed directory to a user
 #       specified destination.  This version of the importer script is designed
 #       for media that comes from a single source device or camera.  Passing
@@ -20,7 +20,7 @@
 #       <user>.<camera>.<YYYY><MM><DD>.<HH><mm><SS><sss>.<counter>.<extention>
 #
 #------------------------------------------------------------------------------
-#		Sample Usage
+#        Sample Usage
 #   >   python importer.py -u $USER -make DJI -model Mavic.Pro -s /Volumes/EOS_DIGITAL/ -d /Volumes/IMAGE_500/STAGING/
 #   >   python importer.py -u $USER -preset drone -s /Volumes/EOS_DIGITAL/ -d /Volumes/IMAGE_500/STAGING/
 #   >   python importer.py -preset drone -s /Volumes/EOS_DIGITAL/ -d /Volumes/IMAGE_500/STAGING/

@@ -7,49 +7,49 @@ Skratch pad for some notes!
 
 #   Convert series of images to 24fps video file
 > ffmpeg -r 24 -f image2 -start_number 1 -i image_%02d.jpg -codec:v prores -profile:v 2 output.mov
-	converts a sequence [image_xx, … , image_yy] to a movie ‘output.mov’ at frame rate 24
+    converts a sequence [image_xx, … , image_yy] to a movie ‘output.mov’ at frame rate 24
 
 #   Convert series of images to 24fps video file, cropping and scaling 5472x3648 source images to a 1920x1080 output
 >ffmpeg -r 24 -f image2 -start_number 1 -i image_%02d.jpg -vf crop=5472:3078:0:285,scale=1920:-1 -codec:v prores -profile:v 2 ~/Desktop/1920x1080Test.mov
-		crop=(sourceWidth):(sourceWidth*9/16):0:(sourceHeight-(sourceWidth*9/16))/2	crops vertical from center to get the correct aspect ratio (16:9)
-		scale=1920:-1									set output scale, the -1 will match the 1920 to the aspect ration we cropped to
+        crop=(sourceWidth):(sourceWidth*9/16):0:(sourceHeight-(sourceWidth*9/16))/2    crops vertical from center to get the correct aspect ratio (16:9)
+        scale=1920:-1                                    set output scale, the -1 will match the 1920 to the aspect ration we cropped to
 
 
 #   Crop 4k Drone footage down to 1920x1080HD, assumes 4096x2160 source footage
 > ffmpeg -i input.mov -vf crop=3840:2160:128:0,scale=1920:-1 -codev:v prores:v 2 output.mov
-				128 = (4096-3840)/2
+                128 = (4096-3840)/2
 
 #   Slow down or speed up video clips
 > ffmpeg -i <sourceFile>.<ext> -vf “setpts=(<sourceFPS>/<desiredFPS>*PTS” -r “<outputFileFPS” <outputFile>.<ext>
 
 examples:
-	Slow down 60fps source to 24fps, creating a 60fps file (this would be a little choppy)
-	> ffmpeg -i input.mov -vf “setpts=(60/24)*PTS” -r “60” output.mov
+    Slow down 60fps source to 24fps, creating a 60fps file (this would be a little choppy)
+    > ffmpeg -i input.mov -vf “setpts=(60/24)*PTS” -r “60” output.mov
 
-	Slow down 60fps source to 24fps, creating a 24fps file
-	> ffmpeg -i input.mov -vf “setpts=(60/24)*PTS” -r “24” output.mov
+    Slow down 60fps source to 24fps, creating a 24fps file
+    > ffmpeg -i input.mov -vf “setpts=(60/24)*PTS” -r “24” output.mov
 
-	Speed up 24fps source to 60fps, creating a 60fps file
-	> ffmpeg -i input.mov -vf “setpts=(24/60)*PTS” -r “60” output.mov
+    Speed up 24fps source to 60fps, creating a 60fps file
+    > ffmpeg -i input.mov -vf “setpts=(24/60)*PTS” -r “60” output.mov
 
     Syncing Audio Speed changes with Video Speed Changes, playback video and audio at half speed
     > ffmpeg -i input.mov -filter_complex "[0:v]setpts=0.5*PTS[v];[0:a]atempo=2.0[a]" -map "[v]" -map ["a"] output.mov
                 *** note the atempo and setpts are inverse each other ***
 
-#	Convert MOV to mp4
+#    Convert MOV to mp4
 > ffmpeg -i input.mov -vcodec h264 -acodec aac -strict -2 output.mp4
 
-#	Convert mp4 to MOV
+#    Convert mp4 to MOV
 > ffmpeg -i input_file.mp4 -acodec copy -vcodec copy -f mov output_file.mov
 
 
-#	Smoothing out video
+#    Smoothing out video
 
-	#	First create transform.trf
-	> ffmpeg -i clip.mp4 -vf vidstabdetect -f null -
+    #    First create transform.trf
+    > ffmpeg -i clip.mp4 -vf vidstabdetect -f null -
 
-	#	Use the .trf file to create a stabilized video
-	> ffmpeg -i clip.mp4 -vf vidstabtransform=smoothing=5:input="transforms.trf" clip-stabilized.mp4
+    #    Use the .trf file to create a stabilized video
+    > ffmpeg -i clip.mp4 -vf vidstabtransform=smoothing=5:input="transforms.trf" clip-stabilized.mp4
 
-	#	Bonus: create a side by side comparison video
-	> ffmpeg -i clip.mov -i clip-stabilized.mov -filter_complex "[0:v:0]pad=iw*2:ih[bg]; [bg][1:v:0]overlay=w" clips-merged.mp4
+    #    Bonus: create a side by side comparison video
+    > ffmpeg -i clip.mov -i clip-stabilized.mov -filter_complex "[0:v:0]pad=iw*2:ih[bg]; [bg][1:v:0]overlay=w" clips-merged.mp4

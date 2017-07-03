@@ -19,7 +19,7 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 #------------------------------------------------------------------------------
-#		classes
+#        classes
 #------------------------------------------------------------------------------
 
 class CameraObject:
@@ -108,7 +108,7 @@ class MediaFileObject:
 
 
 #------------------------------------------------------------------------------
-#		presets
+#        presets
 #------------------------------------------------------------------------------
 
 #   these are all custom presets, they return a mediaFileObject, set them here
@@ -229,7 +229,7 @@ def bigSpacer():
 
 
 #------------------------------------------------------------------------------
-#		file relocation functions
+#        file relocation functions
 #------------------------------------------------------------------------------
 
 #   returns directory contents as a list
@@ -413,7 +413,7 @@ def safeMove(sourceFile, destinationDirectoryName, destinationFileName):
 
 
 #------------------------------------------------------------------------------
-#		DateTimeObject functions
+#        DateTimeObject functions
 #------------------------------------------------------------------------------
 
 #   compare two DateTimeObjects and return earlier one
@@ -574,7 +574,7 @@ def getDateTimeObject(exifData):
 
 
 #------------------------------------------------------------------------------
-#		CameraObject Functions
+#        CameraObject Functions
 #------------------------------------------------------------------------------
 
 #   clean up camera information for file naming
@@ -681,7 +681,7 @@ def getCameraObject(exifData):
 
 
 #------------------------------------------------------------------------------
-#		MediaFileObject Functions
+#        MediaFileObject Functions
 #------------------------------------------------------------------------------
 
 #   uses information from exifData to create a MediaFileObject if possible
@@ -751,7 +751,7 @@ def getMediaFileType(exifData):
 
 
 #------------------------------------------------------------------------------
-#		file backup functions
+#        file backup functions
 #------------------------------------------------------------------------------
 
 #   creates a backup of files if and only if they do not already exist in the destinationDir structure
@@ -800,7 +800,7 @@ def backupMediaFile(sourceDir, inputFile, destinationDir):
 
 
 #------------------------------------------------------------------------------
-#		Command Line Tool Wrappers
+#        Command Line Tool Wrappers
 #------------------------------------------------------------------------------
 
 #   takes a list of arguments and a list of files to pass the against exiftools

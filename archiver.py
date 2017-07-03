@@ -1,7 +1,7 @@
 #!/usr/bin/end python
 
 #------------------------------------------------------------------------------
-#		Description
+#        Description
 #       Script is ideal for archiving large photo or video libraries, uses exif
 #       tags to sort media files into a structured folder system.  If duplicates
 #       are found, they are given an incremented counter in the file name, up to
@@ -17,7 +17,7 @@
 #       <YYYY><MM><DD>.<HH><MM><SS><sss.<creator>.<counter>.<extension>
 #
 #------------------------------------------------------------------------------
-#		Sample Usage
+#        Sample Usage
 #   >   python archiver.py -u $USER -s /Volumes/EOS_DIGITAL/ -d /Volumes/IMAGE_500/STAGING/
 #
 #------------------------------------------------------------------------------
@@ -83,7 +83,7 @@ def getArchiveMediaFileDestination(inputFile, destinationDir, user):
 
 
 #------------------------------------------------------------------------------
-#	Main Function
+#    Main Function
 #------------------------------------------------------------------------------
 
 def main():
