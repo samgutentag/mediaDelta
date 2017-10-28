@@ -1,4 +1,4 @@
-name: py2
+name: mediaDelta
 channels:
 - anaconda-fusion
 - defaults
