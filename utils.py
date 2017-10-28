@@ -125,6 +125,12 @@ def getEXIFPreset(presetName):
         exifArgs['-make='] = 'DJI'
         exifArgs['-model='] = 'Mavic.Pro'
 
+    #   GOPRO preset
+    if presetName.upper() == 'GOPRO3B' or presetName.upper() == 'GOPRO':
+        #   exif arguments to be run to update exif info
+        exifArgs['-make='] = 'GOPRO'
+        exifArgs['-model='] = 'Hero.3.Black'
+
     #   Testing preset
     if presetName.upper() == 'TEST':
         #   exif arguments to be run to update exif info

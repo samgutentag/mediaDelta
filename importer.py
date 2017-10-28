@@ -115,7 +115,7 @@ def main():
 
     parser.add_argument('-preset', '--devicePreset', dest='devicePreset',
                         required = False,
-                        help = 'pass a preset with device make and model for usage in organizing and writing exiftags, use periods in place of spaces',
+                        help = 'pass a preset with device make and model for usage in organizing and writing exiftags, use periods in place of spaces\n\t MAVIC, DRONE, GOPRO_3B, GOPRO',
                         metavar='DEVICE_PRESET')
 
     parser.add_argument('-s', '--source', dest='sourceDirectory',
