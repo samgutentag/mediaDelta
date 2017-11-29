@@ -132,6 +132,12 @@ def getEXIFPreset(presetName):
         exifArgs['-model='] = 'Hero.3.Black'
 
     #   Testing preset
+    if presetName.upper() == 'A6500':
+        #   exif arguments to be run to update exif info
+        exifArgs['-make='] = 'Sony'
+        exifArgs['-model='] = 'a6500'
+
+    #   Testing preset
     if presetName.upper() == 'TEST':
         #   exif arguments to be run to update exif info
         exifArgs['-make='] = 'TEST_MAKE'
@@ -269,7 +275,7 @@ def isValidMediaFileType(file):
 
     # 'Valid' media file type extensions
     validVideoFileExtensions = ['MOV', 'MP4', 'MPG', 'M4V', '3G2', '3GP', 'ASF', 'AVI', 'WMV']
-    validImageFileExtensions = ['JPG', 'JPEG', 'PNG', 'TIF', 'TIFF', 'CR2', 'BMP', 'GIF', 'DNG']
+    validImageFileExtensions = ['JPG', 'JPEG', 'PNG', 'TIF', 'TIFF', 'CR2', 'BMP', 'GIF', 'DNG', 'ARW']
 
     if extensionToCheck in validVideoFileExtensions:
         return True
