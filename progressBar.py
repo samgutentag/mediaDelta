@@ -4,8 +4,7 @@ import sys, time
 
 def main():
 
-    names = ['Megan', 'Sam', 'Aaron', 'Jonah', 'Olivia', 'Max', 'Piper', 'Bailey', 'Kaiser']
-
+    names = ['Megan', 'Sam', 'Aaron', 'Jonah', 'Olivia', 'Max', 'Piper', 'Bailey', 'Kaiser', 'Otto']
 
     for name in names:
 
