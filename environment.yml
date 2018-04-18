@@ -1,4 +1,4 @@
-name: mD3
+name: mediaDelta
 channels:
 - conda-forge
 - anaconda-fusion
@@ -45,4 +45,3 @@ dependencies:
   - pyexifinfo==0.4.0
   - rawpy==0.10.1
   - wand==0.4.4
-
