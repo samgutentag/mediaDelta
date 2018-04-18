@@ -1,24 +1,48 @@
-name: mediaDelta
+name: mD3
 channels:
+- conda-forge
 - anaconda-fusion
 - defaults
 dependencies:
-- openssl=1.0.2l=0
-- pip=9.0.1=py27_1
-- python=2.7.13=0
-- readline=6.2=2
-- setuptools=27.2.0=py27_0
-- sqlite=3.13.0=0
-- tk=8.5.18=0
-- wheel=0.29.0=py27_0
-- zlib=1.2.8=3
+- blas=1.1=openblas
+- ca-certificates=2018.1.18=0
+- certifi=2018.1.18=py36_0
+- cycler=0.10.0=py36_0
+- freetype=2.8.1=0
+- imageio=2.3.0=py36_0
+- jpeg=9b=2
+- kiwisolver=1.0.1=py36_1
+- libgfortran=3.0.0=0
+- libpng=1.6.34=0
+- libtiff=4.0.9=0
+- matplotlib=2.2.2=py36_1
+- ncurses=5.9=10
+- numpy=1.14.2=py36_blas_openblas_200
+- olefile=0.45.1=py36_0
+- openblas=0.2.20=7
+- openssl=1.0.2n=0
+- pandas=0.22.0=py36_0
+- patsy=0.5.0=py36_0
+- pillow=5.0.0=py36_0
+- pip=9.0.3=py36_0
+- pyparsing=2.2.0=py36_0
+- python=3.6.5=0
+- python-dateutil=2.7.2=py_0
+- pytz=2018.3=py_0
+- readline=7.0=0
+- scipy=1.0.1=py36_blas_openblas_200
+- seaborn=0.8.1=py36_0
+- setuptools=39.0.1=py36_0
+- six=1.11.0=py36_1
+- sqlite=3.20.1=2
+- statsmodels=0.8.0=py36_0
+- tk=8.6.7=0
+- tornado=5.0.1=py36_1
+- wheel=0.30.0=py36_2
+- xz=5.2.3=0
+- zlib=1.2.11=0
 - pip:
-  - decorator==4.0.11
-  - imageio==2.1.2
-  - moviepy==0.2.3.2
-  - numpy==1.13.1
-  - olefile==0.44
-  - pillow==4.2.1
   - pyexifinfo==0.4.0
-  - tqdm==4.11.2
+  - rawpy==0.10.1
+  - wand==0.4.4
 
