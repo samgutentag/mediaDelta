@@ -3,16 +3,11 @@
 
 import argparse
 from getpass import getuser
-from glob import glob
 import sys, time
 import os
 import shutil
 
-# import logging
 import utilities
-
-
-from datetime import datetime
 
 
 
@@ -58,17 +53,14 @@ def main():
                             required=False,
                             help='if passed, will generate a 720px thumbnail file')
 
+    parser.add_argument('-move', '--move_only',
+                            action='store_true', default = False,
+                            required=False,
+                            help='if passed, script will move files from source to destination, not make copies')
+
     args = vars(parser.parse_args())
 
     utilities.prettyPrintDict(args)
-
-    # #--------------------------------------------------------------------------
-    # #       Setup Logging
-    # #--------------------------------------------------------------------------
-    #
-    # logDateTime = datetime.now().strftime('%Y%m%d%H%M%S')
-    # logFileName = 'importer_%s.log' % logDateTime
-    # logging.basicConfig(format='%(message)s', filename=logFileName, level=logging.DEBUG)
 
     # get files to process
     files_to_process = utilities.getDirectoryContents(args['source_dir'])
@@ -114,8 +106,11 @@ def main():
                                             # file_counter = ii,
                                             destination_directory = args['destination_dir'])
 
-            # copy file
-            shutil.copy2(file, '{}{}'.format(archive_file_path, archive_file_name))
+            if args['move_only']:
+                # copy file
+                shutil.move(file, '{}{}'.format(archive_file_path, archive_file_name))
+            else:
+                shutil.copy2(file, '{}{}'.format(archive_file_path, archive_file_name))
 
         else:
 
@@ -125,7 +120,11 @@ def main():
                                             destination_directory = args['destination_dir'])
 
             # copy file
-            shutil.copy2(file, '{}{}'.format(import_file_path, import_file_name))
+            if args['move_only']:
+                # copy file
+                shutil.move(file, '{}{}'.format(import_file_path, import_file_name))
+            else:
+                shutil.copy2(file, '{}{}'.format(import_file_path, import_file_name))
 
             # if making thumbnails...
             if args['make_thumbnail']:

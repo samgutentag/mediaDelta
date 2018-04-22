@@ -297,39 +297,26 @@ def getCameraObject(exifData):
 #       Get Capture Date and Time Stamp
 #----------------------------------------------------------------------------
 
-def getCaptureDTS(exifData):
+def getCaptureDTS(exifData, mediaType):
 
-    captureDTS = datetime.now()
+    # prettyPrintDict(exifData)
+    dateTimeTags = {}
 
-    # This is ideal
-    try:
-        captureDTS = datetime.strptime(exifData['EXIF:CreateDate'], '%Y:%m:%d %H:%M:%S')
-    except:
-        # if movie file
-        try:
-            captureDTS = date_parser(exifData['QuickTime:CreateDate']).replace(tzinfo=None)
-        except:
-            # secodn choice capture date
+    for k, v in exifData.items():
+        if 'date' in k.lower() and 'composite:' not in k.lower() and 'icc' not in k.lower():
+            # dateTimeTags[k] = v.split('.')[0].split('-')[0]
+
+            dt = v.split('.')[0].split('-')[0]
+
             try:
-                captureDTS = date_parser(exifData['EXIF:DateTimeOriginal']).replace(tzinfo=None)
+                dt = datetime.strptime(dt, '%Y:%m:%d %H:%M:%S')
+
+                dateTimeTags[k] = dt
             except:
-                # last resort, select oldest tag with 'Date' in the title
-                try:
-                    dateTimeTags = {}
+                pass
 
-                    # select dateTime (key, value) pairs as a subset
-                    for key, value in exifData.items():
-                        if 'date' in key.lower():
-                            # exclude some odd tag keys
-                            if 'icc' not in key.lower() and 'gps' not in key.lower() and not 'flashpix' in key.lower() and 'exif:' in key.lower():
-                                dateTimeTags[key] = date_parser(value).replace(tzinfo=None)
-                    try:
-                        captureDTS = min(dateTimeTags.values())
+    captureDTS = min(dateTimeTags.values())
 
-                    except:
-                        pass
-                except:
-                    prettyPrintDict(exifData)
     return captureDTS
 
 
@@ -346,15 +333,17 @@ def getMediaFileObject(file, creatorName=getuser()):
         # get exifTags into a dictionary
         exif_data = get_exifs(file)
 
+        # pretty print exif tags
+        # prettyPrintDict(exif_data)
+
         # get media type from 'File:MIMEType' value, (video or image)
         mediaType = exif_data['File:MIMEType'].split('/')[0].upper()
 
         # get file extension from 'File:FileTypeExtension' value
         fileExtension = exif_data['File:FileTypeExtension'].upper()
 
-
         # # get DateTimeObject for file
-        captureDTS = getCaptureDTS(exif_data)
+        captureDTS = getCaptureDTS(exif_data, mediaType)
 
         # get CameraObject for file
         cameraObject = getCameraObject(exif_data)
@@ -366,9 +355,18 @@ def getMediaFileObject(file, creatorName=getuser()):
         resolution =  'ORIGINAL'
         try:
             resolution = exif_data['MakerNotes:Quality'].upper()
+            resolution = resolution.replace("N/A","ORIGINAL")
 
         except:
             pass
+
+
+        # video resolution set to widthxheight in pixels
+
+        if mediaType == 'VIDEO':
+            # prettyPrintDict(exif_data)
+            resolution = exif_data['Composite:ImageSize']
+
 
         # init MediaFileObject
         mediaFileObject = MediaFileObject(file,
