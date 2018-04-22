@@ -367,12 +367,11 @@ def getMediaFileObject(file, creatorName=getuser()):
 
 
         # video resolution set to widthxheight in pixels
-
+        # prettyPrintDict(exif_data)
         if mediaType == 'VIDEO':
-            # prettyPrintDict(exif_data)
-            resolution = exif_data['Composite:ImageSize']
 
             try:
+                resolution = exif_data['Composite:ImageSize']
                 # QuickTime:TrackDuration
                 if ' s' in exif_data['QuickTime:TrackDuration'] and 'apple' in cameraObject.make.lower():
 
