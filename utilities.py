@@ -281,7 +281,12 @@ def getCameraObject(exifData):
     try:
         cameraSerial = exifData['EXIF:SerialNumber']
     except:
-        pass
+        # sony camera exception
+        try:
+            cameraSerial = exifData['XML:DeviceSerialNo']
+        except:
+
+            pass
 
 
     #   build CameraObject
@@ -366,6 +371,21 @@ def getMediaFileObject(file, creatorName=getuser()):
         if mediaType == 'VIDEO':
             # prettyPrintDict(exif_data)
             resolution = exif_data['Composite:ImageSize']
+
+            try:
+                # QuickTime:TrackDuration
+                if ' s' in exif_data['QuickTime:TrackDuration'] and 'apple' in cameraObject.make.lower():
+
+                    clip_duration = int(exif_data['QuickTime:TrackDuration'].split('.')[0])
+
+                    if clip_duration < 30 and captureDTS.year > 2015:
+                        mediaType = '1SE'
+
+                    if int(exif_data['QuickTime:Software'].split('.')[0]) >= 9 and float(exif_data['QuickTime:VideoFrameRate']) < 35.0 and clip_duration < 5:
+                        mediaType = 'LIVE'
+            except:
+                pass
+
 
 
         # init MediaFileObject
