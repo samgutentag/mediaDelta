@@ -116,7 +116,7 @@ def main():
 
             # import file
             import_file_path, import_file_name = utilities.make_import_file_name(mediaFileObject,
-                                            file_counter = ii,
+                                            # file_counter = ii,
                                             destination_directory = args['destination_dir'])
 
             # copy file
@@ -140,7 +140,7 @@ def main():
                     mediaFileObject.extension = 'JPEG'
 
                     import_thumbnail_path, import_thumbnail_name = utilities.make_import_file_name(mediaFileObject,
-                                                    file_counter = ii,
+                                                    # file_counter = ii,
                                                     destination_directory = args['destination_dir'])
 
                     # ensure file path exists

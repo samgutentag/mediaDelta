@@ -430,7 +430,8 @@ def getMediaFileObject(file, creatorName=getuser()):
 #       File Name Formatting
 #----------------------------------------------------------------------------
 
-def make_import_file_name(mediaFileObject, file_counter, destination_directory):
+# def make_import_file_name(mediaFileObject, file_counter, destination_directory):
+def make_import_file_name(mediaFileObject, destination_directory):
 
     # assemble file name
     MEDIA_FILE_TYPE     = mediaFileObject.type
@@ -454,13 +455,33 @@ def make_import_file_name(mediaFileObject, file_counter, destination_directory):
                                                             RESOLUTION,
                                                             MAKE, MODEL,
                                                             CAPTURE_DATE)
-
+    file_counter = '0001'
     destination_file_name = '{}.{}.{}.{}.{}.{}'.format(USERNAME,
                                                         SERIAL,
                                                         CAPTURE_DATE,
                                                         CAPTURE_TIME,
                                                         file_counter,
                                                         EXT)
+
+    destination_file_path = destination_file_path.replace(' ','')
+    destination_file_name = destination_file_name.replace(' ','')
+
+    # if file extists, increment counter and try again
+    while os.path.isfile('{}{}'.format(destination_file_path, destination_file_name)):
+
+        # get current file_counter
+        currentCounter = int(destination_file_name.split('.')[-2])
+
+        # if file exists, increment counter and zero pad
+        currentCounter += 1
+        currentCounter = str(currentCounter).zfill(4)
+
+        destination_file_name = '{}.{}.{}.{}.{}.{}'.format(USERNAME,
+                                                            SERIAL,
+                                                            CAPTURE_DATE,
+                                                            CAPTURE_TIME,
+                                                            currentCounter,
+                                                            EXT)
 
     # ensure file path exists
     if not os.path.exists(destination_file_path):
@@ -492,8 +513,6 @@ def make_archive_file_name(mediaFileObject, destination_directory):
                                                     EXT)
 
     # if file extists, increment counter and try again
-
-
     while os.path.isfile('{}{}'.format(destination_file_path, destination_file_name)):
 
         # get current file_counter
