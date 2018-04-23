@@ -361,27 +361,41 @@ def getMediaFileObject(file, creatorName=getuser()):
         try:
             resolution = exif_data['MakerNotes:Quality'].upper()
             resolution = resolution.replace("N/A","ORIGINAL")
-
         except:
             pass
 
 
         # video resolution set to widthxheight in pixels
-        # prettyPrintDict(exif_data)
         if mediaType == 'VIDEO':
 
             try:
                 resolution = exif_data['Composite:ImageSize']
+            except:
+                pass
+
+            try:
                 # QuickTime:TrackDuration
                 if ' s' in exif_data['QuickTime:TrackDuration'] and 'apple' in cameraObject.make.lower():
 
                     clip_duration = int(exif_data['QuickTime:TrackDuration'].split('.')[0])
 
-                    if clip_duration < 30 and captureDTS.year > 2015:
+                    if clip_duration < 10 and captureDTS.year > 2015:
                         mediaType = '1SE'
 
-                    if int(exif_data['QuickTime:Software'].split('.')[0]) >= 9 and float(exif_data['QuickTime:VideoFrameRate']) < 35.0 and clip_duration < 5:
+                    software = int(str(exif_data['QuickTime:Software']).split('.')[0])
+                    frame_rate = float(exif_data['QuickTime:VideoFrameRate'])
+                    if software >= 9 and frame_rate < 35.0 and clip_duration < 4:
                         mediaType = 'LIVE'
+
+                else:
+                    clip_duration = int(exif_data['QuickTime:TrackDuration'].split('.')[0])
+                    if clip_duration < 10 and captureDTS.year > 2015:
+                        mediaType = '1SE'
+                try:
+                    if exif_data['QuickTime:ComApplePhotosCaptureMode'].lower() == 'time-lapse':
+                        mediaType = '1SE'
+                except:
+                    pass
             except:
                 pass
 
