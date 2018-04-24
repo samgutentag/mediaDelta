@@ -556,7 +556,6 @@ def make_thumb(mediaFileObject, outfile, thumb_size=(1080,1080), thumb_file_type
     im.thumbnail(thumb_size)
 
     try:
-
         im.save(outfile, thumb_file_type)
     except:
         # print('Could not write thumbnail, copying original image...')
