@@ -35,6 +35,11 @@ def main():
                         action='store_true', default = False,
                         required=False,
                         help='if passed, will archive files instead of importing')
+    #
+    # parser.add_argument('-bup', '--back_up',
+    #                     action='store_true', default = False,
+    #                     required=False,
+    #                     help='if passed, will archive files instead of importing, if file aready exists in desination, it is not copied')
 
     parser.add_argument('-s', '--source_dir',
                             dest='source_dir',
@@ -97,13 +102,15 @@ def main():
 
         mediaFileObject = utilities.getMediaFileObject(file, creatorName = creatorName)
 
+        # # if operating in backup mode, override archive argument
+        # if args['back_up']:
+        #     args['archive'] = False
 
         # if import mode is 'ARCHIVE'
         if args['archive']:
 
             # archive file
             archive_file_path, archive_file_name = utilities.make_archive_file_name(mediaFileObject,
-                                            # file_counter = ii,
                                             destination_directory = args['destination_dir'])
 
             if args['move_only']:
@@ -111,12 +118,29 @@ def main():
                 shutil.move(file, '{}{}'.format(archive_file_path, archive_file_name))
             else:
                 shutil.copy2(file, '{}{}'.format(archive_file_path, archive_file_name))
+        #
+        # elif args['back_up']:
+        #
+        #     # archive file
+        #     archive_file_path, archive_file_name = utilities.make_archive_file_name(mediaFileObject,
+        #                                     destination_directory = args['destination_dir'], backup=True)
+        #
+        #     # if destination exists, do nothing else, copy
+        #     if os.path.isfile('{}{}'.format(archive_file_path, archive_file_name)):
+        #         pass
+        #     else:
+        #         if args['move_only']:
+        #             # copy file
+        #             shutil.move(file, '{}{}'.format(archive_file_path, archive_file_name))
+        #         else:
+        #             shutil.copy2(file, '{}{}'.format(archive_file_path, archive_file_name))
+        #
+
 
         else:
 
             # import file
             import_file_path, import_file_name = utilities.make_import_file_name(mediaFileObject,
-                                            # file_counter = ii,
                                             destination_directory = args['destination_dir'])
 
             # copy file

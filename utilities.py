@@ -416,6 +416,7 @@ def getMediaFileObject(file, creatorName=getuser()):
 
         # correct model for drone
         if mediaFileObject.device.model.upper() in ['FC220', 'FC220-SE']:
+            mediaFileObject.device.make = 'DJI'
             mediaFileObject.device.model = 'MAVIC.PRO'
 
         return mediaFileObject
@@ -489,7 +490,7 @@ def make_import_file_name(mediaFileObject, destination_directory):
 
     return destination_file_path, destination_file_name
 
-def make_archive_file_name(mediaFileObject, destination_directory):
+def make_archive_file_name(mediaFileObject, destination_directory, backup=False):
 
     # assemble file name
     MEDIA_FILE_TYPE = mediaFileObject.type
@@ -499,6 +500,9 @@ def make_archive_file_name(mediaFileObject, destination_directory):
     CAPTURE_TIME    = mediaFileObject.captureDTS.strftime('%H%M%S')
     USERNAME        = mediaFileObject.creator
     EXT             = mediaFileObject.extension
+
+    if MEDIA_FILE_TYPE == '1SE':
+        MEDIA_FILE_TYPE = 'VIDEO'
 
     destination_file_path = '{}/{}/{}/{}.{}/'.format(destination_directory,
                                                     MEDIA_FILE_TYPE,
@@ -512,21 +516,22 @@ def make_archive_file_name(mediaFileObject, destination_directory):
                                                     file_counter,
                                                     EXT)
 
-    # if file extists, increment counter and try again
-    while os.path.isfile('{}{}'.format(destination_file_path, destination_file_name)):
+    if not backup:
+        # if file extists, increment counter and try again
+        while os.path.isfile('{}{}'.format(destination_file_path, destination_file_name)):
 
-        # get current file_counter
-        currentCounter = int(destination_file_name.split('.')[-2])
+            # get current file_counter
+            currentCounter = int(destination_file_name.split('.')[-2])
 
-        # if file exists, increment counter and zero pad
-        currentCounter += 1
-        currentCounter = str(currentCounter).zfill(4)
+            # if file exists, increment counter and zero pad
+            currentCounter += 1
+            currentCounter = str(currentCounter).zfill(4)
 
-        destination_file_name = '{}.{}.{}.{}.{}'.format(CAPTURE_DATE,
-                                                        CAPTURE_TIME,
-                                                        USERNAME,
-                                                        currentCounter,
-                                                        EXT)
+            destination_file_name = '{}.{}.{}.{}.{}'.format(CAPTURE_DATE,
+                                                            CAPTURE_TIME,
+                                                            USERNAME,
+                                                            currentCounter,
+                                                            EXT)
 
     # ensure file path exists
     if not os.path.exists(destination_file_path):
