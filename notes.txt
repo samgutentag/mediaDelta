@@ -7,7 +7,6 @@ Skratch pad for some notes!
 
 
 #   Convert series of images to 24fps video file
-<<<<<<< HEAD
 > ffmpeg -r 24 -f image2 -start_number 1 -i image_%02d.jpg -codec:v prores -profile:v 2 output.mov
     converts a sequence [image_xx, … , image_yy] to a movie ‘output.mov’ at frame rate 24
 
@@ -15,17 +14,6 @@ Skratch pad for some notes!
 >ffmpeg -r 24 -f image2 -start_number 1 -i image_%03d.jpg -vf crop=5472:3078:0:285,scale=1920:-1 -codec:v prores -profile:v 2 ~/Desktop/1920x1080Test.mov
         crop=(sourceWidth):(sourceWidth*9/16):0:(sourceHeight-(sourceWidth*9/16))/2    crops vertical from center to get the correct aspect ratio (16:9)
         scale=1920:-1                                    set output scale, the -1 will match the 1920 to the aspect ration we cropped to
-=======
-> ffmpeg -r 24 -f image2 -start_number 1 -i image_%04d.jpg -codec:v prores -profile:v 2 output.mov
-	converts a sequence [image_xx, … , image_yy] to a movie ‘output.mov’ at frame rate 24
-
-#   Convert series of images to 24fps video file, cropping and scaling 5472x3648 source images to a 1920x1080 output
-> ffmpeg -r 24 -f image2 -start_number 1 -i image_%02d.jpg -vf crop=5472:3078:0:285,scale=1920:-1 -codec:v prores -profile:v 2 ~/Desktop/1920x1080Test.mov
-		crop=(sourceWidth):(sourceWidth*9/16):0:(sourceHeight-(sourceWidth*9/16))/2	crops vertical from center to get the correct aspect ratio (16:9)
-		scale=1920:-1									set output scale, the -1 will match the 1920 to the aspect ration we cropped to
->>>>>>> 235480c280c6b24fb32570691580ca6d99af8546
-
-
 
 #	Panning crop left to right on 5496x3670 source images - for instagram story
 > ffmpeg -r <framerate> -f image2 -start_number 1 -i image%04d.cr2.jpg -vf crop=<sourceWidth>*9/16:<sourceWidth>:'(<sourceWidth>-(<sourceHeight>*9/16))/(<#frames>/<framerate>))'*t:0,scale=1080:-1 -codec:v prores -profile:v 2 ~/1080x1920_vertical_<framerate>fps.mov
