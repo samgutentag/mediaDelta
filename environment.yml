@@ -1,46 +1,55 @@
 name: mediaDelta
 channels:
-  - conda-forge
-  - anaconda-fusion
   - defaults
 dependencies:
-  - blas=1.1=openblas
-  - ca-certificates=2018.1.18=0
-  - certifi=2018.1.18=py36_0
-  - cycler=0.10.0=py36_0
-  - freetype=2.8.1=0
+  - blas=1.0=mkl
+  - ca-certificates=2018.03.07=0
+  - certifi=2018.4.16=py36_0
+  - cycler=0.10.0=py36hfc81398_0
+  - freetype=2.8=h12048fb_1
   - imageio=2.3.0=py36_0
-  - jpeg=9b=2
-  - kiwisolver=1.0.1=py36_1
-  - libgfortran=3.0.0=0
-  - libpng=1.6.34=0
-  - libtiff=4.0.9=0
-  - matplotlib=2.2.2=py36_1
-  - ncurses=5.9=10
-  - numpy=1.14.2=py36_blas_openblas_200
+  - intel-openmp=2018.0.0=8
+  - jpeg=9b=he5867d9_2
+  - kiwisolver=1.0.1=py36h792292d_0
+  - libcxx=4.0.1=h579ed51_0
+  - libcxxabi=4.0.1=hebd6815_0
+  - libedit=3.1.20170329=hb402a30_2
+  - libffi=3.2.1=h475c297_4
+  - libgfortran=3.0.1=h93005f0_2
+  - libopenblas=0.2.20=hdc02c5d_4
+  - libpng=1.6.34=he12f830_0
+  - libtiff=4.0.9=hcb84e12_1
+  - matplotlib=2.2.2=py36ha7267d0_0
+  - mkl=2018.0.2=1
+  - mkl_fft=1.0.1=py36h917ab60_0
+  - mkl_random=1.0.1=py36h78cc56f_0
+  - ncurses=6.1=h0a44026_0
+  - numpy=1.14.3=py36h9bb19eb_1
+  - numpy-base=1.14.3=py36h479e554_1
   - olefile=0.45.1=py36_0
-  - openblas=0.2.20=7
-  - openssl=1.0.2n=0
-  - pandas=0.22.0=py36_0
+  - openblas=0.2.20=4
+  - openblas-devel=0.2.20=4
+  - openssl=1.0.2o=h26aff7b_0
+  - pandas=0.23.0=py36h1702cab_0
   - patsy=0.5.0=py36_0
-  - pillow=5.0.0=py36_0
-  - pip=9.0.3=py36_0
-  - pyparsing=2.2.0=py36_0
-  - python=3.6.5=0
-  - python-dateutil=2.7.2=py_0
-  - pytz=2018.3=py_0
-  - readline=7.0=0
-  - scipy=1.0.1=py36_blas_openblas_200
-  - seaborn=0.8.1=py36_0
-  - setuptools=39.0.1=py36_0
-  - six=1.11.0=py36_1
-  - sqlite=3.20.1=2
-  - statsmodels=0.8.0=py36_0
-  - tk=8.6.7=0
-  - tornado=5.0.1=py36_1
-  - wheel=0.30.0=py36_2
-  - xz=5.2.3=0
-  - zlib=1.2.11=0
+  - pillow=5.1.0=py36hfcce615_0
+  - pip=10.0.1=py36_0
+  - pyparsing=2.2.0=py36hb281f35_0
+  - python=3.6.5=hc167b69_1
+  - python-dateutil=2.7.3=py36_0
+  - pytz=2018.4=py36_0
+  - readline=7.0=hc1231fa_4
+  - scipy=1.1.0=py36hcaad992_0
+  - seaborn=0.8.1=py36h595ecd9_0
+  - setuptools=39.1.0=py36_0
+  - six=1.11.0=py36h0e22d5e_1
+  - sqlite=3.23.1=hf1716c9_0
+  - statsmodels=0.9.0=py36h917ab60_0
+  - tk=8.6.7=h35a86e2_3
+  - tornado=5.0.2=py36_0
+  - wheel=0.31.1=py36_0
+  - xz=5.2.4=h1de35cc_4
+  - zlib=1.2.11=hf3cbc9b_2
   - pip:
     - pyexifinfo==0.4.0
     - rawpy==0.10.1
