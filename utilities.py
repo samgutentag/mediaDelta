@@ -341,11 +341,17 @@ def getMediaFileObject(file, creatorName=getuser()):
         # pretty print exif tags
         # prettyPrintDict(exif_data)
 
-        # get media type from 'File:MIMEType' value, (video or image)
-        mediaType = exif_data['File:MIMEType'].split('/')[0].upper()
+        try:
+            # get media type from 'File:MIMEType' value, (video or image)
+            mediaType = exif_data['File:MIMEType'].split('/')[0].upper()
+        except:
+            mediaType = 'UNKNOWN'
 
-        # get file extension from 'File:FileTypeExtension' value
-        fileExtension = exif_data['File:FileTypeExtension'].upper()
+        try:
+            # get file extension from 'File:FileTypeExtension' value
+            fileExtension = exif_data['File:FileTypeExtension'].upper()
+        except:
+            fileExtension = 'UNKNOWN'
 
         # # get DateTimeObject for file
         captureDTS = getCaptureDTS(exif_data, mediaType)
@@ -398,8 +404,6 @@ def getMediaFileObject(file, creatorName=getuser()):
                     pass
             except:
                 pass
-
-
 
         # init MediaFileObject
         mediaFileObject = MediaFileObject(file,
