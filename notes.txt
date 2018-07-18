@@ -23,6 +23,9 @@ ffmpeg -r 60 -f image2 -start_number 1 -i image%04d.cr2.jpg -vf crop=2064:3670:1
 
 
 
+# Crop 2k drone footage for IGTV
+> ffmpeg -i source_video.MOV -r 30 -vf crop=860:1530 source_story_crop.mp4
+
 
 #   Crop 4k Drone footage down to 1920x1080HD, assumes 4096x2160 source footage
 > ffmpeg -i input.mov -vf crop=3840:2160:128:0,scale=1920:-1 -codev:v prores:v 2 output.mov
