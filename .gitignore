@@ -40,3 +40,8 @@ Thumbs.db
 
 # project specific
 *.pyc
+
+.Python
+bin/
+include/
+lib/
