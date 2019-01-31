@@ -9,7 +9,7 @@ from getpass import getuser
 import shutil
 
 from datetime import datetime
-from dateutil.parser import parse as date_parser
+# from dateutil.parser import parse as date_parser
 
 # thumbnail imports
 from PIL import Image
