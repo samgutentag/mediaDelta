@@ -8,15 +8,16 @@ from tqdm import tqdm
 import pyexifinfo
 import argparse
 import os
+import shutil
 
 __author__ = "Sam Gutentag"
 __copyright__ = "Copyright 2019, Sam Gutentag"
 __credits__ = ["Sam Gutentag"]
 __license__ = "GPL"
-__version__ = "0.0.1"
+__version__ = "0.2.0"
 __maintainer__ = "Sam Gutentag"
 __email__ = "developer@samgutentag.com"
-__status__ = 'Prototype'
+__status__ = "Development"
 # "Prototype", "Development", or "Production"
 
 
@@ -45,7 +46,7 @@ class Bucket:
 
     Holds all information needed to make a file archive or import
 
-    Parameters
+    Parameters:
     input_file (string): input media file to be processed
     destination_dir (string): destination root directory for import/archive
     username (string): user that created the file, defaults to current user
@@ -63,11 +64,15 @@ class Bucket:
 
     def process_file(self):
         """Process file to get other attributes."""
-        self.set_exif_tags()
-        self.set_capture_device()
-        self.set_capture_dt()
-        self.set_media_type()
-        self.set_media_resolution()
+        self.read_exif_tags()
+        self.get_capture_device()
+        self.get_capture_dt()
+        self.get_media_type()
+        self.get_media_resolution()
+
+        # update media type and resolution for videos
+        if self.media_type.lower() == "video":
+            self.update_media_data()
 
         self.set_import_filepath()
         self.set_archive_filepath()
@@ -89,11 +94,11 @@ class Bucket:
 
         print(f"{indent}exif_tags         {self.exif_tags}")
 
-    def set_exif_tags(self):
+    def read_exif_tags(self):
         """Read exif tags from source file."""
         self.exif_tags = pyexifinfo.get_json(self.input_file)[0]
 
-    def set_capture_device(self):
+    def get_capture_device(self):
         """Find capture device/software."""
         make, model, serial, software = None, None, None, None
 
@@ -131,8 +136,8 @@ class Bucket:
 
         self.capture_device = CaptureDevice(make, model, serial, software)
 
-    def set_capture_dt(self):
-        """Find capture/creation date of media file frmo exif tags."""
+    def get_capture_dt(self):
+        """Find capture/creation date of media file from exif tags."""
         datetime_tags = []
 
         for k, v in self.exif_tags.items():
@@ -148,15 +153,15 @@ class Bucket:
 
         self.capture_dt = capture_datetime
 
-    def set_media_type(self):
+    def get_media_type(self):
         """Attempt to find media type in exif tags."""
         try:
-            media_type = self.exif_tags["File:MIMEType"].split('/')[0].upper()
+            media_type = self.exif_tags["File:MIMEType"].split("/")[0].upper()
             self.media_type = media_type
         except Exception:
             self.media_type = None
 
-    def set_media_resolution(self):
+    def get_media_resolution(self):
         """Categorize resolution of media file."""
         resolution = "ORIGINAL"
         try:
@@ -167,38 +172,33 @@ class Bucket:
 
         if self.media_type == "VIDEO":
             try:
-                resolution = self.exif_data['Composite:ImageSize']
+                resolution = self.exif_data["Composite:ImageSize"]
             except Exception:
                 pass
 
-            # special cases
-            # try:
-            #     # QuickTime:TrackDuration
-            #     if ' s' in exif_data['QuickTime:TrackDuration'] and 'apple' in cameraObject.make.lower():
-            #
-            #         clip_duration = int(exif_data['QuickTime:TrackDuration'].split('.')[0])
-            #
-            #         if clip_duration < 10 and captureDTS.year > 2015:
-            #             mediaType = '1SE'
-            #
-            #         software = int(str(exif_data['QuickTime:Software']).split('.')[0])
-            #         frame_rate = float(exif_data['QuickTime:VideoFrameRate'])
-            #         if software >= 9 and frame_rate < 35.0 and clip_duration < 4:
-            #             mediaType = 'LIVE'
-            #
-            #     else:
-            #         clip_duration = int(exif_data['QuickTime:TrackDuration'].split('.')[0])
-            #         if clip_duration < 10 and captureDTS.year > 2015:
-            #             mediaType = '1SE'
-            #     try:
-            #         if exif_data['QuickTime:ComApplePhotosCaptureMode'].lower() == 'time-lapse':
-            #             mediaType = '1SE'
-            #     except:
-            #         pass
-            # except:
-            #     pass
-
         self.media_resolution = resolution
+
+    def update_media_data(self):
+        """Update Media File resolution and media type."""
+        pass
+
+        self.resolution = self.exif_tags["Composite:ImageSize"]
+
+        cond_a = " s" in self.exif_tags["QuickTime:TrackDuration"]
+        cond_b = "apple" in self.capture_device.device_make
+        if cond_a and cond_b:
+            clip_duration = int(self.exif_tags["QuickTime:TrackDuration"].split(".")[0])
+
+            if clip_duration < 10 and self.capture_dt.year > 2015:
+                self.media_type = "1SE"
+
+            software = int(str(self.exif_tags["QuickTime:Software"]).split(".")[0])
+            frame_rate = float(self.exif_tags["QuickTime:VideoFrameRate"])
+            if software >= 9 and frame_rate < 35.0 and clip_duration < 4:
+                self.media_type = "LIVE"
+
+
+
 
     def set_import_filepath(self):
         """Format import filepath string."""
@@ -220,6 +220,19 @@ class Bucket:
 
         import_filepath = f"{import_directory}/{import_filename}"
 
+        # increment counter if filename exists
+        while os.path.exists(import_filepath):
+            current_counter = int(import_filename.split(".")[-2])
+            current_counter += 1
+            file_counter = str(current_counter).zfill(4)
+
+            import_filename = ".".join([self.username,
+                                        self.capture_device.serial,
+                                        capture_dt_str, file_counter,
+                                        self.extension])
+
+            import_filepath = f"{import_directory}/{import_filename}"
+
         self.import_filepath = import_filepath
 
     def set_archive_filepath(self):
@@ -238,6 +251,16 @@ class Bucket:
                                      file_counter, self.extension])
 
         archive_filepath = f"{archive_directory}/{archive_filename}"
+
+        # increment counter if filename exists
+        while os.path.exists(archive_filepath):
+            current_counter = int(archive_filename.split(".")[-2])
+            current_counter += 1
+            file_counter = str(current_counter).zfill(4)
+
+            archive_filename = ".".join([capture_dt_str, self.username,
+                                         file_counter, self.extension])
+            archive_filepath = f"{archive_directory}/{archive_filename}"
 
         self.archive_filepath = archive_filepath
 
@@ -299,7 +322,7 @@ def get_media_files(search_dir=None, image_extensions=[], video_extensions=[]):
         for file in files:
             # check file extension
             ext = file.split(".")[-1]
-            abs_filepath = f"{root}{file}"
+            abs_filepath = f"{root}/{file}"
 
             if ext.upper() in image_extensions:
                 image_file_list.append(abs_filepath)
@@ -312,10 +335,9 @@ def get_media_files(search_dir=None, image_extensions=[], video_extensions=[]):
     return [image_file_list, video_file_list, non_media_files]
 
 
-if __name__ == '__main__':
+def bucket():
+    """Collect and Process images files."""
     args = get_arguments()
-
-    # print(args)
 
     video_extensions = ["3G2", "3GP", "ASF", "AVI",
                         "M4V", "MOV", "MP4", "MPG",
@@ -329,24 +351,45 @@ if __name__ == '__main__':
                                              image_extensions=image_extensions,
                                              video_extensions=video_extensions)
 
-    print(f"images:\t{len(images)}")
-    print(f"videos:\t{len(videos)}")
-    print(f"others:\t{len(others)}")
+    print(f"Script found {len(images)} image files.")
+    print(f"Script found {len(videos)} video files.")
+    print(f"Script found {len(others)} other files.")
 
     # archive will skip over THUMB directories
-    if args['archive']:
+    if args["archive"]:
         images = [f for f in images if "/THUMB/" not in f]
         videos = [f for f in videos if "/THUMB/" not in f]
         others = [f for f in others if "/THUMB/" not in f]
 
     # process files
-    # for idx, image_file in enumerate(sorted(images)[:5]):
     for image_file in tqdm(sorted(images)[:100]):
 
-        # print("="*100)
-        # print(f"{idx:08d}\t{image_file}")
+        try:
+            bucket_image = Bucket(image_file,
+                                  destination_dir=args["destination_dir"],
+                                  username=args["username"])
 
-        bucket = Bucket(image_file,
-                        destination_dir=args["destination_dir"],
-                        username=args["username"])
-        # bucket.pretty_print()
+            # bucket_image.pretty_print()
+        except ValueError as ve:
+            print(ve)
+
+        # set destination path
+        if args["archive"]:
+            destination_path = bucket_image.archive_filepath
+        else:
+            destination_path = bucket_image.import_filepath
+
+        # ensure destination directory exists
+        destination_dir = os.path.dirname(destination_path)
+        if not os.path.isdir(destination_dir):
+            os.makedirs(destination_dir)
+
+        # copy or move file
+        if args["move_only"]:
+            shutil.move(bucket_image.input_file, destination_path)
+        else:
+            shutil.copy2(bucket_image.input_file, destination_path)
+
+
+if __name__ == "__main__":
+    bucket()
