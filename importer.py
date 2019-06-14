@@ -2,13 +2,13 @@
 
 
 import argparse
-from getpass import getuser
-import sys, time
 import os
 import shutil
+import sys
+import time
+from getpass import getuser
 
 import utilities
-
 
 
 def main():

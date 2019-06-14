@@ -1,19 +1,20 @@
 
 
-import sys
 import logging
 import os
-import pyexifinfo
+import shutil
+import sys
+from datetime import datetime
 # import getpass
 from getpass import getuser
-import shutil
 
-from datetime import datetime
-# from dateutil.parser import parse as date_parser
-
+import pyexifinfo
+import rawpy
 # thumbnail imports
 from PIL import Image
-import rawpy
+
+# from dateutil.parser import parse as date_parser
+
 
 #----------------------------------------------------------------------------
 #       Custom Classes

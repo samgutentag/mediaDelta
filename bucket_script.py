@@ -2,19 +2,20 @@
 
 """Sort media files by capture date."""
 
-from getpass import getuser
-from datetime import datetime
-from tqdm import tqdm
-import pyexifinfo
 import argparse
 import os
 import shutil
+from datetime import datetime
+from getpass import getuser
+
+import pyexifinfo
+from tqdm import tqdm
 
 __author__ = "Sam Gutentag"
 __copyright__ = "Copyright 2019, Sam Gutentag"
 __credits__ = ["Sam Gutentag"]
 __license__ = "GPL"
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 __maintainer__ = "Sam Gutentag"
 __email__ = "developer@samgutentag.com"
 __status__ = "Development"
