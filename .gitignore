@@ -37,8 +37,12 @@
 ehthumbs.db
 Thumbs.db
 
+# VSCode Workspace #
+####################
+*.code-workspace
 
-# project specific
+# Project Specific #
+####################
 *.pyc
 
 .Python
