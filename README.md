@@ -3,8 +3,17 @@
 - These tools all need the following utilities installed on the host machine
     ```
     > pip install -r requirements.txt
-    > brew install ffmpeg
+    ```
+
+- Reading and writing exif data is implemented with Phil Harvey's ExifTool which can be found and downloaded here:
+    ```
     https://www.sno.phy.queensu.ca/~phil/exiftool/
+    ```
+
+- Future experimentation and video testing will require ffmpeg, install on OSX with Homebrew
+    ```
+    https://brew.sh
+    > brew install ffmpeg
     ```
 
 ## Order of Operations
