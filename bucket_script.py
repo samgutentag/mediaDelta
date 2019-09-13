@@ -28,7 +28,7 @@ __deprecated__ = False
 __license__ = "GPLv3"
 __maintainer__ = "Sam Gutentag"
 __status__ = "Production"
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 # "Prototype", "Development", "Production", or "Legacy"
 
 
@@ -325,11 +325,9 @@ def bucket(source_file=None, target_dir="", bucket_mode="i", move_only=False, ar
         os.makedirs(full_target_dir)
 
     if move_only:
-        # shutil.move(source_file, target_filepath)
-        print("move!")
+        shutil.move(source_file, target_filepath)
     else:
         shutil.copy2(source_file, target_filepath)
-        # print("copy2!")
 
 
 def collect_files():
