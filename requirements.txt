@@ -1,5 +1,2 @@
-numpy==1.16.2
-Pillow==6.0.0
 pyexifinfo==0.4.0
-rawpy==0.13.1
-tqdm==4.31.1
+tqdm==4.35.0
