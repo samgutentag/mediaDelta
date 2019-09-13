@@ -4,8 +4,6 @@
 import argparse
 import os
 import shutil
-import sys
-import time
 from getpass import getuser
 
 import utilities
@@ -14,7 +12,7 @@ import utilities
 def main():
 
     #--------------------------------------------------------------------------
-    #       Setup Arguemnt Parser
+    #       Setup Argument Parser
     #--------------------------------------------------------------------------
 
     parser = argparse.ArgumentParser(description='Import Media Files from Media Card or External Hard Drive')

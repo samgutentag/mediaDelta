@@ -9,13 +9,27 @@
 ## Order of Operations
 1. Create media with camera or drone or phone or potato
 
-2. Import from media card using
-  - "importer.py" to '/STAGING_DRIVE/staging'
+2. Import Data with bucket_script.py and arguments as needed
 
-3. Use Lightroom to go over images and import (via "Copy as DNG") to '/MASTERS_DRIVE/MASTERS' AND TO 'MASTERS_BACKUP_DRIVE/MASTERS'
+  > python bucket_script.py -m import -s /SOURCE_DRIVE/ -t /TARGET_DRIVE/ -a samgutentag
 
-4. Run "archiver.py"
-  - '/STAGING_DRIVE/STAGING/IMAGE' to '/ARCHIVE_DRIVE/IMAGE_ARCHIVE'
-  - '/STAGING_DRIVE/STAGING/VIDEO' to '/ARCHIVE_DRIVE/VIDEO_ARCHIVE'
+  -m mode, which mode bucket_script should be using to copy/relocate/transfer files
 
-5. Process photos in Lightroom as desired, export selects to "Photos.app"
+    import stages files by
+      /TARGET_DIR/IMPORT/<MEDIA_TYPE>/<EXTENSION>/<YYYYMMDD.HH>/<artist>.<SOURCE_DEVICE>.<YYYYMMDD>.<HHmmss>.<ms>.<extension>
+
+    archive locates files by
+      /TARGET_DIR/IMPORT/<MEDIA_TYPE>/<YYYY>/<YYYY.MM>/<YYYYMMDD>.<HHmmss>.<artist>.<counter>.<extension>
+
+  -a artist, assign exif creator and/or artist tags with passed variable
+
+  -s source_drive, top level drive containing media files
+
+  -t target_drive, top level destination directory
+
+
+3. If desired or possible, do base level culling here, helps keep things cleaner later on
+
+4. Optional - Use GeoTag.app and recorded GPX tracks to append GPS data to imported files.
+
+5. Run script again in `archive` mode before importing to Lightroom
