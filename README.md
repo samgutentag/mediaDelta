@@ -28,3 +28,12 @@
 4. Optional - Use GeoTag.app and recorded GPX tracks to append GPS data to imported files.
 
 5. Run script again in `archive` mode before importing to Lightroom
+
+
+## Notes
+1.  datetime is converted to UTC for file naming
+2.  artist information cascades in the following order
+    a.  found in exif data
+    b.  passed artist argument
+    c.  logged in username
+3.  video file datetime is at beginning of recording
