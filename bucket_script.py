@@ -28,7 +28,7 @@ __deprecated__ = False
 __license__ = "GPLv3"
 __maintainer__ = "Sam Gutentag"
 __status__ = "Production"
-__version__ = "1.0.1"
+__version__ = "1.1.0"
 # "Prototype", "Development", "Production", or "Legacy"
 
 
@@ -359,13 +359,21 @@ def collect_files():
                                              video_extensions=video_extensions,
                                              ignore_paths=["THMBNL"])
 
-    for image_file in tqdm(images):
+    print(f">>>> Found {len(images)} image files")
+    print(f">>>> Found {len(videos)} video files")
+
+    # log other files to console for inspection
+    print(f">>>> Found {len(others)} other files")
+    for other_file in others:
+        print(f"\t>>{other_file}")
+
+    for image_file in tqdm(images, desc="Image Files", total=len(images), ncols=100):
         bucket(source_file=image_file, target_dir=args["target_dir"],
                bucket_mode=args["bucket_mode"],
                move_only=args["move_only"],
                artist=args["artist"])
 
-    for video_file in tqdm(videos):
+    for video_file in tqdm(videos, desc="Video Files", total=len(videos), ncols=100):
         bucket(source_file=video_file, target_dir=args["target_dir"],
                bucket_mode=args["bucket_mode"],
                move_only=args["move_only"],
