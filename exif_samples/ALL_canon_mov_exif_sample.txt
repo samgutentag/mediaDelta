@@ -1,0 +1,268 @@
+ExifTool Version Number         : 11.33
+File Name                       : IMG_7103.MOV
+Directory                       : /Users/samgutentag/Downloads/CAMERAS/CANON_7DMK3/DCIM/100EOS7D
+File Size                       : 88 MB
+File Modification Date/Time     : 2019:08:27 15:45:22-07:00
+File Access Date/Time           : 2019:09:12 11:45:12-07:00
+File Inode Change Date/Time     : 2019:08:27 16:19:57-07:00
+File Permissions                : rwxrwxrwx
+File Type                       : MOV
+File Type Extension             : mov
+MIME Type                       : video/quicktime
+Major Brand                     : Apple QuickTime (.MOV/QT)
+Minor Version                   : 2012.8.0
+Compatible Brands               : qt  , CAEP
+Compressor Version              : CanonAVC0011/05.00.00/00.00.00
+Exif Byte Order                 : Little-endian (Intel, II)
+Orientation                     : Horizontal (normal)
+Resolution Unit                 : inches
+Y Cb Cr Positioning             : Co-sited
+Exposure Time                   : 1/125
+F Number                        : 3.5
+Exposure Program                : Manual
+Sensitivity Type                : Recommended Exposure Index
+Recommended Exposure Index      : 100
+Exif Version                    : 0230
+Date/Time Original              : 2019:08:27 15:45:31
+Components Configuration        : Y, Cb, Cr, -
+Shutter Speed Value             : 1/128
+Aperture Value                  : 3.4
+Exposure Compensation           : 0
+Metering Mode                   : Center-weighted average
+Flash                           : Off, Did not fire
+Focal Length                    : 50.0 mm
+Macro Mode                      : Normal
+Self Timer                      : Off
+Quality                         : Movie (2)
+Canon Flash Mode                : n/a
+Continuous Drive                : Movie
+Focus Mode                      : Manual Focus (3)
+Record Mode                     : MOV
+Canon Image Size                : 1920x1080 Movie
+Easy Mode                       : Manual
+Digital Zoom                    : None
+Contrast                        : Normal
+Saturation                      : Normal
+Focus Range                     : Not Known
+Canon Exposure Mode             : Manual
+Lens Type                       : Canon EF 50mm f/1.8 STM
+Max Focal Length                : 50 mm
+Min Focal Length                : 50 mm
+Focal Units                     : 1/mm
+Max Aperture                    : 1.8
+Min Aperture                    : 23
+Flash Activity                  : 0
+Flash Bits                      : (none)
+Zoom Source Width               : 0
+Zoom Target Width               : 0
+Manual Flash Output             : n/a
+Color Tone                      : Normal
+Auto ISO                        : 100
+Base ISO                        : 100
+Measured EV                     : 11.62
+Target Aperture                 : 3.4
+Target Exposure Time            : 1/128
+White Balance                   : Shade
+Slow Shutter                    : None
+Shot Number In Continuous Burst : 0
+Optical Zoom Code               : n/a
+Camera Temperature              : 29 C
+Flash Guide Number              : 0
+Flash Exposure Compensation     : 0
+Auto Exposure Bracketing        : Off
+AEB Bracket Value               : 0
+Control Mode                    : Camera Local Control
+Measured EV 2                   : 12.375
+Bulb Duration                   : 0
+Camera Type                     : EOS High-end
+ND Filter                       : n/a
+Canon Image Type                : MVI:Canon EOS 7D Mark II
+Canon Firmware Version          : Firmware Version 1.1.2
+Owner Name                      : Sam Gutentag
+Canon Model ID                  : EOS 7D Mark II
+Thumbnail Image Valid Area      : 0 159 16 103
+Time Zone                       : -07:00
+Time Zone City                  : Los Angeles
+Daylight Savings                : On
+Battery Type                    : LP-E6
+Bracket Mode                    : Off
+Bracket Value                   : 0
+Bracket Shot Number             : 0
+Raw Jpg Size                    : Large
+WB Bracket Mode                 : Off
+WB Bracket Value AB             : 0
+WB Bracket Value GM             : 0
+Live View Shooting              : On
+Focus Distance Upper            : 1.1 m
+Focus Distance Lower            : 0.87 m
+Flash Exposure Lock             : Off
+Lens Model                      : EF50mm f/1.8 STM
+Internal Serial Number          : LA0078490
+Crop Left Margin                : 0
+Crop Right Margin               : 0
+Crop Top Margin                 : 0
+Crop Bottom Margin              : 0
+Exposure Level Increments       : 1/2 Stop
+ISO Speed Increments            : 1/3 Stop
+AEB Auto Cancel                 : Off
+AEB Sequence                    : +,0,-
+AEB Shot Count                  : 5 shots
+Safety Shift                    : Disable
+Same Exposure For New Aperture  : Disable
+Shutter Speed Range             : Disable; Hi 1/8192; Lo 32
+Aperture Range                  : Disable; Closed 91; Open 1
+Focusing Screen                 : Eh-A
+LV Shooting Area Display        : Masked
+Viewfinder Warnings             : Monochrome, WB corrected, One-touch image quality, [6]
+Continuous Shooting Speed       : Disable; Hi 10; Lo 3; 4
+Custom Controls                 : 0 0 0 0 0 0 0 0 0 0 0 0 0 7 0 0 0 0 0 1 0 6 0 0 0 0 0 0 0 0 254 255 0 3 112 48 0 0 0 0 0 0 0 0 0 0 0 20 80 0 0 0 7 3 0 255 255 255 0 255 255 255
+Dial Direction Tv Av            : Normal
+Multi Function Lock             : Off; Quick control dial
+Add Aspect Ratio Info           : Off
+Default Erase Option            : Cancel selected
+Tone Curve                      : Standard
+Sharpness                       : 3
+Sharpness Frequency             : n/a
+Sensor Red Level                : 0
+Sensor Blue Level               : 0
+White Balance Red               : 0
+White Balance Blue              : 0
+Color Temperature               : 6500
+Picture Style                   : User Def. 1
+Digital Gain                    : 0
+WB Shift AB                     : 0
+WB Shift GM                     : 0
+Color Space                     : sRGB
+VRD Offset                      : 0
+Sensor Width                    : 5568
+Sensor Height                   : 3708
+Sensor Left Border              : 84
+Sensor Top Border               : 50
+Sensor Right Border             : 5555
+Sensor Bottom Border            : 3697
+Black Mask Left Border          : 0
+Black Mask Top Border           : 0
+Black Mask Right Border         : 0
+Black Mask Bottom Border        : 0
+Picture Style User Def          : Standard; Standard; Standard
+Picture Style PC                : None; None; None
+Custom Picture Style File Name  : 
+Peripheral Illumination Corr    : On
+Auto Lighting Optimizer         : Off
+Highlight Tone Priority         : Off
+Long Exposure Noise Reduction   : Off
+High ISO Noise Reduction        : Off
+Lens Serial Number              : 0000240c99
+User Comment                    : 
+Sub Sec Time                    : 00
+Sub Sec Time Original           : 00
+Sub Sec Time Digitized          : 00
+Flashpix Version                : 0100
+Exif Image Width                : 160
+Exif Image Height               : 120
+Interoperability Index          : THM - DCF thumbnail file
+Interoperability Version        : 0100
+Related Image Width             : 1920
+Related Image Height            : 1080
+Focal Plane X Resolution        : 177.9755284
+Focal Plane Y Resolution        : 200.3338898
+Focal Plane Resolution Unit     : inches
+Custom Rendered                 : Normal
+Exposure Mode                   : Manual
+Scene Capture Type              : Standard
+Serial Number                   : 032021001510
+Lens Info                       : 50mm f/0
+GPS Version ID                  : 2.3.0.0
+Encoding Process                : Baseline DCT, Huffman coding
+Bits Per Sample                 : 8
+Color Components                : 3
+Y Cb Cr Sub Sampling            : YCbCr4:2:2 (2 1)
+Thumbnail Image                 : (Binary data 16786 bytes, use -b option to extract)
+Make                            : Canon
+Model                           : Canon EOS 7D Mark II
+User Rating                     : 0
+Copyright                       : (c) 2019 Sam Gutentag
+Author                          : Sam Gutentag
+Movie Header Version            : 0
+Create Date                     : 2019:08:27 15:45:22
+Modify Date                     : 2019:08:27 15:45:22
+Time Scale                      : 60000
+Duration                        : 12.35 s
+Preferred Rate                  : 1
+Preferred Volume                : 100.00%
+Preview Time                    : 0 s
+Preview Duration                : 0 s
+Poster Time                     : 0 s
+Selection Time                  : 0 s
+Selection Duration              : 0 s
+Current Time                    : 0 s
+Next Track ID                   : 4
+Track Header Version            : 0
+Track Create Date               : 2019:08:27 15:45:22
+Track Modify Date               : 2019:08:27 15:45:22
+Track ID                        : 1
+Track Duration                  : 12.35 s
+Track Layer                     : 0
+Track Volume                    : 0.00%
+Image Width                     : 1920
+Image Height                    : 1080
+Graphics Mode                   : srcCopy
+Op Color                        : 0 0 0
+Compressor ID                   : avc1
+Source Image Width              : 1920
+Source Image Height             : 1080
+X Resolution                    : 72
+Y Resolution                    : 72
+Bit Depth                       : 24
+Video Frame Rate                : 59.94
+Time Code                       : 3
+Balance                         : 0
+Audio Format                    : sowt
+Audio Bits Per Sample           : 16
+Audio Sample Rate               : 48000
+Layout Flags                    : Stereo
+Audio Channels                  : 2
+Matrix Structure                : 1 0 0 0 1 0 0 0 1
+Media Header Version            : 0
+Media Create Date               : 2019:08:27 15:45:22
+Media Modify Date               : 2019:08:27 15:45:22
+Media Time Scale                : 60000
+Media Duration                  : 12.35 s
+Gen Media Version               : 0
+Gen Flags                       : 0 0 0
+Gen Graphics Mode               : srcCopy
+Gen Op Color                    : 0 0 0
+Gen Balance                     : 0
+Text Font                       : System
+Text Face                       : Plain
+Text Size                       : 12
+Text Color                      : 0 0 0
+Background Color                : 0 0 0
+Font Name                       : 
+Handler Class                   : Data Handler
+Handler Type                    : Alias Data
+Other Format                    : tmcd
+Movie Data Size                 : 92358076
+Movie Data Offset               : 131080
+Aperture                        : 3.5
+Avg Bitrate                     : 59.8 Mbps
+Drive Mode                      : Continuous Shooting
+ISO                             : 100
+Image Size                      : 1920x1080
+Lens                            : 50.0 mm
+Lens ID                         : Canon EF 50mm f/1.8 STM
+Megapixels                      : 2.1
+Rotation                        : 0
+Scale Factor To 35 mm Equivalent: 1.6
+Shooting Mode                   : Manual
+Shutter Speed                   : 1/125
+Create Date                     : 2019:08:27 15:45:31.00
+Date/Time Original              : 2019:08:27 15:45:31.00
+Modify Date                     : 2019:08:27 15:45:31.00
+Circle Of Confusion             : 0.019 mm
+Depth Of Field                  : 0.05 m (0.96 - 1.01 m)
+Field Of View                   : 25.7 deg
+Focal Length                    : 50.0 mm (35 mm equivalent: 78.8 mm)
+Hyperfocal Distance             : 37.49 m
+Lens                            : 50.0 mm (35 mm equivalent: 78.8 mm)
+Light Value                     : 10.6

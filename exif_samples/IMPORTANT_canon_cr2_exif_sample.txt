@@ -1,0 +1,20 @@
+File Type                       : CR2
+File Type Extension             : cr2
+Date/Time Original              : 2019:08:16 21:58:40
+Date/Time Original              : 2019:08:16 21:58:40.10
+Artist                          : Sam Gutentag
+Canon Image Type                : Canon EOS 7D Mark II
+MIME Type                       : image/x-canon-cr2
+Make                            : Canon
+Internal Serial Number          : LA0078490
+Lens Serial Number              : 0000240c99
+Serial Number                   : 032021001510
+Camera Model Name               : Canon EOS 7D Mark II
+File Size                       : 28 MB
+Daylight Savings                : On
+Owner Name                      : Sam Gutentag
+Quality                         : RAW
+Time Zone                       : -07:00
+Time Zone City                  : Los Angeles
+Orientation                     : Horizontal (normal)
+Copyright                       : (c) 2019 Sam Gutentag

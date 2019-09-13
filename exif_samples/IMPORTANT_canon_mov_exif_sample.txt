@@ -1,0 +1,26 @@
+File Size                       : 88 MB
+File Type                       : MOV
+File Type Extension             : mov
+MIME Type                       : video/quicktime
+Quality                         : Movie (2)
+Canon Image Size                : 1920x1080 Movie
+Canon Image Type                : MVI:Canon EOS 7D Mark II
+Owner Name                      : Sam Gutentag
+Canon Model ID                  : EOS 7D Mark II
+Time Zone                       : -07:00
+Time Zone City                  : Los Angeles
+Daylight Savings                : On
+Internal Serial Number          : LA0078490
+Serial Number                   : 032021001510
+Make                            : Canon
+Model                           : Canon EOS 7D Mark II
+Copyright                       : (c) 2019 Sam Gutentag
+Author                          : Sam Gutentag
+Create Date                     : 2019:08:27 15:45:22
+Duration                        : 12.35 s
+Track Create Date               : 2019:08:27 15:45:22
+Video Frame Rate                : 59.94
+Media Create Date               : 2019:08:27 15:45:22
+Media Duration                  : 12.35 s
+Image Size                      : 1920x1080
+Date/Time Original              : 2019:08:27 15:45:31.00

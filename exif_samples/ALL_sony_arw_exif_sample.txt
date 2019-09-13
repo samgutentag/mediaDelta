@@ -1,0 +1,251 @@
+AF Area Mode                    : Flexible Spot
+AF Area Mode Setting            : Flexible Spot
+AF Point Selected               : n/a
+AF Points Used                  : (none)
+AF Tracking                     : Off
+Ambient Temperature             : 22 C
+Anti-Blur                       : On (Shooting)
+Aperture                        : 5.6
+Artist                          : Sam Gutentag
+Auto Portrait Framed            : No
+Base ISO                        : 100
+Battery Level                   : 101%
+Battery Temperature             : 29.4 C
+Bits Per Sample                 : 14
+Black Level                     : 512 512 512 512
+Blue Balance                    : 1.699219
+Brightness                      : 0
+Brightness Value                : 4.28671875
+CFA Pattern                     : [Red,Green][Green,Blue]
+CFA Pattern 2                   : 0 1 1 2
+CFA Repeat Pattern Dim          : 2 2
+Camera E-mount Version          : 1.80
+Camera Model Name               : ILCE-6400
+Camera Orientation              : Horizontal (normal)
+Chromatic Aberration Corr Params: 22 -256 -256 -256 -128 0 256 512 768 1024 1280 1536 1280 1536 1536 1408 1280 896 512 384 128 -128 -512 0 0 0 0 0 0 0 0 0 0
+Chromatic Aberration Correction : Auto
+Circle Of Confusion             : 0.020 mm
+Color Compensation Filter       : 0
+Color Matrix                    : 1280 -211 -12 64 1151 -159 31 -259 1284
+Color Mode                      : Standard
+Color Space                     : sRGB
+Color Temperature               : Auto
+Components Configuration        : Y, Cb, Cr, -
+Compressed Bits Per Pixel       : 8
+Compression                     : Sony ARW Compressed
+Contrast                        : Normal
+Copyright                       : (c) 2019 Sam Gutentag
+Create Date                     : 2019:08:23 19:15:35-07:00
+Create Date                     : 2019:08:23 19:15:35
+Creative Style                  : Standard
+Custom Rendered                 : Normal
+Date/Time Original              : 2019:08:23 19:15:35
+Date/Time Original              : 2019:08:23 19:15:35-07:00
+Default Crop Origin             : 12 12
+Default Crop Size               : 6000 4000
+Digital Zoom Ratio              : 1
+Directory                       : /Users/samgutentag/Downloads/CAMERAS/SONY_A6400/DCIM/100MSDCF
+Distortion Corr Params          : 11 86 0 -122 -259 -438 -632 -862 -1100 -1358 -1610 -1876 0 0 0 0 0
+Distortion Corr Params Number   : 11 (APS-C)
+Distortion Corr Params Present  : Yes
+Distortion Correction           : Auto fixed by lens
+Distortion Correction Setting   : Auto
+Dynamic Range Optimizer         : Auto
+Electronic Front Curtain Shutter: On
+Exif Byte Order                 : Little-endian (Intel, II)
+Exif Image Height               : 4000
+Exif Image Width                : 6000
+Exif Version                    : 0231
+ExifTool Version Number         : 11.33
+Exposure Compensation           : 0
+Exposure Mode                   : Manual
+Exposure Program                : Manual
+Exposure Standard Adjustment    : 0
+Exposure Time                   : 1/160
+F Number                        : 5.6
+Face 1 Position                 : 657 2456 1106 1106
+Face Info Length                : 37
+Face Info Offset                : 94
+Faces Detected                  : 1
+Field Of View                   : 73.7 deg
+File Access Date/Time           : 2019:09:12 12:00:04-07:00
+File Format                     : ARW 2.3.5
+File Inode Change Date/Time     : 2019:09:04 21:48:50-07:00
+File Modification Date/Time     : 2019:09:04 21:48:50-07:00
+File Name                       : A6400001.ARW
+File Permissions                : rwxrwxrwx
+File Size                       : 24 MB
+File Source                     : Digital Camera
+File Type                       : ARW
+File Type Extension             : arw
+Flash                           : Off, Did not fire
+Flash Action                    : Did not fire
+Flash Exposure Compensation     : 0
+Flash Level                     : Normal
+Flash Mode                      : Fill-flash
+Flash Status                    : Built-in Flash present
+Flashpix Version                : 0100
+Flexible Spot Position          : 320 240
+Focal Length                    : 16.0 mm (35 mm equivalent: 24.0 mm)
+Focal Length                    : 16.0 mm
+Focal Length In 35mm Format     : 24 mm
+Focal Plane AF Points Used      : 0
+Focus Distance 2                : 0.94 m
+Focus Location                  : 6000 4000 3000 2000
+Focus Mode                      : AF-C
+Focus Position 2                : 164
+Full Image Size                 : 6000x4000
+GPS Latitude                    : 37 deg 48' 20.74" N
+GPS Latitude Ref                : North
+GPS Longitude                   : 122 deg 25' 41.97" W
+GPS Longitude Ref               : West
+GPS Position                    : 37 deg 48' 20.74" N, 122 deg 25' 41.97" W
+GPS Version ID                  : 2.3.0.0
+HDR                             : Off; Uncorrected image
+HDR Setting                     : Off
+High ISO Noise Reduction        : Off
+Hyperfocal Distance             : 2.28 m
+ISO                             : 1600
+ISO Auto Max                    : 6400
+ISO Auto Min                    : 100
+ISO Setting                     : 1600
+Image Description               : 
+Image Height                    : 4024
+Image Size                      : 6048x4024
+Image Stabilization             : On
+Image Width                     : 6048
+Intelligent Auto                : Off
+Internal Serial Number          : 00000000980c
+Interoperability Index          : R98 - DCF basic file (sRGB)
+Interoperability Version        : 0100
+Lateral Chromatic Aberration    : Auto
+Lens E-mount Version            : 1.20
+Lens Firmware Version           : Ver.01.129
+Lens Format                     : APS-C
+Lens ID                         : Sony E PZ 16-50mm F3.5-5.6 OSS
+Lens Info                       : 16-50mm f/3.5-5.6
+Lens Model                      : E PZ 16-50mm F3.5-5.6 OSS
+Lens Mount                      : E-mount
+Lens Mount 2                    : E-mount
+Lens Spec                       : E PZ 16-50mm F3.5-5.6 OSS
+Lens Spec Features              : E PZ OSS
+Lens Type                       : E-Mount, T-Mount, Other Lens or no lens
+Lens Type 2                     : Sony E PZ 16-50mm F3.5-5.6 OSS
+Lens Type 3                     : Sony E PZ 16-50mm F3.5-5.6 OSS
+Light Source                    : Cloudy
+Light Value                     : 8.3
+Long Exposure Noise Reduction   : Off
+MIME Type                       : image/x-sony-arw
+Make                            : SONY
+Max Aperture Value              : 3.5
+Max Focal Length                : 50.0 mm
+Megapixels                      : 24.3
+Meta Version                    : DC7303320222000
+Metering Mode                   : Multi-segment
+Metering Mode 2                 : Multi-segment
+Min Focal Length                : 16.0 mm
+Model Release Year              : 2018
+Modify Date                     : 2019:08:23 19:15:35
+Modify Date                     : 2019:08:23 19:15:35-07:00
+Multi Frame NR Effect           : Normal
+Multi Frame Noise Reduction     : Off
+Offset Time                     : -07:00
+Offset Time Digitized           : -07:00
+Offset Time Original            : -07:00
+Orientation                     : Horizontal (normal)
+Photometric Interpretation      : Color Filter Array
+Picture Effect                  : Off
+Picture Effect 2                : Off
+Picture Profile                 : Gamma Still - Standard/Neutral (PP2)
+Pixel Shift Info                : n/a
+Planar Configuration            : Chunky
+Preview Image                   : (Binary data 438531 bytes, use -b option to extract)
+Preview Image Length            : 438531
+Preview Image Size              : 1616x1080
+Preview Image Start             : 132682
+PrintIM Version                 : 0300
+Priority Set In AWB             : Standard
+Quality                         : RAW
+Quality 2                       : RAW
+RAW File Type                   : Compressed RAW
+Rating                          : 0
+Recommended Exposure Index      : 1600
+Red Balance                     : 2.832031
+Release Mode                    : Normal
+Release Mode 2                  : Normal
+Release Mode 3                  : Normal
+Resolution Unit                 : inches
+Rows Per Strip                  : 4024
+SR2 Sub IFD Key                 : 0x44332211
+SR2 Sub IFD Length              : 42876
+SR2 Sub IFD Offset              : 80768
+Samples Per Pixel               : 1
+Saturation                      : Normal
+Scale Factor To 35 mm Equivalent: 1.5
+Scene Capture Type              : Standard
+Scene Mode                      : Standard
+Scene Type                      : Directly photographed
+Self Timer                      : Off
+Sensitivity Type                : Recommended Exposure Index
+Sequence File Number            : 1
+Sequence Image Number           : 1
+Sequence Length                 : 1 file
+Sequence Number                 : Single
+Sharpness                       : Normal
+Shot Number Since Power Up      : 10
+Shutter Count                   : 113
+Shutter Count 2                 : 113
+Shutter Count 3                 : 113
+Shutter Speed                   : 1/160
+Soft Skin Effect                : Off
+Software                        : ILCE-6400 v2.00
+Sony Date Time                  : 2019:08:23 19:15:35
+Sony Exposure Time              : 1/161
+Sony Exposure Time 2            : 1/161
+Sony F Number                   : 5.7
+Sony ISO                        : 1600
+Sony Image Height               : n.a.
+Sony Image Height Max           : 4024
+Sony Image Width                : 6000
+Sony Image Width Max            : 6024
+Sony Max Aperture Value         : 3.7
+Sony Model ID                   : ILCE-6400
+Sony Raw File Type              : Sony Compressed RAW
+Sony Tone Curve                 : 8000 10400 12900 14100
+Stops Above Base ISO            : 4.0
+Strip Byte Counts               : 24337152
+Strip Offsets                   : 571214
+Subfile Type                    : Reduced-resolution image
+Thumbnail Image                 : (Binary data 8704 bytes, use -b option to extract)
+Thumbnail Length                : 8704
+Thumbnail Offset                : 123978
+User Comment                    : 
+Variable Low Pass Filter        : n/a
+Vignetting Corr Params          : 11 0 0 192 512 1024 1600 2432 3648 5504 8256 12032 0 0 0 0 0
+Vignetting Correction           : Auto
+WB RGB Levels                   : 800 256 394
+WB RGB Levels 2500K             : 1476 1024 4220
+WB RGB Levels 3200K             : 1884 1024 3000
+WB RGB Levels 4500K             : 2440 1024 2144
+WB RGB Levels 6000K             : 2876 1024 1760
+WB RGB Levels 8500K             : 3336 1024 1480
+WB RGB Levels Cloudy            : 2900 1024 1740
+WB RGB Levels Daylight          : 2696 1024 1900
+WB RGB Levels Flash             : 3164 1024 1660
+WB RGB Levels Fluorescent       : 2516 1024 2824
+WB RGB Levels Fluorescent M1    : 1972 1024 3424
+WB RGB Levels Fluorescent P1    : 2624 1024 2024
+WB RGB Levels Fluorescent P2    : 2924 1024 1836
+WB RGB Levels Shade             : 3180 1024 1564
+WB RGB Levels Tungsten          : 1692 1024 3476
+WB RGGB Levels                  : 2900 1024 1024 1740
+WB RGGB Levels Auto             : 3172 1024 1024 1580
+WB Shift AB GM                  : 0 0
+WB Shift AB GM Precise          : 0.00 0.00
+White Balance                   : Cloudy
+White Balance Fine Tune         : 0
+White Level                     : 15360 15360 15360
+X Resolution                    : 350
+Y Cb Cr Positioning             : Co-sited
+Y Resolution                    : 350
+Zone Matching                   : ISO Setting Used
