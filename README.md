@@ -12,7 +12,7 @@
 
 2. Import Data with bucket_script.py and arguments as needed
 
-  > python bucket_script.py -m import -s /SOURCE_DRIVE/ -t /TARGET_DRIVE/ -a samgutentag
+  > python bucket_script.py -s /SOURCE_DRIVE/ -t /TARGET_DRIVE/ -a samgutentag -mode archive
 
 3. If desired or possible, do base level culling here, helps keep things cleaner later on
 
