@@ -28,7 +28,7 @@ __deprecated__ = False
 __license__ = "GPLv3"
 __maintainer__ = "Sam Gutentag"
 __status__ = "Production"
-__version__ = "1.2.1"
+__version__ = "1.2.2"
 # "Prototype", "Development", "Production", or "Legacy"
 
 
@@ -140,8 +140,16 @@ def parse_sony_exif(exif_data={}, artist=getpass.getuser()):
         quality = exif_data["QuickTime:VideoSize"]
 
     elif file_type == "image":
-        artist = exif_data["EXIF:Artist"]
-        source_device = f"{exif_data['MakerNotes:SonyModelID']}"
+        try:
+            artist = exif_data["EXIF:Artist"]
+        except:
+            pass
+
+        try:
+            source_device = f"{exif_data['MakerNotes:SonyModelID']}"
+        except KeyError:
+            source_device = f"{exif_data['EXIF:Model']}"
+
         capture_date = exif_data["Composite:SubSecCreateDate"]
         quality = exif_data["File:FileType"]
 
@@ -375,6 +383,7 @@ def bucket(source_file=None, target_dir="", bucket_mode="i", move_only=False, ar
     # convert to dictionary
     exif_dict = dict(sorted(exif_json[0].items()))
 
+    # from pprint import pprint
     # pprint(exif_dict)
 
     try:
@@ -441,7 +450,7 @@ def bucket(source_file=None, target_dir="", bucket_mode="i", move_only=False, ar
 
         return 1
     except Exception as e:
-        print(e)
+        print(f"{e}\t{source_file}")
         return source_file
 
 
