@@ -28,7 +28,7 @@ __deprecated__ = False
 __license__ = "GPLv3"
 __maintainer__ = "Sam Gutentag"
 __status__ = "Production"
-__version__ = "1.2.0"
+__version__ = "1.2.1"
 # "Prototype", "Development", "Production", or "Legacy"
 
 
@@ -167,11 +167,17 @@ def parse_canon_exif(exif_data={}, artist=getpass.getuser()):
     file_type = exif_data["File:MIMEType"].split("/")[0]
 
     if file_type == "video":
-        artist = exif_data["QuickTime:Author"]
+        try:
+            artist = exif_data["QuickTime:Author"]
+        except:
+            pass
         quality = exif_data["Composite:ImageSize"]
 
     elif file_type == "image":
-        artist = exif_data["EXIF:Artist"]
+        try:
+            artist = exif_data["EXIF:Artist"]
+        except:
+            pass
         quality = exif_data["File:FileType"]
 
     # source device
