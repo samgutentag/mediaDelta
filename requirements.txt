@@ -1,2 +1,7 @@
+importlib-resources==1.0.2
+isort==4.3.21
+numpy==1.17.2
 pyexifinfo==0.4.0
+pytz==2019.2
+timezonefinder==4.1.0
 tqdm==4.35.0
