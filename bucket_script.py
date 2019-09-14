@@ -28,7 +28,7 @@ __deprecated__ = False
 __license__ = "GPLv3"
 __maintainer__ = "Sam Gutentag"
 __status__ = "Production"
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 # "Prototype", "Development", "Production", or "Legacy"
 
 
@@ -37,9 +37,14 @@ import os
 import shutil
 from datetime import datetime, timezone
 import getpass
+import re
 
 import pyexifinfo
 from tqdm import tqdm
+from timezonefinder import TimezoneFinder
+import pytz
+from pytz.exceptions import UnknownTimeZoneError
+from pprint import pprint
 
 
 def get_arguments():
@@ -175,11 +180,95 @@ def parse_canon_exif(exif_data={}, artist=getpass.getuser()):
     source_device = source_device.replace("Canon", "")
 
     # capture date
-    capture_date = exif_data["Composite:SubSecDateTimeOriginal"]
+    try:
+        capture_date = exif_data["Composite:SubSecDateTimeOriginal"]
+    except KeyError:
+        capture_date = exif_data["EXIF:DateTimeOriginal"]
+
     capture_date_tz = exif_data["MakerNotes:TimeZone"]
     capture_date = f"{capture_date}{capture_date_tz}"
 
     data = {"device_make": "Canon",
+            "file_extension": file_extension,
+            "file_type": file_type,
+            "artist": artist,
+            "source_device": source_device,
+            "capture_date": capture_date,
+            "quality": quality}
+
+    return data
+
+
+def timezone_from_gps(gps_position="", capture_date=""):
+
+    tf = TimezoneFinder(in_memory=True)
+
+    # parse sample to lat and long
+    # 32 deg 12\' 7.60" N, 80 deg 41\' 8.19" W
+
+    # capture_date
+    # 2018:06:28 09:45:37
+
+    # extrac degrees, minutes, seconds
+    dms_re = re.compile(r"\d+.?\d+")
+    dms_matches = dms_re.findall(gps_position)
+
+    # exrtact cardinal directions
+    card_re = re.compile(r"[NWSE]")
+    card_matches = card_re.findall(gps_position)
+
+    # convert to coordinates
+    latitude = float(dms_matches[0]) + float(dms_matches[1]) / 60 + float(dms_matches[2]) / (60 * 60)
+    if card_matches[0] == 'S':
+        latitude *= -1
+
+    longitude = float(dms_matches[3]) + float(dms_matches[4]) / 60 + float(dms_matches[5]) / (60 * 60)
+    if card_matches[1] == 'W':
+        longitude *= -1
+
+    try:
+        # get timezone_name from lookup
+        timezone_name = tf.timezone_at(lng=longitude, lat=latitude)
+
+        # make timezone aware datetime
+        capture_date = datetime.strptime(capture_date, "%Y:%m:%d %H:%M:%S")
+
+        # get timezone from timesone name
+        tz = pytz.timezone(timezone_name)
+
+        # make aware string, parse out timezone offset, this is gross
+        aware_datetime = str(capture_date.replace(tzinfo=tz))
+        tz_string = f"{aware_datetime[-6:-3]}:{aware_datetime[-2:]}"
+
+        return tz_string
+
+    except:
+        return "-00:00"
+
+
+def parse_dji_exif(exif_data={}, artist=getpass.getuser()):
+    """Specialized parsing for DJI Devices. Built with DJI Mavic Pro target in mind."""
+    # print("file is from a DJI device!")
+    file_extension = exif_data["File:FileType"]
+
+    file_type = exif_data["File:MIMEType"].split("/")[0]
+
+    if file_type == "video":
+        quality = exif_data["Composite:ImageSize"]
+        capture_date = exif_data["QuickTime:CreateDate"]
+        source_device = exif_data["QuickTime:Model"].split("-")[0]
+
+    elif file_type == "image":
+        quality = exif_data["File:FileType"]
+        capture_date = exif_data["EXIF:DateTimeOriginal"]
+        source_device = exif_data["XMP:Model"]
+
+    capture_date_tz = timezone_from_gps(gps_position=exif_data["Composite:GPSPosition"],
+                                        capture_date=capture_date)
+
+    capture_date = f"{capture_date}{capture_date_tz}"
+
+    data = {"device_make": "DJI",
             "file_extension": file_extension,
             "file_type": file_type,
             "artist": artist,
@@ -244,7 +333,7 @@ def format_archive_path(exif_data={}, target_dir=""):
 
     archive_filepath = os.path.join(target_dir, "ARCHIVE",
                                     exif_data["file_type"].upper(),
-                                    exif_data['capture_utc'].strftime("%Y/%Y%m"),
+                                    exif_data['capture_utc'].strftime("%Y/%Y.%m"),
                                     archive_filename)
     # ensure we are not duplicating files, increment counter file with this name already exists
     while os.path.exists(archive_filepath):
@@ -273,61 +362,81 @@ def bucket(source_file=None, target_dir="", bucket_mode="i", move_only=False, ar
     artist (string): the username of the artist, used when exif data can not be found or does not exist
     """
 
+    # try:
     # get exif data from file
     exif_json = pyexifinfo.get_json(source_file)
 
     # convert to dictionary
     exif_dict = dict(sorted(exif_json[0].items()))
 
-    # exif formatting is manufacturer specific and media type specific
-    # get device make
+    # pprint(exif_dict)
+
     try:
-        device_make = exif_dict["EXIF:Make"]
-    except KeyError:
-        device_make = exif_dict["XML:DeviceManufacturer"]
-    device_make = device_make.title()
+        # exif formatting is manufacturer specific and media type specific
+        # get device make
+        try:
+            device_make = exif_dict["EXIF:Make"]
+        except KeyError:
+            try:
+                device_make = exif_dict["XML:DeviceManufacturer"]
+            except KeyError:
+                device_make = exif_dict["QuickTime:CompressorName"].split(" ")[0]
+        device_make = device_make.title()
 
-    # sony handling, written for a6400
-    if device_make == "Sony":
-        exif_data = parse_sony_exif(exif_data=exif_dict, artist=artist)
+        # sony handling, written for a6400
+        if device_make == "Sony":
+            exif_data = parse_sony_exif(exif_data=exif_dict, artist=artist)
 
-    # canon handling, written for EOS 7D Mark II
-    elif device_make == "Canon":
-        exif_data = parse_canon_exif(exif_data=exif_dict, artist=artist)
+        # canon handling, written for EOS 7D Mark II
+        elif device_make == "Canon":
+            exif_data = parse_canon_exif(exif_data=exif_dict, artist=artist)
 
-    # format all text to uppercase and replace spaces with dots
-    exif_data["artist"] = exif_data["artist"].replace(" ", "")
-    exif_data["source_device"] = exif_data["source_device"].replace(" ", "")
+        # dji handling, written for DJI Mavic Pro
+        elif device_make == "Dji":
+            exif_data = parse_dji_exif(exif_data=exif_dict, artist=artist)
 
-    # formatting datetime into a datetime obect
-    exif_data["capture_date"] = f"{exif_data['capture_date'][:-3]}00"
-    try:
-        exif_data["capture_date"] = datetime.strptime(exif_data["capture_date"], "%Y:%m:%d %H:%M:%S%z")
-    except ValueError:
-        exif_data["capture_date"] = datetime.strptime(exif_data["capture_date"], "%Y:%m:%d %H:%M:%S.%f%z")
+        else:
+            return source_file
 
-    # convert to UTC
-    exif_data["capture_utc"] = exif_data["capture_date"].astimezone(timezone.utc)
+        # format all text to uppercase and replace spaces with dots
+        exif_data["artist"] = exif_data["artist"].replace(" ", "")
+        exif_data["source_device"] = exif_data["source_device"].replace(" ", "")
 
-    # format import filepath
-    if bucket_mode == "i":
-        target_filepath = format_import_path(exif_data=exif_data,
-                                             target_dir=target_dir)
+        # formatting datetime into a datetime obect
+        exif_data["capture_date"] = f"{exif_data['capture_date'][:-3]}{exif_data['capture_date'][-2:]}"
 
-    # format archive filepath
-    elif bucket_mode == "a":
-        target_filepath = format_archive_path(exif_data=exif_data,
-                                              target_dir=target_dir)
+        try:
+            exif_data["capture_date"] = datetime.strptime(exif_data["capture_date"], "%Y:%m:%d %H:%M:%S%z")
+        except ValueError:
+            exif_data["capture_date"] = datetime.strptime(exif_data["capture_date"], "%Y:%m:%d %H:%M:%S.%f%z")
 
-    # ensure target directory exists
-    full_target_dir = os.path.dirname(target_filepath)
-    if not os.path.isdir(full_target_dir):
-        os.makedirs(full_target_dir)
+        # convert to UTC
+        exif_data["capture_utc"] = exif_data["capture_date"].astimezone(timezone.utc)
 
-    if move_only:
-        shutil.move(source_file, target_filepath)
-    else:
-        shutil.copy2(source_file, target_filepath)
+        # format import filepath
+        if bucket_mode == "i":
+            target_filepath = format_import_path(exif_data=exif_data,
+                                                target_dir=target_dir)
+
+        # format archive filepath
+        elif bucket_mode == "a":
+            target_filepath = format_archive_path(exif_data=exif_data,
+                                                target_dir=target_dir)
+
+        # ensure target directory exists
+        full_target_dir = os.path.dirname(target_filepath)
+        if not os.path.isdir(full_target_dir):
+            os.makedirs(full_target_dir)
+
+        if move_only:
+            shutil.move(source_file, target_filepath)
+        else:
+            shutil.copy2(source_file, target_filepath)
+
+        return 1
+    except Exception as e:
+        print(e)
+        return source_file
 
 
 def collect_files():
@@ -340,10 +449,12 @@ def collect_files():
     args = get_arguments()
     print(args)
 
+    error_files = []
+
     # check bucketing mode
     args["bucket_mode"] = args["bucket_mode"][:1].lower()
     if args["bucket_mode"] not in ["a", "i"]:
-        print(f"Invalide Bucketting mode {args['bucket_mode']} passed...")
+        print(f"Invalide Bucketing mode {args['bucket_mode']} passed...")
         print(f"\tvalid options are (i)mport or (a)rchive.")
 
     video_extensions = [".3G2", ".3GP", ".ASF", ".AVI",
@@ -367,17 +478,29 @@ def collect_files():
     for other_file in others:
         print(f"\t>>{other_file}")
 
-    for image_file in tqdm(images, desc="Image Files", total=len(images), ncols=100):
-        bucket(source_file=image_file, target_dir=args["target_dir"],
-               bucket_mode=args["bucket_mode"],
-               move_only=args["move_only"],
-               artist=args["artist"])
+    if len(images) > 0:
+        for image_file in tqdm(images, desc="Image Files", total=len(images), ncols=100):
+            b = bucket(source_file=image_file, target_dir=args["target_dir"],
+                       bucket_mode=args["bucket_mode"],
+                       move_only=args["move_only"],
+                       artist=args["artist"])
+            if b != 1:
+                error_files.append(b)
 
-    for video_file in tqdm(videos, desc="Video Files", total=len(videos), ncols=100):
-        bucket(source_file=video_file, target_dir=args["target_dir"],
-               bucket_mode=args["bucket_mode"],
-               move_only=args["move_only"],
-               artist=args["artist"])
+    if len(videos) > 0:
+        for video_file in tqdm(videos, desc="Video Files", total=len(videos), ncols=100):
+            b = bucket(source_file=video_file, target_dir=args["target_dir"],
+                       bucket_mode=args["bucket_mode"],
+                       move_only=args["move_only"],
+                       artist=args["artist"])
+            if b != 1:
+                error_files.append(b)
+
+    if len(error_files) > 0:
+        print(f"Could not process {len(error_files)} files...")
+        error_files = sorted(error_files)
+        for idx, err_file in enumerate(error_files):
+            print(f"\t{idx + 1}\t{err_file}")
 
 
 if __name__ == "__main__":
