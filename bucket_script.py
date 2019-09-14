@@ -33,18 +33,16 @@ __version__ = "1.2.0"
 
 
 import argparse
+import getpass
 import os
+import re
 import shutil
 from datetime import datetime, timezone
-import getpass
-import re
 
 import pyexifinfo
-from tqdm import tqdm
-from timezonefinder import TimezoneFinder
 import pytz
-from pytz.exceptions import UnknownTimeZoneError
-from pprint import pprint
+from timezonefinder import TimezoneFinder
+from tqdm import tqdm
 
 
 def get_arguments():
@@ -199,16 +197,17 @@ def parse_canon_exif(exif_data={}, artist=getpass.getuser()):
     return data
 
 
-def timezone_from_gps(gps_position="", capture_date=""):
+def timezone_from_gps(gps_position="", capture_date="", tf=TimezoneFinder(in_memory=True)):
+    """Bsic Lookup of timezone from gps coordinates
 
-    tf = TimezoneFinder(in_memory=True)
+    Parameters:
+    gps_coordinates (string): example 32 deg 12\' 7.60" N, 80 deg 41\' 8.19" W
+    capture_date (string): example 2018:06:28 09:45:37
+    tf (TimezoneFInder): a TimezoneFinder obejct
 
-    # parse sample to lat and long
-    # 32 deg 12\' 7.60" N, 80 deg 41\' 8.19" W
-
-    # capture_date
-    # 2018:06:28 09:45:37
-
+    Returns
+    tz_offset (string): example "-07:00"
+    """
     # extrac degrees, minutes, seconds
     dms_re = re.compile(r"\d+.?\d+")
     dms_matches = dms_re.findall(gps_position)
@@ -416,12 +415,12 @@ def bucket(source_file=None, target_dir="", bucket_mode="i", move_only=False, ar
         # format import filepath
         if bucket_mode == "i":
             target_filepath = format_import_path(exif_data=exif_data,
-                                                target_dir=target_dir)
+                                                 target_dir=target_dir)
 
         # format archive filepath
         elif bucket_mode == "a":
             target_filepath = format_archive_path(exif_data=exif_data,
-                                                target_dir=target_dir)
+                                                  target_dir=target_dir)
 
         # ensure target directory exists
         full_target_dir = os.path.dirname(target_filepath)
