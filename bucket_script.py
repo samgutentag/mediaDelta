@@ -40,9 +40,10 @@ import shutil
 from datetime import datetime, timezone
 
 import pyexifinfo
+from tqdm import tqdm
+
 import pytz
 from timezonefinder import TimezoneFinder
-from tqdm import tqdm
 
 
 def get_arguments():
