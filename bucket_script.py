@@ -28,7 +28,7 @@ __deprecated__ = False
 __license__ = "GPLv3"
 __maintainer__ = "Sam Gutentag"
 __status__ = "Production"
-__version__ = "1.2.2"
+__version__ = "1.3.0"
 # "Prototype", "Development", "Production", or "Legacy"
 
 
@@ -40,10 +40,9 @@ import shutil
 from datetime import datetime, timezone
 
 import pyexifinfo
-from tqdm import tqdm
-
 import pytz
 from timezonefinder import TimezoneFinder
+from tqdm import tqdm
 
 
 def get_arguments():
@@ -275,7 +274,10 @@ def parse_dji_exif(exif_data={}, artist=getpass.getuser()):
     elif file_type == "image":
         quality = exif_data["File:FileType"]
         capture_date = exif_data["EXIF:DateTimeOriginal"]
-        source_device = exif_data["XMP:Model"]
+        try:
+            source_device = exif_data["XMP:Model"]
+        except:
+            source_device = exif_data["EXIF:Model"]
 
     capture_date_tz = timezone_from_gps(gps_position=exif_data["Composite:GPSPosition"],
                                         capture_date=capture_date)
@@ -293,7 +295,21 @@ def parse_dji_exif(exif_data={}, artist=getpass.getuser()):
     return data
 
 
-def format_import_path(exif_data={}, target_dir=""):
+def check_image_match(imageA=None, imageB=None):
+
+    # read imageA to rgb
+    with open(imageA, "rb") as f1:
+        imgA = f1.read()
+    with open(imageB, "rb") as f2:
+        imgB = f2.read()
+
+    if imgA == imgB:
+        return True
+    else:
+        return False
+
+
+def format_import_path(source_file=None, exif_data={}, target_dir=""):
     # format import filename
     """
     import stages files by
@@ -317,6 +333,10 @@ def format_import_path(exif_data={}, target_dir=""):
                                    import_filename)
     # ensure we are not duplicating files, increment counter file with this name already exists
     while os.path.exists(import_filepath):
+
+        if check_image_match(imageA=source_file, imageB=import_filepath):
+            return None
+
         # increment counter
         file_counter += 1
 
@@ -331,7 +351,7 @@ def format_import_path(exif_data={}, target_dir=""):
     return import_filepath
 
 
-def format_archive_path(exif_data={}, target_dir=""):
+def format_archive_path(source_file=None, exif_data={}, target_dir=""):
     """
     archive locates files by
       /TARGET_DIR/IMPORT/<FILE_TYPE>/<YYYY>/<YYYY.MM>/
@@ -351,6 +371,10 @@ def format_archive_path(exif_data={}, target_dir=""):
                                     archive_filename)
     # ensure we are not duplicating files, increment counter file with this name already exists
     while os.path.exists(archive_filepath):
+
+        if check_image_match(imageA=source_file, imageB=archive_filepath):
+            return None
+
         # increment counter
         file_counter += 1
 
@@ -430,13 +454,19 @@ def bucket(source_file=None, target_dir="", bucket_mode="i", move_only=False, ar
 
         # format import filepath
         if bucket_mode == "i":
-            target_filepath = format_import_path(exif_data=exif_data,
+            target_filepath = format_import_path(source_file=source_file,
+                                                 exif_data=exif_data,
                                                  target_dir=target_dir)
+            if target_filepath is None:
+                return "EXISTS"
 
         # format archive filepath
         elif bucket_mode == "a":
-            target_filepath = format_archive_path(exif_data=exif_data,
+            target_filepath = format_archive_path(source_file=source_file,
+                                                  exif_data=exif_data,
                                                   target_dir=target_dir)
+            if target_filepath is None:
+                return "EXISTS"
 
         # ensure target directory exists
         full_target_dir = os.path.dirname(target_filepath)
@@ -451,7 +481,11 @@ def bucket(source_file=None, target_dir="", bucket_mode="i", move_only=False, ar
         return 1
     except Exception as e:
         print(f"{e}\t{source_file}")
-        return source_file
+
+        # from pprint import pprint
+        # pprint(exif_dict)
+
+        return "ERROR"
 
 
 def collect_files():
@@ -465,6 +499,7 @@ def collect_files():
     print(args)
 
     error_files = []
+    existing_files = []
 
     # check bucketing mode
     args["bucket_mode"] = args["bucket_mode"][:1].lower()
@@ -495,27 +530,43 @@ def collect_files():
 
     if len(images) > 0:
         for image_file in tqdm(images, desc="Image Files", total=len(images), ncols=100):
-            b = bucket(source_file=image_file, target_dir=args["target_dir"],
-                       bucket_mode=args["bucket_mode"],
-                       move_only=args["move_only"],
-                       artist=args["artist"])
-            if b != 1:
-                error_files.append(b)
+            bucket_status = bucket(source_file=image_file, target_dir=args["target_dir"],
+                                   bucket_mode=args["bucket_mode"],
+                                   move_only=args["move_only"],
+                                   artist=args["artist"])
+
+            if bucket_status == "ERROR":
+                error_files.append(image_file)
+            elif bucket_status == "EXISTS":
+                existing_files.append(image_file)
+            else:
+                pass
 
     if len(videos) > 0:
         for video_file in tqdm(videos, desc="Video Files", total=len(videos), ncols=100):
-            b = bucket(source_file=video_file, target_dir=args["target_dir"],
-                       bucket_mode=args["bucket_mode"],
-                       move_only=args["move_only"],
-                       artist=args["artist"])
-            if b != 1:
-                error_files.append(b)
+            bucket_status = bucket(source_file=video_file, target_dir=args["target_dir"],
+                                   bucket_mode=args["bucket_mode"],
+                                   move_only=args["move_only"],
+                                   artist=args["artist"])
+            if bucket_status == "ERROR":
+                error_files.append(image_file)
+            elif bucket_status == "EXISTS":
+                existing_files.append(image_file)
+            else:
+                pass
 
     if len(error_files) > 0:
         print(f"Could not process {len(error_files)} files...")
         error_files = sorted(error_files)
         for idx, err_file in enumerate(error_files):
             print(f"\t{idx + 1}\t{err_file}")
+
+    if len(existing_files) > 0:
+        print(f"Found {len(existing_files)} files that already existed at target...")
+        existing_files = sorted(existing_files)
+        for idx, exist_file in enumerate(existing_files):
+            print(f"\t{idx + 1}\t{exist_file}")
+
 
 
 if __name__ == "__main__":
