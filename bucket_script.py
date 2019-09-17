@@ -28,7 +28,7 @@ __deprecated__ = False
 __license__ = "GPLv3"
 __maintainer__ = "Sam Gutentag"
 __status__ = "Production"
-__version__ = "1.3.0"
+__version__ = "1.3.1"
 # "Prototype", "Development", "Production", or "Legacy"
 
 
@@ -566,7 +566,6 @@ def collect_files():
         existing_files = sorted(existing_files)
         for idx, exist_file in enumerate(existing_files):
             print(f"\t{idx + 1}\t{exist_file}")
-
 
 
 if __name__ == "__main__":
