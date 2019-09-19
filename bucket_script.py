@@ -28,7 +28,7 @@ __deprecated__ = False
 __license__ = "GPLv3"
 __maintainer__ = "Sam Gutentag"
 __status__ = "Production"
-__version__ = "1.3.2"
+__version__ = "1.3.3"
 # "Prototype", "Development", "Production", or "Legacy"
 
 
@@ -419,7 +419,11 @@ def bucket(source_file=None, target_dir="", bucket_mode="i", move_only=False, ar
             try:
                 device_make = exif_dict["XML:DeviceManufacturer"]
             except KeyError:
-                device_make = exif_dict["QuickTime:CompressorName"].split(" ")[0]
+                try:
+                    device_make = exif_dict["QuickTime:CompressorName"].split(" ")[0]
+                except:
+                    device_make = exif_dict["QuickTime:MajorBrand"].split(" ")[0]
+
         device_make = device_make.title()
 
         # sony handling, written for a6400
