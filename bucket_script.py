@@ -23,12 +23,12 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 
 __authors__ = ["Sam Gutentag"]
 __email__ = "developer@samgutentag.com"
-__date__ = "2019/09/13"
+__date__ = "2019/09/19"
 __deprecated__ = False
 __license__ = "GPLv3"
 __maintainer__ = "Sam Gutentag"
 __status__ = "Production"
-__version__ = "1.3.1"
+__version__ = "1.3.2"
 # "Prototype", "Development", "Production", or "Legacy"
 
 
@@ -549,9 +549,9 @@ def collect_files():
                                    move_only=args["move_only"],
                                    artist=args["artist"])
             if bucket_status == "ERROR":
-                error_files.append(image_file)
+                error_files.append(video_file)
             elif bucket_status == "EXISTS":
-                existing_files.append(image_file)
+                existing_files.append(video_file)
             else:
                 pass
 
