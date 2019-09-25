@@ -23,12 +23,12 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 
 __authors__ = ["Sam Gutentag"]
 __email__ = "developer@samgutentag.com"
-__date__ = "2019/09/19"
+__date__ = "2019/09/24"
 __deprecated__ = False
 __license__ = "GPLv3"
 __maintainer__ = "Sam Gutentag"
 __status__ = "Production"
-__version__ = "1.3.3"
+__version__ = "1.3.4"
 # "Prototype", "Development", "Production", or "Legacy"
 
 
@@ -149,7 +149,11 @@ def parse_sony_exif(exif_data={}, artist=getpass.getuser()):
         except KeyError:
             source_device = f"{exif_data['EXIF:Model']}"
 
-        capture_date = exif_data["Composite:SubSecCreateDate"]
+        # capture_date = exif_data["Composite:SubSecCreateDate"]
+        capture_date = exif_data["EXIF:DateTimeOriginal"]
+        capture_date_tz = exif_data["EXIF:OffsetTimeOriginal"]
+        capture_date = f"{capture_date}{capture_date_tz}"
+
         quality = exif_data["File:FileType"]
 
     # remove dashes from source_device
@@ -445,7 +449,7 @@ def bucket(source_file=None, target_dir="", bucket_mode="i", move_only=False, ar
         exif_data["artist"] = exif_data["artist"].replace(" ", "")
         exif_data["source_device"] = exif_data["source_device"].replace(" ", "")
 
-        # formatting datetime into a datetime obect
+        # formatting datetime into a datetime obect, remove colon in timezone offset
         exif_data["capture_date"] = f"{exif_data['capture_date'][:-3]}{exif_data['capture_date'][-2:]}"
 
         try:

@@ -15,6 +15,13 @@ Skratch pad for some notes!
         crop=(sourceWidth):(sourceWidth*9/16):0:(sourceHeight-(sourceWidth*9/16))/2    crops vertical from center to get the correct aspect ratio (16:9)
         scale=1920:-1                                    set output scale, the -1 will match the 1920 to the aspect ration we cropped to
 
+#   Convert series of images to 24fps video file, cropping and scaling 6000x4000 source images to a 1920x1080 output
+>ffmpeg -r 24 -f image2 -start_number 1 -i image_%03d.jpg -vf crop=6000:3375:0:312,scale=1920:-1 -codec:v prores -profile:v 2 ~/Desktop/1920x1080Test.mov
+
+
+# adjust datetime of all images in a dirctory with exiftool
+>exiftool '-AllDates+=0:0:0 1:0:0' *
+
 #	Panning crop left to right on 5496x3670 source images - for instagram story
 > ffmpeg -r <framerate> -f image2 -start_number 1 -i image%04d.cr2.jpg -vf crop=<sourceWidth>*9/16:<sourceWidth>:'(<sourceWidth>-(<sourceHeight>*9/16))/(<#frames>/<framerate>))'*t:0,scale=1080:-1 -codec:v prores -profile:v 2 ~/1080x1920_vertical_<framerate>fps.mov
 ffmpeg -r 60 -f image2 -start_number 1 -i image%04d.cr2.jpg -vf crop=3670*9/16:3670:'(5496-(3670*9/16))/(1967/60)'*t:0,scale=1080:-1 -codec:v prores -profile:v 2 ~/Desktop/1080x1920_vertical_60fps_LRPan.mov
