@@ -23,12 +23,12 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 
 __authors__ = ["Sam Gutentag"]
 __email__ = "developer@samgutentag.com"
-__date__ = "2019/09/24"
+__date__ = "2019/11/02"
 __deprecated__ = False
 __license__ = "GPLv3"
 __maintainer__ = "Sam Gutentag"
 __status__ = "Production"
-__version__ = "1.3.4"
+__version__ = "1.4.0"
 # "Prototype", "Development", "Production", or "Legacy"
 
 
@@ -299,6 +299,60 @@ def parse_dji_exif(exif_data={}, artist=getpass.getuser()):
     return data
 
 
+def parse_apple_exif(exif_data={}, artist=getpass.getuser()):
+    """Specialized parsing for Apple Devices. Built with iPhone XS target in mind."""
+    # print("file is from a apple device!")
+    file_extension = exif_data["File:FileType"]
+
+    file_type = exif_data["File:MIMEType"].split("/")[0]
+
+    if file_type == "video":
+        try:
+            artist = exif_data["QuickTime:Author"]
+        except:
+            pass
+        quality = exif_data["Composite:ImageSize"]
+
+    elif file_type == "image":
+        try:
+            artist = exif_data["EXIF:Artist"]
+        except:
+            pass
+        quality = exif_data["File:FileType"]
+
+    # source device
+    source_device = exif_data["EXIF:Model"]
+    source_device = source_device.replace(" ", "")
+
+    # capture date
+    try:
+        capture_date = exif_data["Composite:SubSecDateTimeOriginal"]
+    except KeyError:
+        capture_date = exif_data["EXIF:DateTimeOriginal"]
+
+    try:
+        capture_date_tz = timezone_from_gps(gps_position=exif_data["Composite:GPSPosition"],
+                                        capture_date=capture_date)
+    except:
+        capture_date_tz = ""
+
+    capture_date = f"{capture_date}{capture_date_tz}"
+
+    # correct uploaded dates without timezones, defaults to california -07:00
+    if not capture_date.endswith("-07:00") and not capture_date.endswith("-00:00"):
+        capture_date = f"{capture_date}-07:00"
+
+    data = {"device_make": "Apple",
+            "file_extension": file_extension,
+            "file_type": file_type,
+            "artist": artist,
+            "source_device": source_device,
+            "capture_date": capture_date,
+            "quality": quality}
+
+    return data
+
+
 def check_image_match(imageA=None, imageB=None):
 
     # read imageA to rgb
@@ -442,6 +496,10 @@ def bucket(source_file=None, target_dir="", bucket_mode="i", move_only=False, ar
         elif device_make == "Dji":
             exif_data = parse_dji_exif(exif_data=exif_dict, artist=artist)
 
+        # apple handling, written for iPhone 11 Pro
+        elif device_make == "Apple":
+            exif_data = parse_apple_exif(exif_data=exif_dict, artist=artist)
+
         else:
             return source_file
 
@@ -480,6 +538,9 @@ def bucket(source_file=None, target_dir="", bucket_mode="i", move_only=False, ar
         full_target_dir = os.path.dirname(target_filepath)
         if not os.path.isdir(full_target_dir):
             os.makedirs(full_target_dir)
+
+        # print(f"source\t{source_file}")
+        # print(f"target\t{target_filepath}\n")
 
         if move_only:
             shutil.move(source_file, target_filepath)
