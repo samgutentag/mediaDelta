@@ -25,7 +25,10 @@
 
 3. If desired or possible, do base level culling here, helps keep things cleaner later on
 
-4. Optional - Use GeoTag.app and recorded GPX tracks to append GPS data to imported files.
+4. Optional - Use GeoTag.app and recorded GPX tracks to append GPS data to imported files. 
+	4a.	Use 'dd.dddddd' format
+	4b.	Do not update sidecar XMP files
+	4c.	Do not Update GPS Date/Time stamps
 
 5. Run script again in `archive` mode before importing to Lightroom
 
