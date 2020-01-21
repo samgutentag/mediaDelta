@@ -49,3 +49,5 @@ Thumbs.db
 bin/
 include/
 lib/
+
+.vscode/
