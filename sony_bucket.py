@@ -13,7 +13,7 @@ Use CalVer versioning as described at https://calver.org/
 __authors__ = ["Sam Gutentag"]
 __email__ = "developer@samgutentag.com"
 __maintainer__ = "Sam Gutentag"
-__version__ = "2020.07.29dev"
+__version__ = "2020.11.10dev"
 # "dev", "alpha", "beta", "rc1"
 
 import argparse
@@ -23,6 +23,7 @@ import shutil
 from datetime import datetime
 
 import pyexifinfo
+from tqdm import tqdm
 
 
 def get_files(source_dir=None):
@@ -125,7 +126,10 @@ def format_filepath(input_file=None, media_type=None, destination_dir=None):
     if media_type == "IMAGE":
         capture_date = exif_dict["Composite:SubSecDateTimeOriginal"]
     elif media_type == "VIDEO":
-        capture_date = exif_dict["XML:CreationDateValue"]
+        try:
+            capture_date = exif_dict["XML:CreationDateValue"]
+        except KeyError:
+            capture_date = exif_dict["File:FileModifyDate"]
     else:
         return None
 
@@ -159,67 +163,13 @@ def format_filepath(input_file=None, media_type=None, destination_dir=None):
         # if this file path already exists, compare images
         if os.path.exists(archive_filepath):
             comparison = compare_files(input_file, archive_filepath)
+            print(input_file)
+            print(archive_filepath)
             if comparison:
                 return None
         counter += 1
 
     return archive_filepath
-
-
-# def parse_video_file(input_file=None, destination_dir=None):
-#     """parse input image file for capture/creation date
-
-#     Read exif tags to find creation date of input media file. Will
-#     prioritze datetimes that include a timezone offset.
-
-#     Args:
-#         argument_name (type): description
-
-#     Returns:
-#         return_value (type): description
-
-#     Raises:
-#         ErrorType: description and cause
-
-#     """
-#     # parse file exif data to json object
-#     exif_json = pyexifinfo.get_json(input_file)[0]
-
-#     # convert to dictionary
-#     exif_dict = dict(exif_json)
-
-#     # get capture date - example `2020:07:29 16:44:57-07:00`
-#     capture_date = exif_dict["XML:CreationDateValue"]
-
-#     # remove colon from timezone offset
-#     last_colon = capture_date.rfind(":")
-#     capture_date = capture_date[:last_colon] + capture_date[-2:]
-
-#     capture_datetime = datetime.strptime(capture_date, "%Y:%m:%d %H:%M:%S%z")
-
-#     # format filepath
-#     # dir -> /TARGET_DIR/IMPORT/<FILE_TYPE>/<YYYY>/<YYYY.MM>/
-#     # file -> <YYYYMMDD>.<HHmmss>.<artist>.<counter>.<extension>
-
-#     counter = 1
-#     archive_filepath = ""
-
-#     while os.path.exists(archive_filepath) or counter == 1:
-#         file_extension = os.path.splitext(input_file)[1]
-#         archive_timestamp = capture_datetime.strftime("%Y%m%d.%H%M%S")
-
-#         archive_filename = ".".join([archive_timestamp, "samgutentag", f"{counter:04d}"])
-#         archive_filename = f"{archive_filename}{file_extension}"
-
-#         archive_filepath = os.path.join(destination_dir,
-#                                         "ARCHIVE",
-#                                         "VIDEO",
-#                                         capture_datetime.strftime("%Y"),
-#                                         capture_datetime.strftime("%Y.%m"),
-#                                         archive_filename)
-#         counter += 1
-
-#     return archive_filepath
 
 
 def sony_bucket(*args):
@@ -254,8 +204,7 @@ def sony_bucket(*args):
 
     image_files, video_files, other_files = get_files(source_dir=args["source_dir"])
 
-    for image_file in image_files:
-        # print(image_file)
+    for image_file in tqdm(image_files):
         dest_path = format_filepath(input_file=image_file,
                                     media_type="IMAGE",
                                     destination_dir=args["destination_dir"])
@@ -272,8 +221,7 @@ def sony_bucket(*args):
         # copy file
         shutil.copy2(image_file, dest_path)
 
-    for video_file in video_files:
-        # print(image_file)
+    for video_file in tqdm(video_files):
         dest_path = format_filepath(input_file=video_file,
                                     media_type="VIDEO",
                                     destination_dir=args["destination_dir"])
@@ -294,6 +242,7 @@ def sony_bucket(*args):
         print("Other Files found:")
         for i in other_files:
             print(f"\t{i}")
+
 
 if __name__ == "__main__":
     sony_bucket()
